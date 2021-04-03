@@ -1,0 +1,173 @@
+section.splash {
+  h1 {
+    font-size: 60px;
+    font-weight: 300;
+    line-height: 1.29;
+    color: #fff;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, .2);
+  }
+
+  h2 {
+    font-size: 30px;
+    font-weight: 300;
+    line-height: 28px;
+    margin-bottom: 22px;
+  }
+
+  > header.splash {
+    color: #959595;
+    height: 67px;
+    display: flex;
+
+    div.doggie-logo {
+      a {
+        padding: 24px 24px 0 24px;
+        display: block;
+
+        img {
+          opacity: .53;
+          width: 90px;
+          height: auto;
+        }
+      }
+    }
+
+    > nav {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      > ul {
+        display: flex;
+
+        &.nav-main{
+          > li{
+            border-left: 1px solid #f5f5f5;
+            &:last-child { border-right: 1px solid #f5f5f5; }
+
+            &:hover {
+              border-bottom: 3px solid;
+            }
+          }
+          
+        }
+
+        >li {
+          > a {
+            &.nav-link{
+              font-size: 22px;
+              padding: 13px 30px 12px 30px;
+
+              > span.file-icon {
+                width: 26px;
+                height: 36px;
+                margin-right: 3px;
+                background: url("/assets/icons.png");
+                background-size: auto 36px;
+                display: inline-block;
+
+                &.icon-1 {
+                  background-position-x: -40px;
+                }
+
+                &.icon-2 {
+                  background-position-x: -76px;
+                }
+
+                &.icon-3 {
+                  background-position-x: -112px;
+                }
+
+                &.icon-4 {
+                  background-position-x: -148px;
+                }
+              }
+            }
+
+            &.nav-anchor{
+              font-weight: 600;
+              font-size: 15px;
+              line-height: 16px;
+              padding: 24px 18px;
+
+              &:hover{ text-decoration: underline; }
+            }
+          }
+        }
+
+        &.nav-tertiary {
+          margin-right: 22px;
+        }
+      }
+    }
+  }
+
+  section.section-intro{
+    color: #626262;
+    height: calc(100vh - 67px);
+    background: url("/assets/background-splash.jpg");
+    background-repeat: no-repeat;
+    background-position: 50% 80%;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+
+    div.one-whole {
+      max-width: 1080px;
+      width: 100%;
+      margin: auto;
+      position: relative;
+      text-align: center;
+
+      h1 {
+        display: block;
+        width: 100%;
+      }
+
+      div.headline-items {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+
+        div.headline-item {
+          background: rgba(255,255,255,.9);
+          backdrop-filter: blur(8px);
+          border-radius: 12px;
+          margin: 8px;
+          padding: 36px 24px;
+          display: flex;
+          flex-basis: 45%;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 360px;
+
+          img{
+            width: 48px;
+            height: 55px;
+            object-fit: cover;
+
+            &.icon-0{
+              object-position: 0px 50%;
+            }
+            &.icon-5{
+              object-position: -280px 50%;
+            }
+          }
+
+          p {
+            font-size: 17px;
+            margin-bottom: 25px;
+          }
+
+          .button-anchor{
+            background-color: #4386fc;
+            color: #fff;
+            padding: 16px;
+            min-width: 150px;
+          }
+        }
+      }
+    }
+  }
+}
