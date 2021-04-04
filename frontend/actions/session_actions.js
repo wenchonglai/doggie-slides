@@ -5,6 +5,7 @@ export const RECEIVE_ACCOUNT = 'RECEIVE_ACCOUNT';
 export const LOGOUT_CURRENT_USER = 'LOGOUT_CURRENT_USER';
 // export const REMOVE_CURRENT_USER = 'REMOVE_CURRENT_USER';
 export const RECEIVE_ERRORS = 'RECEIVE_ERRORS';
+export const CLEAR_ERRORS = 'CLEAR_ERRORS';
 
 export const receiveCurrentUser = (user) => ({
   type: RECEIVE_CURRENT_USER,
@@ -28,6 +29,10 @@ export const logoutCurrentUser = () => ({
 export const receiveErrors = (errors) => ({
   type: RECEIVE_ERRORS,
   errors
+});
+
+export const clearErrors = () => ({
+  type: CLEAR_ERRORS
 });
 
 export const fetchAccount = (formUser) => (dispatch) =>

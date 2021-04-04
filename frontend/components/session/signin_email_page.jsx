@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import SigninWrapper from './signin_wrapper';
 
+import SessionWrapper from './session_wrapper';
 import SmartInputContainer from './smart_input';
 
 export default function SigninEmailPage({history, demoLoginHandler, fetchAccountHandler, errors}){
@@ -39,7 +39,7 @@ export default function SigninEmailPage({history, demoLoginHandler, fetchAccount
   }
 
   return (
-    <SigninWrapper>
+    <SessionWrapper>
         <h1>Sign in</h1>
         <div className='heading-subtext'>to continue to Doogie Slides</div>
         <form onSubmit={(e) => handleSubmit(e)}>
@@ -61,10 +61,10 @@ export default function SigninEmailPage({history, demoLoginHandler, fetchAccount
 
 
           <div className="bottom-bar">
-            <Link className='link' to='/signup/identifier'>Create account</Link>
+            <Link className='link' to='/signup'>Create account</Link>
             <input type='submit' value='Next'/>
           </div>
         </form>
-    </SigninWrapper>
+    </SessionWrapper>
   );
 }

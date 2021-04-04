@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import SigninWrapper from './signin_wrapper';
+import SessionWrapper from './session_wrapper';
 
 import SmartInputContainer from './smart_input';
 
@@ -14,7 +14,7 @@ export default function SigninPasswordPage({history, loginHandler, errors}){
     // props.history.push('/signin/challenge')
     e.preventDefault();
     loginHandler(user).then(res => {
-      history.push('/presentation');
+      history.replace('/presentation');
     });
   }
 
@@ -23,7 +23,7 @@ export default function SigninPasswordPage({history, loginHandler, errors}){
   }
 
   return (
-    <SigninWrapper>
+    <SessionWrapper>
         <h1>{`Hi, ${user.firstname}`}</h1>
         <div className='heading-subtext'>{user.email}</div>
         <form onSubmit={(e) => handleSubmit(e, user)}>
@@ -43,10 +43,10 @@ export default function SigninPasswordPage({history, loginHandler, errors}){
 
 
           <div className="bottom-bar">
-            <Link className='link' to='/signup/identifier'>Forgot password</Link>
+            <Link className='link' to='/signup'>Forgot password</Link>
             <input type='submit' value='Next'/>
           </div>
         </form>
-    </SigninWrapper>
+    </SessionWrapper>
   );
 }

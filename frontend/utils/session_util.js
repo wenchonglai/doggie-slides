@@ -1,6 +1,6 @@
 export const asyncSignup = (user) => 
   $.ajax({
-    method: 'GET',
+    method: 'POST',
     url: '/api/users',
     data: {user}
   });
