@@ -3,8 +3,8 @@ import {connect} from 'react-redux'
 import {Redirect, Route, withRouter} from 'react-router-dom';
 
 const mapStateToProps = state => ({
-  hasAccount: !!state.session.currentUser,
-  loggedIn: typeof (state.session.currentUser) === 'number'
+  hasAccount: !!state.session.email,
+  loggedIn: typeof (state.session.id) === 'number'
 });
 
 export function Auth({loggedIn, path, exact, component: Component}){

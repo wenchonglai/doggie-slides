@@ -4,14 +4,15 @@ import SigninWrapper from './signin_wrapper';
 
 import SmartInputContainer from './smart_input';
 
-export default function SigninEmailPage({history, fetchAccountHandler}){
+export default function SigninEmailPage({history, fetchAccountHandler, errors}){
+  const localStorageObject = JSON.parse(localStorage.getItem("doggieSlides")) || {user: {}};
+  const [user, setUser] = React.useState({...localStorageObject.user});
+
   function handleSubmit(e){
     // props.history.push('/signin/challenge')
     e.preventDefault();
 
     fetchAccountHandler(user).then(({user}) => {
-      const localStorageObject = JSON.parse(localStorage.getItem('doggieSlides')) || {};
-
       localStorage.setItem(
         'doggieSlides',
         JSON.stringify({
@@ -28,8 +29,6 @@ export default function SigninEmailPage({history, fetchAccountHandler}){
     setUser({...user, email: e.target.value});
   }
 
-  const [user, setUser] = React.useState({email: ""});
-
   return (
     <SigninWrapper>
         <h1>Sign in</h1>
@@ -41,6 +40,7 @@ export default function SigninEmailPage({history, fetchAccountHandler}){
             labelText="Email or Phone"
             value={user.email}
             onChange={(e) => handleChange(e)}
+            errors={errors}
           >
             {/* Forgot Email? -> Fake an email */}
 

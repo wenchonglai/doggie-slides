@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { withRouter } from "react-router";
 
-function SmartInput({className = "", labelText="", children, value, staticContext, ...props} = {}){
+function SmartInput({className = "", labelText="", children, value, staticContext, errors = [], ...props} = {}){
   const [focus, setFocus] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
@@ -10,7 +10,7 @@ function SmartInput({className = "", labelText="", children, value, staticContex
 
   return (
     <div className={['smartinput'].concat(className.split(' ')).join(' ')}>
-      <label>
+      <label className={errors.length > 0 ? "error" : ""}>
         <div className={`placeholder${focus ? ' focus' : ''}${value ? ' has_val' : ''}`}>
           {labelText} 
         </div>
@@ -20,6 +20,9 @@ function SmartInput({className = "", labelText="", children, value, staticContex
           onBlur={() => handleBlur()}
           value={value}
         />
+        <div className="errors">
+          {errors[0] || " "}&nbsp;
+        </div>
       </label>
       {children}
     </div>

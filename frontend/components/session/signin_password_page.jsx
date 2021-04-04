@@ -4,30 +4,8 @@ import SigninWrapper from './signin_wrapper';
 
 import SmartInputContainer from './smart_input';
 
-// export default function SigninPage(props){
-
-//   return (
-//     <section>
-//       Hi #name
-//       email@email.com
-//       <form onSubmit={(e) => handleSubmit(e)}>
-//         <div>
-//           <input type="password"/>
-//           <div>Enter your password</div>
-//           <label>
-//             <input type="checkbox"/>
-//             Show password
-//           </label>
-//         </div>
-//         {/*Forgot Password? -> Fake an email*/}
-//         <input type='submit' value='Next'/>
-//       </form>
-//     </section>
-//   );
-// }
-
-export default function SigninPasswordPage({history, login}){
-  let localStorageObject = JSON.parse(localStorage.getItem("doggieSlides")) || {user: {}};
+export default function SigninPasswordPage({history, loginHandler, errors}){
+  const localStorageObject = JSON.parse(localStorage.getItem("doggieSlides")) || {user: {}};
   const [user, setUser] = React.useState(
     {...localStorageObject.user, password: ""}
   );
@@ -35,7 +13,7 @@ export default function SigninPasswordPage({history, login}){
   function handleSubmit(e){
     // props.history.push('/signin/challenge')
     e.preventDefault();
-    login(user).then(res => {
+    loginHandler(user).then(res => {
       history.push('/presentation');
     });
   }
@@ -46,7 +24,7 @@ export default function SigninPasswordPage({history, login}){
 
   return (
     <SigninWrapper>
-        <h1>{`Hi, ${user.email.split('@')[0]}`}</h1>
+        <h1>{`Hi, ${user.firstname}`}</h1>
         <div className='heading-subtext'>{user.email}</div>
         <form onSubmit={(e) => handleSubmit(e)}>
           <SmartInputContainer
@@ -55,6 +33,7 @@ export default function SigninPasswordPage({history, login}){
             labelText="Enter your password"
             value={user.password}
             onChange={(e) => handleChange(e)}
+            errors={errors}
           >
             {/* <div className="body-subtext">
               Forgot your password? Use Demo user to sign in privately.

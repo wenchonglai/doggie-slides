@@ -1,3 +1,29 @@
+.product-icon {
+  background: url("/assets/icons.png");
+  background-size: auto 100%;
+  display: inline-block;
+  
+  &.icon-1 {
+    background-position-x: 20%;
+  }
+
+  &.icon-2 {
+    background-position-x: 40%;
+  }
+
+  &.icon-3 {
+    background-position-x: 60%;
+  }
+
+  &.icon-4 {
+    background-position-x: 80%;
+  }
+
+  &.icon-5 {
+    background-position-x: 100%;
+  }
+}
+
 section.splash {
   h1 {
     font-size: 60px;
@@ -18,6 +44,10 @@ section.splash {
     color: #959595;
     height: 67px;
     display: flex;
+
+    .nav-toggle-wrapper {
+      display: none;
+    }
 
     div.doggie-logo {
       a {
@@ -45,9 +75,9 @@ section.splash {
             border-left: 1px solid #f5f5f5;
             &:last-child { border-right: 1px solid #f5f5f5; }
 
-            &:hover {
-              border-bottom: 3px solid;
-            }
+            &:hover { border-bottom: 3px solid; }
+
+            .product-icon { width: 36px; height: 36px; margin-right: 3px;}
           }
           
         }
@@ -57,31 +87,6 @@ section.splash {
             &.nav-link{
               font-size: 22px;
               padding: 13px 30px 12px 30px;
-
-              > span.file-icon {
-                width: 26px;
-                height: 36px;
-                margin-right: 3px;
-                background: url("/assets/icons.png");
-                background-size: auto 36px;
-                display: inline-block;
-
-                &.icon-1 {
-                  background-position-x: -40px;
-                }
-
-                &.icon-2 {
-                  background-position-x: -76px;
-                }
-
-                &.icon-3 {
-                  background-position-x: -112px;
-                }
-
-                &.icon-4 {
-                  background-position-x: -148px;
-                }
-              }
             }
 
             &.nav-anchor{
@@ -104,7 +109,7 @@ section.splash {
 
   section.section-intro{
     color: #626262;
-    height: calc(100vh - 67px);
+    min-height: calc(100vh - 67px);
     background: url("/assets/background-splash.jpg");
     background-repeat: no-repeat;
     background-position: 50% 80%;
@@ -142,18 +147,7 @@ section.splash {
           align-items: center;
           max-width: 360px;
 
-          img{
-            width: 48px;
-            height: 55px;
-            object-fit: cover;
-
-            &.icon-0{
-              object-position: 0px 50%;
-            }
-            &.icon-5{
-              object-position: -280px 50%;
-            }
-          }
+          .product-icon { width: 55px; height: 55px; }
 
           p {
             font-size: 17px;
@@ -168,6 +162,66 @@ section.splash {
           }
         }
       }
+    }
+  }
+}
+
+
+@media (max-width: 1320px){
+  section.splash > header.splash > nav {
+    position: absolute;
+    width: 100%;
+    flex-direction: column;
+    z-index: 1;
+    
+    .nav-toggle-wrapper{
+      width: 67px;
+      height: 67px;
+      display: flex;
+      align-self: flex-end;
+      align-items: center;
+      justify-content: center;
+
+      > button {
+        width: 25px;
+        height: 25px;
+        position: relative;
+
+        > svg {
+          width: 100%;
+          height: 100%;
+        }
+      } 
+    }
+    
+    &.hidden > ul { display: none; }
+
+    > ul {
+      background-color: #fff;
+      flex-direction: column;
+      width: 100%;
+
+      &.nav-main > li:hover {border-bottom: 1px solid #f5f5f5; }
+
+      > li {
+        border-bottom: 1px solid #f5f5f5;
+
+        > a.nav-link, > a.nav-anchor { 
+          padding: 25px 35px;
+          font-size: 24px;
+          font-weight: 400;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px){
+  section.splash > section.section-intro > div.one-whole > div.headline-items {
+    flex-wrap: wrap;
+
+    > div.headline-item {
+      flex-basis: 100%;
     }
   }
 }

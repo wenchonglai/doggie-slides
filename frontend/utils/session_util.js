@@ -26,7 +26,7 @@ export const asyncFetchAccount = (user) =>
 
 export const asyncLogin = (user) => 
   $.ajax({
-    method: 'GET',
+    method: 'POST',
     url: '/api/session',
     data: {user}
   });

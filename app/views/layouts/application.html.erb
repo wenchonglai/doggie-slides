@@ -1,12 +1,28 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>DoggieSlides</title>
+    <title>DoggIe Slides</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%= favicon_link_tag '/assets/favicon.png' %>
+
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <script
+      src="https://use.fontawesome.com/releases/v5.15.3/js/all.js"
+      data-search-pseudo-elements
+    ></script>
+    <script>
+      <% if current_user %>
+        window.currentUser = <%= render(
+          "api/users/user.json.jbuilder",
+          user: current_user
+        ).html_safe %>
+      <% end %>
+    </script>
   </head>
 
   <body>
