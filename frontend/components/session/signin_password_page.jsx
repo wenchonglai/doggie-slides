@@ -10,7 +10,7 @@ export default function SigninPasswordPage({history, loginHandler, errors}){
     {...localStorageObject.user, password: ""}
   );
 
-  function handleSubmit(e){
+  function handleSubmit(e, user){
     // props.history.push('/signin/challenge')
     e.preventDefault();
     loginHandler(user).then(res => {
@@ -26,7 +26,7 @@ export default function SigninPasswordPage({history, loginHandler, errors}){
     <SigninWrapper>
         <h1>{`Hi, ${user.firstname}`}</h1>
         <div className='heading-subtext'>{user.email}</div>
-        <form onSubmit={(e) => handleSubmit(e)}>
+        <form onSubmit={(e) => handleSubmit(e, user)}>
           <SmartInputContainer
             type="password"
             name="user[password]"

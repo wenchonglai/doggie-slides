@@ -4,7 +4,7 @@ import SigninWrapper from './signin_wrapper';
 
 import SmartInputContainer from './smart_input';
 
-export default function SigninEmailPage({history, fetchAccountHandler, errors}){
+export default function SigninEmailPage({history, demoLoginHandler, fetchAccountHandler, errors}){
   const localStorageObject = JSON.parse(localStorage.getItem("doggieSlides")) || {user: {}};
   const [user, setUser] = React.useState({...localStorageObject.user});
 
@@ -23,6 +23,15 @@ export default function SigninEmailPage({history, fetchAccountHandler, errors}){
 
       history.push('/signin/challenge');
     })
+  }
+
+  function handleDemoLogin(e){
+    e.preventDefault();
+    const demoUser = {email: "demo@bmail.com", password: "123456"};
+
+    demoLoginHandler(demoUser).then(() => {
+      history.replace('/presentation');
+    });
   }
 
   function handleChange(e){
@@ -46,7 +55,7 @@ export default function SigninEmailPage({history, fetchAccountHandler, errors}){
 
             <div className="body-subtext">
               Not your computer? Use Demo user to sign in privately.
-              <Link className='link' to='#'>Demo User</Link>
+              <Link className='link' to='#' onClick={(e) => handleDemoLogin(e)}>Demo User</Link>
             </div>
           </SmartInputContainer>
 

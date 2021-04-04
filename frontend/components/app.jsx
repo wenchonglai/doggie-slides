@@ -4,6 +4,7 @@ import {Link, Redirect, Route, Switch, withRouter} from 'react-router-dom';
 import {ProtectedRoute, AuthRoute} from '../utils/route_utils';
 import SigninEmailPageContainer from './session/signin_email_page_container';
 import SigninPasswordPageContainer from './session/signin_password_page_container';
+import UserInfoContainer from './session/user_info_container';
 import SplashPage from './splash/splash_page'
 
 function PresentationPage(props){

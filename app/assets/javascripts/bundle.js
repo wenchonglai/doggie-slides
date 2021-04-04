@@ -3009,8 +3009,7 @@ var receiveAccount = function receiveAccount(user) {
 };
 var logoutCurrentUser = function logoutCurrentUser() {
   return {
-    type: LOGOUT_CURRENT_USER,
-    user: user
+    type: LOGOUT_CURRENT_USER
   };
 }; // export const removeCurrentUser = () => ({
 //   type: REMOVE_CURRENT_USER,
@@ -3080,11 +3079,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ App)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/esm/react-router.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var _utils_route_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/route_utils */ "./frontend/utils/route_utils.jsx");
 /* harmony import */ var _session_signin_email_page_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./session/signin_email_page_container */ "./frontend/components/session/signin_email_page_container.jsx");
 /* harmony import */ var _session_signin_password_page_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./session/signin_password_page_container */ "./frontend/components/session/signin_password_page_container.jsx");
-/* harmony import */ var _splash_splash_page__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./splash/splash_page */ "./frontend/components/splash/splash_page.jsx");
+/* harmony import */ var _session_user_info_container__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./session/user_info_container */ "./frontend/components/session/user_info_container.jsx");
+/* harmony import */ var _splash_splash_page__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./splash/splash_page */ "./frontend/components/splash/splash_page.jsx");
+
 
 
 
@@ -3093,7 +3094,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function PresentationPage(props) {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(UserInfoContainer, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "edit"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", null, "Log out!"));
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_session_user_info_container__WEBPACK_IMPORTED_MODULE_4__.default, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "edit"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", null, "Log out!"));
 }
 
 function SignupPage(props) {
@@ -3101,10 +3102,10 @@ function SignupPage(props) {
 }
 
 function App(props) {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Switch, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Route, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_6__.Switch, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_6__.Route, {
     path: "/:productName/about",
     exact: true,
-    component: _splash_splash_page__WEBPACK_IMPORTED_MODULE_4__.default
+    component: _splash_splash_page__WEBPACK_IMPORTED_MODULE_5__.default
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_route_utils__WEBPACK_IMPORTED_MODULE_1__.AuthRoute, {
     path: "/signin/identifier",
     exact: true,
@@ -3120,10 +3121,10 @@ function App(props) {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_route_utils__WEBPACK_IMPORTED_MODULE_1__.ProtectedRoute, {
     path: "/presentation",
     component: PresentationPage
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Route, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_6__.Route, {
     path: "/",
     render: function render() {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Redirect, {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_6__.Redirect, {
         to: "/slides/about"
       });
     }
@@ -3201,6 +3202,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function SigninEmailPage(_ref) {
   var history = _ref.history,
+      demoLoginHandler = _ref.demoLoginHandler,
       fetchAccountHandler = _ref.fetchAccountHandler,
       errors = _ref.errors;
   var localStorageObject = JSON.parse(localStorage.getItem("doggieSlides")) || {
@@ -3221,6 +3223,17 @@ function SigninEmailPage(_ref) {
         user: Object.assign({}, user)
       })));
       history.push('/signin/challenge');
+    });
+  }
+
+  function handleDemoLogin(e) {
+    e.preventDefault();
+    var demoUser = {
+      email: "demo@bmail.com",
+      password: "123456"
+    };
+    demoLoginHandler(demoUser).then(function () {
+      history.replace('/presentation');
     });
   }
 
@@ -3249,7 +3262,10 @@ function SigninEmailPage(_ref) {
     className: "body-subtext"
   }, "Not your computer? Use Demo user to sign in privately.", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_3__.Link, {
     className: "link",
-    to: "#"
+    to: "#",
+    onClick: function onClick(e) {
+      return handleDemoLogin(e);
+    }
   }, "Demo User"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "bottom-bar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_3__.Link, {
@@ -3293,6 +3309,9 @@ var mapDTP = function mapDTP(dispatch) {
   return {
     fetchAccountHandler: function fetchAccountHandler(user) {
       return dispatch((0,_actions_session_actions__WEBPACK_IMPORTED_MODULE_2__.fetchAccount)(user));
+    },
+    demoLoginHandler: function demoLoginHandler(user) {
+      return dispatch((0,_actions_session_actions__WEBPACK_IMPORTED_MODULE_2__.login)(user));
     }
   };
 };
@@ -3353,7 +3372,7 @@ function SigninPasswordPage(_ref) {
       user = _React$useState2[0],
       setUser = _React$useState2[1];
 
-  function handleSubmit(e) {
+  function handleSubmit(e, user) {
     // props.history.push('/signin/challenge')
     e.preventDefault();
     loginHandler(user).then(function (res) {
@@ -3371,7 +3390,7 @@ function SigninPasswordPage(_ref) {
     className: "heading-subtext"
   }, user.email), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
     onSubmit: function onSubmit(e) {
-      return handleSubmit(e);
+      return handleSubmit(e, user);
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_smart_input__WEBPACK_IMPORTED_MODULE_2__.default, {
     type: "password",
@@ -3546,6 +3565,83 @@ function SmartInput() {
 
 var SmartInputContainer = (0,react_router__WEBPACK_IMPORTED_MODULE_1__.withRouter)(SmartInput);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SmartInputContainer);
+
+/***/ }),
+
+/***/ "./frontend/components/session/user_info.jsx":
+/*!***************************************************!*\
+  !*** ./frontend/components/session/user_info.jsx ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ UserInfo)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+function UserInfo(_ref) {
+  var user = _ref.user,
+      logoutHandler = _ref.logoutHandler,
+      history = _ref.history;
+
+  function handleLogout() {
+    logoutHandler();
+    history.push('/slides/about');
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "user-info"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "user-profile"
+  }, (user.firstname || '?')[0]), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "user-name"
+  }, user.firstname), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "user-email"
+  }, user.email)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", {
+    onClick: handleLogout
+  }, "Sign Out")));
+}
+
+/***/ }),
+
+/***/ "./frontend/components/session/user_info_container.jsx":
+/*!*************************************************************!*\
+  !*** ./frontend/components/session/user_info_container.jsx ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
+/* harmony import */ var _actions_session_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/session_actions */ "./frontend/actions/session_actions.js");
+/* harmony import */ var _user_info__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./user_info */ "./frontend/components/session/user_info.jsx");
+
+
+
+
+
+var mapSTP = function mapSTP(state) {
+  return {
+    user: state.session
+  };
+};
+
+var mapDTP = function mapDTP(dispatch) {
+  return {
+    logoutHandler: function logoutHandler() {
+      return dispatch((0,_actions_session_actions__WEBPACK_IMPORTED_MODULE_1__.logout)());
+    }
+  };
+};
+
+var UserInfoContainer = (0,react_router__WEBPACK_IMPORTED_MODULE_3__.withRouter)((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTP, mapDTP)(_user_info__WEBPACK_IMPORTED_MODULE_2__.default));
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (UserInfoContainer);
 
 /***/ }),
 

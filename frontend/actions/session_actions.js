@@ -18,7 +18,6 @@ export const receiveAccount = (user) => ({
 
 export const logoutCurrentUser = () => ({
   type: LOGOUT_CURRENT_USER,
-  user
 });
 
 // export const removeCurrentUser = () => ({
