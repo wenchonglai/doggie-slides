@@ -1,30 +1,6 @@
-.product-icon {
-  background: url("/assets/icons.png");
-  background-size: auto 100%;
-  display: inline-block;
-  
-  &.icon-1 {
-    background-position-x: 20%;
-  }
-
-  &.icon-2 {
-    background-position-x: 40%;
-  }
-
-  &.icon-3 {
-    background-position-x: 60%;
-  }
-
-  &.icon-4 {
-    background-position-x: 80%;
-  }
-
-  &.icon-5 {
-    background-position-x: 100%;
-  }
-}
-
 section.splash {
+  -webkit-font-smoothing: antialiased;
+
   h1 {
     font-size: 60px;
     font-weight: 300;

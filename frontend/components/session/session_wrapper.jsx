@@ -1,10 +1,11 @@
 import React from "react"
+import DoggieLogo from "../utils/doggie_logo"
 
-export default function SessionWrapper({children}){
+export default function SessionWrapper({className, children}){
   return (
-    <div className="session-wrapper">
-      <section className="session signin">
-        <img className='logo' src="/assets/logo-cr.svg"/>
+    <div className={`session-wrapper ${className}`}>
+      <section className={`session ${className}`}>
+        <DoggieLogo color='cr' />
         
         {children}
       </section>

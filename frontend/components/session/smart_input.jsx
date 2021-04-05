@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { withRouter } from "react-router";
 
-function SmartInput({className = "", labelText="", children, value, staticContext, errors = [], ...props} = {}){
+function SmartInput({className = "", labelText="", children, value, staticContext, errors = [], note="", ...props} = {}){
   const [focus, setFocus] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
@@ -21,7 +21,7 @@ function SmartInput({className = "", labelText="", children, value, staticContex
           value={value}
         />
         <div className="errors">
-          {errors[0] || " "}&nbsp;
+          {errors[0] || note}&nbsp;
         </div>
       </label>
       {children}

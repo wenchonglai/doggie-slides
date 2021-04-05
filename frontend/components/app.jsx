@@ -1,28 +1,14 @@
 import React, { useEffect, useRef } from 'react';
-import {Link, Redirect, Route, Switch, withRouter} from 'react-router-dom';
+import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
 
 import {ProtectedRoute, AuthRoute} from '../utils/route_utils';
 import SigninEmailPageContainer from './session/signin_email_page_container';
 import SigninPasswordPageContainer from './session/signin_password_page_container';
 import SignupContainer from './session/signup_page_container';
-import UserInfoContainer from './session/user_info_container';
 import SplashPage from './splash/splash_page'
 import {clearErrors} from '../actions/session_actions'
 import { connect } from 'react-redux';
-
-function PresentationPage(props){
-  return (
-    <div>
-      <header>
-        <UserInfoContainer />
-      </header>
-      <p>
-        edit
-      </p>
-      <button>Log out!</button>
-    </div>
-  );
-}
+import PresentationPage from './presentation/presentation_page';
 
 function App({history, clearErrorsHandler}){
   const unListenRef = useRef();

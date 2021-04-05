@@ -1,0 +1,106 @@
+section.page.presentation{
+  display: block;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+
+  > header {
+    display: flex;
+    align-items: center;
+    z-index: 1;
+    height: 64px;
+    top: 0px;
+    width: 100%;
+
+    div.icon-wrapper {
+      margin: 4px 4px 4px 8px;
+      padding: 8px;
+    }
+
+    section.titlebar {
+      display: flex;
+      flex: 1 0 auto;
+      justify-content: space-between;
+      align-items: center;
+      height: 64px;
+
+      div.docs-title-widget {
+        margin-top: 9px;
+        align-self: flex-start;
+        display: flex;
+        flex-direction: column;
+
+        input.doc-title-input {
+          padding: 2px 7px;
+          font-family: "Google Sans", "Roboto", Helvetica,Arial,sans-serif;
+          font-size: 18px;
+          line-height: 22px;
+          height: 20px;
+          border-radius: 2px;
+          border: 1px solid transparent;
+          color: #777;
+
+          &:focus {
+            color: #000;
+          }
+        }
+      }
+
+      .titlebar-buttons{
+        padding: 0 12px 0 16px;
+        align-self: center;
+      }
+    }
+  }
+
+  > section {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    border-top: 1px solid #dadce0;
+    height: 100%;
+
+    > section {
+      display: flex;
+      flex: 1 0 auto;
+      flex-direction: column;
+
+      > section.toolbar{
+        flex: 0 1 auto;
+        height: 40px;
+        border-bottom: 1px solid #dadce0;
+        display: flex;
+        align-items: center;
+      }
+
+      > section {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: row;
+
+        > section.filmstrip {
+          flex: 0 1 auto;
+          width: 220px;
+          border-right: 1px solid #dadce0;
+        }
+
+        > section.slidesview {
+          flex: 1 0 auto;
+        }
+      }
+    }
+
+    section.app-switcher {
+      width: 56px;
+      flex: 0 1 auto;
+      border-left: 1px solid #dadce0;
+    }
+  }
+}
+
+div.menu-item {
+  display: flex;
+  flex-direction: row;
+}

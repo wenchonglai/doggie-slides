@@ -30,7 +30,7 @@ export default function SignupPage({history, signupHandler, errors}){
   }
 
   return (
-    <SigninWrapper>
+    <SigninWrapper className='signup'>
         <h1>Create your DoggIe Account</h1>
         <form onSubmit={(e) => handleSubmit(e)}>
           <div className='name'>
@@ -47,7 +47,6 @@ export default function SignupPage({history, signupHandler, errors}){
               labelText="Last name"
               value={user.lastname}
               onChange={(e) => handleChange(e, 'lastname')}
-
             />
           </div>
 
@@ -59,6 +58,7 @@ export default function SignupPage({history, signupHandler, errors}){
               value={user.email}
               onChange={(e) => handleChange(e, 'email')}
               errors={errors.filter(x => x.toLowerCase().match(/email/))}
+              note={"You can use letters, numbers & periods"}
             />
           </div>
 
@@ -70,6 +70,7 @@ export default function SignupPage({history, signupHandler, errors}){
               value={user.password}
               onChange={(e) => handleChange(e, 'password')}
               errors={errors.filter(x => x.toLowerCase().match(/password/))}
+              note={"Use 8 or more characters with letters, numbers, or symbols"}
             />
           </div>
 

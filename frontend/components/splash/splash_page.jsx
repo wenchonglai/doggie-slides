@@ -1,30 +1,14 @@
 import React, { useState } from 'react';
 import {Link} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import DoggieLogo from '../utils/doggie_logo';
+import ProductIcon from '../utils/product_icon';
 
 const BODYTEXT = {
   'docs': 'With Google Docs, you can write, edit, and collaborate wherever you are. For Free.',
   'sheets': 'With Google Sheets, you can create, edit, and collaborate wherever you are. For free.',
   'slides': 'With Google Slides, you can create, edit, collaborate, and present wherever you are. For free.',
   'forms': 'Collect and organize information big and small with Google Forms. For free.'
-}
-
-function DoggieHeaderLogo(){
-  return (<div className='splash doggie-logo'>
-    <a href="http://www.jka-la.com/LAB/">
-      <img src="/assets/logo-bw.svg" alt="Doggie"/>
-    </a>
-  </div>)
-}
-
-function ProductIcon({className, iconIndex}){
-  return (
-      <div
-        className={`product-icon ${className || ''} icon-${iconIndex}`}
-        src="/assets/icons.png">&nbsp;
-      </div>
-    );
 }
 
 function NavLink({keyword, iconIndex}){
@@ -109,7 +93,7 @@ export default function SplashPage(props){
   return (
     <section className='splash'>
       <header className='splash header'>
-        <DoggieHeaderLogo />
+        <DoggieLogo />
         <SplashNavBar />
       </header>
       <section className='section-intro'>
