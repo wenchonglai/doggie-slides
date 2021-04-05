@@ -1,7 +1,8 @@
 class Api::UsersController < ApplicationController
-  # def index
-  #   @current_user = self.current_user
-  # end
+  def index
+    @user = User.includes(docs: [:slides]).find_by(id: current_user && current_user.id)
+    render :index
+  end
 
   def create
     @user = User.new(user_params)
@@ -32,9 +33,6 @@ class Api::UsersController < ApplicationController
 
   def show
     @user = User.find_by(id: params[:id])
-  end
-
-  def index
   end
 
   def search

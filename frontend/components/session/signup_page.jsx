@@ -6,7 +6,13 @@ import SmartInputContainer from './smart_input';
 
 export default function SignupPage({history, signupHandler, errors}){
   const localStorageObject = JSON.parse(localStorage.getItem("doggieSlides")) || {user: {}};
-  const [user, setUser] = React.useState({...localStorageObject.user});
+  const [user, setUser] = React.useState({
+    firstname: '',
+    lastname: '',
+    email: '',
+    password: ''
+  });
+  console.log(user);
   
   const handleChange = (e, key) => {
     setUser({...user, [key]: e.target.value});

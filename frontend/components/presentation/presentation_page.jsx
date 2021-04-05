@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import UserInfoContainer from '../session/user_info_container';
 import ProductIcon from '../utils/product_icon';
 import Menu from './menu'
-import {MENU_ITEMS, BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS} from './menu-items';
+import {MENU_ITEMS, BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS} from './menu-items';
 import AutosaveInputContainer from '../utils/autosave_input_container';
+import FilmStripContainer from './filmstrip_container';
 
 export default function PresentationPage(props){
   const docHook = useState({
@@ -43,12 +44,14 @@ export default function PresentationPage(props){
           <section className='toolbar'>
             <Menu
               className="toolbar-menu"
-              items={TEXTBOX_TOOLBAR_ITEMS}
+              items={IMAGE_TOOLBAR_ITEMS}
               respondToMouseOut={false}
             />
           </section>
           <section>
-            <section className='filmstrip'>filmstrip</section>
+            <section className='filmstrip'>
+              <FilmStripContainer />
+            </section>
             <section className='slides-view'>slidesview</section>
           </section>
         </section>

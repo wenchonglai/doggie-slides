@@ -10,10 +10,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_01_174735) do
+ActiveRecord::Schema.define(version: 2021_04_05_044628) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "docs", force: :cascade do |t|
+    t.integer "owner_id", null: false
+    t.integer "share_id"
+    t.string "filename", default: "Untitled presentation", null: false
+    t.integer "width", default: 1600, null: false
+    t.integer "height", default: 1000, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_id"], name: "index_docs_on_owner_id"
+    t.index ["share_id"], name: "index_docs_on_share_id"
+  end
+
+  create_table "slides", force: :cascade do |t|
+    t.integer "doc_id", null: false
+    t.integer "order", null: false
+    t.boolean "skipped", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["doc_id", "order"], name: "index_slides_on_doc_id_and_order", unique: true
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", null: false

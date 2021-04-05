@@ -43,6 +43,10 @@ const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, action: undef
   { name: "Justify", icon: [3, 6], shortCut: undefined, action: undefined},
 ]};
 
+const CROP_IMAGE = { name: "Crop image", icon: [5, 10], shortCut: undefined, action: undefined};
+const RESET_IMAGE = { name: "Reset image", icon: [6, 10], shortCut: undefined, action: undefined};
+
+
 export const MENU_ITEMS = [
   { name: "Edit", icon: undefined, children: [
     CUT, COPY, PASTE, PASTE_WITHOUT_FORMATTING, SELECT_ALL
@@ -68,4 +72,10 @@ export const TEXTBOX_TOOLBAR_ITEMS = [
   FILL_COLOR, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined,
   BOLD, ITALIC, UNDERLINE, TEXT_COLOR, HIGHLIGHT_COLOR, undefined, 
   ALIGN
+];
+
+export const IMAGE_TOOLBAR_ITEMS = [
+  ...BASE_TOOLBAR_ITEMS, undefined, 
+  BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined,
+  CROP_IMAGE, RESET_IMAGE
 ];

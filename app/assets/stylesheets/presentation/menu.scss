@@ -9,6 +9,7 @@ section.dropdown-menu {
     background: url('/assets/sprite.svg');
     background-size: 288px 288px;
     margin-right: 8px;
+    opacity: .7;
   }
 
   hr {
@@ -23,12 +24,6 @@ section.dropdown-menu {
     background-color: #f1f3f4;
   }
 
-  > div.dropdown-body {
-    min-width: 234px;
-    padding: 8px 0;
-    border: 1px solid transparent;
-  }
-
   &.hidden{
     > div.dropdown-body {
       display: none;
@@ -39,24 +34,6 @@ section.dropdown-menu {
         background-color: #fff;
       }
     }
-  }
-
-  > div.dropdown-body {
-    padding: 8px 0;
-    border: 1px solid transparent;
-    top: 0px;
-    left: 234px;
-  }
-  > div.dropdown-button {
-    border: 1px solid transparent;
-    padding: 8px 16px;
-  }
-
-  > div.dropdown-body {
-    padding: 8px 0;
-    border: 1px solid transparent;
-    top: 0px;
-    left: 234px;
   }
 }
 
@@ -76,18 +53,27 @@ ul.docs-menu {
     background-position-x: -21px;
     background-position-y: -198px;
   }
+  > li > section.dropdown-menu {
+    > div.dropdown-body {
+      padding: 8px 0;
+      border: 1px solid transparent;
+      top: 0px;
+      left: 234px;
+      min-width: 234px;
+    }
+  }
 
   &.tier-0 {
-    > li > section {
+    > li > section.dropdown-menu {
       > div.dropdown-button {
         padding: 4px 6px;
         border-radius: 4px;
         background-color: #f1f3f4;
-
+        
         .menu-icon{ display: none; }
         .submenu-indicator {display: none;}
       }
-
+      
       &:not(.hidden) {
         > div.dropdown-button {
           background-color: #feefc3;
@@ -128,8 +114,13 @@ ul.toolbar-menu {
       }
     }
 
-    > li > section {
+    > li > section:not(.hidden){
+      > div.dropdown-button .menu-icon {
+        opacity: 1;
+      }
+    }
 
+    > li > section {
       > div.dropdown-button {
         margin: 3px 1px;
         padding: 3px 3px;

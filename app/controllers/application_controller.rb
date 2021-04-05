@@ -23,6 +23,6 @@ class ApplicationController < ActionController::Base
     @current_user = nil
     session[:session_token] = nil
 
-    redirect_to api_users_url, status: 303
+    render json: ['successfully logged out']
   end
 end

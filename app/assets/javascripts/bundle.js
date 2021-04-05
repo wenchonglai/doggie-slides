@@ -3169,6 +3169,73 @@ var mapDTP = function mapDTP(dispatch) {
 
 /***/ }),
 
+/***/ "./frontend/components/presentation/filmstrip.jsx":
+/*!********************************************************!*\
+  !*** ./frontend/components/presentation/filmstrip.jsx ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ FilmStrip)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+function FilmStrip(_ref) {
+  var entities = _ref.entities;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", {
+    version: "1.1",
+    className: "filmstrip",
+    xmlns: "http://www.w3.org/2000/svg",
+    xmlnsXlink: "http://www.w3.org/1999/xlink",
+    width: "200px",
+    height: "600px",
+    xmlSpace: "preserve"
+  });
+}
+;
+
+/***/ }),
+
+/***/ "./frontend/components/presentation/filmstrip_container.jsx":
+/*!******************************************************************!*\
+  !*** ./frontend/components/presentation/filmstrip_container.jsx ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
+/* harmony import */ var _filmstrip__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./filmstrip */ "./frontend/components/presentation/filmstrip.jsx");
+/* harmony import */ var _presentation_page__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./presentation_page */ "./frontend/components/presentation/presentation_page.jsx");
+
+
+
+
+
+var mapSTP = function mapSTP(_ref) {
+  var entities = _ref.entities;
+  return {
+    entities: {
+      entities: entities
+    }
+  };
+};
+
+var mapDTP = function mapDTP(dispatch) {
+  return {};
+};
+
+var FilmStripContainer = (0,react_router__WEBPACK_IMPORTED_MODULE_3__.withRouter)((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTP, mapDTP)(_filmstrip__WEBPACK_IMPORTED_MODULE_1__.default));
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FilmStripContainer);
+
+/***/ }),
+
 /***/ "./frontend/components/presentation/menu-items.js":
 /*!********************************************************!*\
   !*** ./frontend/components/presentation/menu-items.js ***!
@@ -3180,7 +3247,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "MENU_ITEMS": () => (/* binding */ MENU_ITEMS),
 /* harmony export */   "BASE_TOOLBAR_ITEMS": () => (/* binding */ BASE_TOOLBAR_ITEMS),
-/* harmony export */   "TEXTBOX_TOOLBAR_ITEMS": () => (/* binding */ TEXTBOX_TOOLBAR_ITEMS)
+/* harmony export */   "TEXTBOX_TOOLBAR_ITEMS": () => (/* binding */ TEXTBOX_TOOLBAR_ITEMS),
+/* harmony export */   "IMAGE_TOOLBAR_ITEMS": () => (/* binding */ IMAGE_TOOLBAR_ITEMS)
 /* harmony export */ });
 var NEW_SLIDE = {
   name: "New Slide",
@@ -3406,6 +3474,18 @@ var ALIGN = {
     action: undefined
   }]
 };
+var CROP_IMAGE = {
+  name: "Crop image",
+  icon: [5, 10],
+  shortCut: undefined,
+  action: undefined
+};
+var RESET_IMAGE = {
+  name: "Reset image",
+  icon: [6, 10],
+  shortCut: undefined,
+  action: undefined
+};
 var MENU_ITEMS = [{
   name: "Edit",
   icon: undefined,
@@ -3425,6 +3505,7 @@ var MENU_ITEMS = [{
 }];
 var BASE_TOOLBAR_ITEMS = [NEW_SLIDE, undefined, ZOOM, SELECT, TEXTBOX, IMAGE, SHAPE];
 var TEXTBOX_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, FILL_COLOR, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, BOLD, ITALIC, UNDERLINE, TEXT_COLOR, HIGHLIGHT_COLOR, undefined, ALIGN]);
+var IMAGE_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, CROP_IMAGE, RESET_IMAGE]);
 
 /***/ }),
 
@@ -3520,6 +3601,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _menu__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./menu */ "./frontend/components/presentation/menu.jsx");
 /* harmony import */ var _menu_items__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./menu-items */ "./frontend/components/presentation/menu-items.js");
 /* harmony import */ var _utils_autosave_input_container__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/autosave_input_container */ "./frontend/components/utils/autosave_input_container.jsx");
+/* harmony import */ var _filmstrip_container__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./filmstrip_container */ "./frontend/components/presentation/filmstrip_container.jsx");
+
 
 
 
@@ -3560,11 +3643,11 @@ function PresentationPage(props) {
     className: "toolbar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu__WEBPACK_IMPORTED_MODULE_4__.default, {
     className: "toolbar-menu",
-    items: _menu_items__WEBPACK_IMPORTED_MODULE_5__.TEXTBOX_TOOLBAR_ITEMS,
+    items: _menu_items__WEBPACK_IMPORTED_MODULE_5__.IMAGE_TOOLBAR_ITEMS,
     respondToMouseOut: false
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "filmstrip"
-  }, "filmstrip"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_filmstrip_container__WEBPACK_IMPORTED_MODULE_7__.default, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "slides-view"
   }, "slidesview"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "app-switcher"
@@ -3697,7 +3780,7 @@ function SigninEmailPage(_ref) {
   function handleDemoLogin(e) {
     e.preventDefault();
     var demoUser = {
-      email: "demo@bmail.com",
+      email: "demo@dmail.com",
       password: "123456"
     };
     demoLoginHandler(demoUser).then(function () {
@@ -3965,10 +4048,17 @@ function SignupPage(_ref) {
     user: {}
   };
 
-  var _React$useState = react__WEBPACK_IMPORTED_MODULE_0__.useState(_objectSpread({}, localStorageObject.user)),
+  var _React$useState = react__WEBPACK_IMPORTED_MODULE_0__.useState({
+    firstname: '',
+    lastname: '',
+    email: '',
+    password: ''
+  }),
       _React$useState2 = _slicedToArray(_React$useState, 2),
       user = _React$useState2[0],
       setUser = _React$useState2[1];
+
+  console.log(user);
 
   var handleChange = function handleChange(e, key) {
     setUser(_objectSpread(_objectSpread({}, user), {}, _defineProperty({}, key, e.target.value)));

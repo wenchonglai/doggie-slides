@@ -27,7 +27,7 @@ export default function SigninEmailPage({history, demoLoginHandler, fetchAccount
 
   function handleDemoLogin(e){
     e.preventDefault();
-    const demoUser = {email: "demo@bmail.com", password: "123456"};
+    const demoUser = {email: "demo@dmail.com", password: "123456"};
 
     demoLoginHandler(demoUser).then(() => {
       history.replace('/presentation');

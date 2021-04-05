@@ -1,16 +1,33 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :bigint           not null, primary key
+#  email           :string           not null
+#  password_digest :string           not null
+#  firstname       :string
+#  lastname        :string
+#  session_token   :string           not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
 class User < ApplicationRecord
   attr_reader :password
 
   before_validation :ensure_session_token
+  after_create :ensure_doc!
 
   validates :email, :session_token, {presence: true, uniqueness: true}
   validates :password_digest, {presence: true}
-  validates :password, {length: {minimum: 8}, allow_nil: true}
+  validates :password, {length: {minimum: 6}, allow_nil: true}
   validates_format_of :email, {with: /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/}
+
+  has_many :docs, foreign_key: :owner_id, class_name: :Doc, dependent: :destroy
+  has_many :slides, through: :docs, source: :slides
   
   def self.find_by_credentials(email, password)
     @user = User.find_by(email: email)
-p [email, @user]
+
     return @user if @user && @user.is_password?(password)
   end
 
@@ -39,5 +56,10 @@ p [email, @user]
 
   def logged_in?
     self.session_token;
+  end
+
+  private
+  def ensure_doc!
+    Doc.create!({owner_id: self.id})
   end
 end
