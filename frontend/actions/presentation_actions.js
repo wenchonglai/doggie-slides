@@ -1,4 +1,5 @@
 import * as PresentationUtils from '../utils/presentation_utils';
+import { updatePageSettings } from './ui_actions';
 
 export const RECEIVE_DOCS = 'RECEIVE_DOCS';
 export const RECEIVE_DOC = 'RECEIVE_DOC';
@@ -23,6 +24,8 @@ const receiveSlides = (slides) => ({
 export const fetchPresentation = () => (dispatch) =>
   PresentationUtils.asyncFetchPresentation()
     .then((entities) => {
+      let doc = Object.values(entities.docs)[0];
+      dispatch(updatePageSettings({pageWidth: doc.width, pageHeight: doc.height}));
       dispatch(receiveDocs(entities.docs));
       dispatch(receiveSlides(entities.slides));
       return entities;
@@ -33,4 +36,11 @@ export const updateDoc = (formDoc) => (dispatch) =>
     .then((doc) => {
       dispatch(receiveDoc(doc));
       return doc;
+    });
+
+export const moveSlide = ({start, end=start, offset}) => (dispatch) => 
+  PresentationUtils.asyncMoveSlide({start, end, offset})
+    .then((slides) => {
+      dispatch(receiveSlides(slides));
+      return slides;
     });

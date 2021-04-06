@@ -9,7 +9,7 @@ section.page.presentation{
   > header {
     display: flex;
     align-items: center;
-    z-index: 1;
+    z-index: 2;
     height: 64px;
     top: 0px;
     width: 100%;
@@ -69,6 +69,10 @@ section.page.presentation{
     }
   }
 
+  section {
+    background-color: #fff;
+  }
+
   > section {
     display: flex;
     flex: 1 1 auto;
@@ -86,6 +90,7 @@ section.page.presentation{
         height: 40px;
         display: flex;
         align-items: center;
+        z-index: 1;
       }
 
       > section.two-panel-layout {
@@ -99,11 +104,13 @@ section.page.presentation{
           overflow-y: auto;
           flex: 0 1 auto;
           width: 220px;
+          z-index: 1;
         }
 
         > section.workspace {
           border-left: 1px solid #dadce0;
           flex: 1 0 auto;
+          overflow: scroll;
         }
       }
     }
@@ -112,6 +119,7 @@ section.page.presentation{
       width: 56px;
       flex: 0 1 auto;
       border-left: 1px solid #dadce0;
+      z-index: 1;
     }
   }
 }

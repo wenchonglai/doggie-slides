@@ -10,12 +10,14 @@ import {clearErrors} from '../actions/session_actions'
 import { connect } from 'react-redux';
 import PresentationPageContainer from './presentation/presentation_page_container';
 
-function App({history, clearErrorsHandler}){
+function App({errors, history, clearErrorsHandler}){
   const unListenRef = useRef();
 
   useEffect(() => {
-    unListenRef.current = history.listen((l, a) => {
-      clearErrorsHandler();
+    unListenRef.current = history.listen(({pathname}, a) => {
+      if (errors.length > 0){
+        clearErrorsHandler();
+      }
     });
   
     return () => {
@@ -29,15 +31,20 @@ function App({history, clearErrorsHandler}){
       <AuthRoute path='/signin/identifier' exact component={SigninEmailPageContainer}/>
       <AuthRoute path='/signin/challenge' exact component={SigninPasswordPageContainer}/>
       <AuthRoute path='/signup' exact component={SignupContainer}/>
-      <ProtectedRoute path='/presentation' component={PresentationPageContainer}/>
+      <ProtectedRoute path='/presentation/:slideId' component={PresentationPageContainer}/>
+      <Route path='/presentation' render={() => <Redirect to="/presentation/1"/>}/>
       <Route path='/signin' render={() => <Redirect to="/signin/identifier"/>}/>
       <Route path='/' render={() => <Redirect to="/slides/about"/>}/>
     </Switch>
   )
 };
 
+const mapSTP = state => ({
+  errors: state.errors.session
+});
+
 const mapDTP = dispatch => ({
   clearErrorsHandler: () => dispatch(clearErrors())
 });
 
-export default withRouter(connect(null, mapDTP)(App));
+export default withRouter(connect(mapSTP, mapDTP)(App));

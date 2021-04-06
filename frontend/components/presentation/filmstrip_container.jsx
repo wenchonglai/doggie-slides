@@ -1,16 +1,16 @@
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
+import { moveSlide } from "../../actions/presentation_actions";
 import FilmStrip from "./filmstrip";
-import PresentationPage from "./presentation_page";
-import {updateCurrentSlide} from '../../actions/ui_actions';
 
-const mapSTP = ({entities}) => ({
-  entities: {entities}
+const mapSTP = ({entities, ui}) => ({
+  slides: entities.slides,
+  pageWidth: ui.pageWidth,
+  pageHeight: ui.pageHeight,
 });
 
-
 const mapDTP = (dispatch) => ({
-  updateCurrentSlideHandler: (slideId) => dispatch(updateCurrentSlide(slideId))
+  moveSlideHandler: (data) => dispatch(moveSlide(data))
 });
 
 const FilmStripContainer = withRouter(connect(mapSTP, mapDTP)(FilmStrip));

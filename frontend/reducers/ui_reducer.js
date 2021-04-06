@@ -6,6 +6,9 @@ export default function UIReducer(state = {}, action){
   switch (action.type){
     case UIActions.RECEIVE_CURRENT_SLIDE:
       return {...state, slideId: action.slideId};
+    case UIActions.RECEIVE_PAGE_SETTINGS: {
+      return {...state, pageWidth: action.pageSettings.pageWidth, pageHeight: action.pageSettings.pageHeight}
+    }
     default: return state;
   }
 } 

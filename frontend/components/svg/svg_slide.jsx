@@ -77,23 +77,32 @@ import React, {useState, useEffect} from 'react';
 //   null
 // )(SVGWrapper);
 
-export default function SVGSlidePreview({width, height, slide}){
+export default function SVGSlide({isPreview, containerWidth, width, height, slide}){
+  let widthAttr = {};
+  if (containerWidth) { widthAttr = {width: containerWidth}; }
+
+
   return (
     <svg 
       version="1.1" 
-      className="filmstrip"
+      className="svg-slide"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      width={150}
-      height={150 * height / width}
       viewBox={`0 0 ${width} ${height}`}
       xmlSpace="preserve"
+      {...widthAttr}
     > 
+      <g>
+        <rect width={width} height={height} fill="#FFFFFF"></rect>
+      </g>
       {/* { (slide.wrapperIds || []).map(wrapperId => (
           // <SVGNoWrapperContainer wrapperId={wrapperId} />
         )
       } */}
-      <rect x='200' width="1200" y ="300" height="200" stroke='#777' fill="none"></rect>
+      <text x={800} y={400} alignmentBaseline="middle" textAnchor="middle" fontSize="60">{`Slide #${slide.id} (Page ${slide.page})`}</text>
+      <rect x='200' width="1200" y ="300" height="200" stroke='#777' fill="none">
+        
+      </rect>
       <rect x='500' width="600" y ="600" height="200" stroke='#777' fill="none"></rect>
     </svg>
   )

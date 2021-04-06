@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import UserInfoContainer from '../session/user_info_container';
 import ProductIcon from '../utils/product_icon';
-import Menu from './menu'
+import Menu from './menu';
 import {MENU_ITEMS, BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS} from './menu-items';
 import AutosaveInputContainer from '../utils/autosave_input_container';
-import LastUpdate from '../utils/last_update'
+import LastUpdate from '../utils/last_update';
 import FilmStripContainer from './filmstrip_container';
+import WorkspaceContainer from './workspace_container';
 
-export default function PresentationPage({doc, slides, fetchPresentationHandler, saveDocHandler}){
-  
+export default function PresentationPage({state, ownProps, currentSlideId, doc, slides, fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler}){
   useEffect(() => {
-    fetchPresentationHandler()
+    fetchPresentationHandler();
+    updateCurrentSlideHandler(currentSlideId);
   }, []);
   
   const _docHook = useState({});
@@ -19,12 +20,8 @@ export default function PresentationPage({doc, slides, fetchPresentationHandler,
   useEffect(() => {
     _setDoc({..._doc, ...doc});
   }, [doc]);
-
-  useEffect(() => {
-    
-  }, [slides]);
-
-  return ( _doc.id ? 
+  
+  return ( _doc.id && slides.length ? 
     (<section className='page presentation'>
       <header>
         <div className='icon-wrapper'>
@@ -69,9 +66,11 @@ export default function PresentationPage({doc, slides, fetchPresentationHandler,
           </section>
           <section className='two-panel-layout'>
             <section className='filmstrip'>
-              <FilmStripContainer doc={doc} slides={slides}/>
+              <FilmStripContainer/>
             </section>
-            <section className='workspace'>slidesview</section>
+
+            <WorkspaceContainer slideId={currentSlideId}/>
+
           </section>
         </section>
         <section className='app-switcher'>appswitcher</section>

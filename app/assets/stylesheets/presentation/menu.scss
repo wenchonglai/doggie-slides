@@ -38,8 +38,10 @@ section.dropdown-menu {
 
 ul.docs-menu, ul.toolbar-menu{
   section.dropdown-menu {
-    div.menu-item.no-action {
-      opacity: 0.5;
+    div.menu-item.no-action  {
+      > .menu-item-icon, >.menu-item-name{
+        opacity: 0.5;
+      }
     }
     div.dropdown-button {
       padding: 8px 16px;

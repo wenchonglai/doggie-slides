@@ -21,6 +21,12 @@ export const asyncDeleteSlide = (slideId) => $.ajax({
 });
 
 export const asyncUpdateSlide = (slideId) => $.ajax({
-  method: 'DELETE',
+  method: 'PATCH',
   url: `/api/slides/${slideId}`,
+});
+
+export const asyncMoveSlide = (data) => $.ajax({
+  method: 'PATCH',
+  url: `/api/slides/move`,
+  data: {slide: data}
 });
