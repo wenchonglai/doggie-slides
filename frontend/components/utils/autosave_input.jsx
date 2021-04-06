@@ -1,17 +1,20 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-export default function AutosaveInput({className, type="text", keyName: key, value="", saveHandler, stateHook = []}){
+export default function AutosaveInput({className, type="text", keyName: key, saveHandler, value="", _docHook}){
+
   const _timeout = useRef();
-  const [data, setData] = stateHook;
+  const [_doc, _setDoc] = _docHook;
 
   const handleChange = (e) => {
-    setData({...data, [key]: e.target.value});
+    const newVal = {..._doc, [key]: e.target.value};
+
+    _setDoc(newVal);
 
     clearTimeout(_timeout.current);
 
     _timeout.current = setTimeout(() => {
-      saveHandler(data);
-    }, 800);
+      saveHandler(newVal);
+    }, 500);
   }
 
   return (
@@ -19,7 +22,7 @@ export default function AutosaveInput({className, type="text", keyName: key, val
       className={`autosave ${className}`}
       type={type}
       name={key}
-      value={data[key]}
+      value={_docHook[0].filename}
       onChange={(e) => handleChange(e)}
     />
   )

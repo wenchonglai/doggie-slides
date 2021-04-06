@@ -27,6 +27,6 @@ class Doc < ApplicationRecord
   end
 
   def ensure_slide!
-    Slide.create!({doc_id: self.id, order: 0})
+    Slide.create!({doc_id: self.id})
   end
 end

@@ -4,6 +4,7 @@
   display: inline-block;
   height: 40px;
   width: 40px;
+  user-select: none;
   
   &.icon-1 {
     background-position-x: 20%;

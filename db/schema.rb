@@ -29,11 +29,11 @@ ActiveRecord::Schema.define(version: 2021_04_05_044628) do
 
   create_table "slides", force: :cascade do |t|
     t.integer "doc_id", null: false
-    t.integer "order", null: false
+    t.integer "page", default: 1, null: false
     t.boolean "skipped", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["doc_id", "order"], name: "index_slides_on_doc_id_and_order", unique: true
+    t.index ["doc_id", "page"], name: "index_slides_on_doc_id_and_page"
   end
 
   create_table "users", force: :cascade do |t|

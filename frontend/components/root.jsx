@@ -5,7 +5,7 @@ import {HashRouter} from 'react-router-dom';
 import App from './app'
 
 export default function Root({store}){
-  console.log(store.getState());
+
   return (
     <Provider store={store}>
       <HashRouter>

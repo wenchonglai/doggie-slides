@@ -113,18 +113,19 @@ section.user-info {
   font: 14px/16px "Google Sans","Roboto",Helvetica,Arial,sans-serif;
 
   div.profile-image {
-      width: 32px;
-      height: 32px;
-      position: relative;
-      background-color: rgb(240, 100, 160);
-      border-radius: 50%;
-      font-size: 18px;
-      line-height: 32px;
-      font-weight: 600;
-      text-align: center;
-      color: white;
-      font-family: "Google Sans","Roboto",Helvetica,Arial,sans-serif;
-      user-select: none;
+    width: 32px;
+    height: 32px;
+    margin: 12px;
+    position: relative;
+    background-color: rgb(240, 100, 160);
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 32px;
+    font-weight: 600;
+    text-align: center;
+    color: white;
+    font-family: "Google Sans","Roboto",Helvetica,Arial,sans-serif;
+    user-select: none;
   }
 
   .dropdown-body {

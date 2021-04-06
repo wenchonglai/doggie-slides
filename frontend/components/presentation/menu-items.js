@@ -12,6 +12,7 @@ const ZOOM = { name: "Zoom", icon: [5, 8], children: [
   { name: "50%", icon: undefined, shortCut: undefined, action: undefined},
   { name: "100%", icon: undefined, shortCut: undefined, action: undefined},
   { name: "200%", icon: undefined, shortCut: undefined, action: undefined},
+  undefined,
   { name: "Zoom in", icon: undefined, shortCut: undefined, action: undefined},
   { name: "Zoom out", icon: undefined, shortCut: undefined, action: undefined},
 ]};

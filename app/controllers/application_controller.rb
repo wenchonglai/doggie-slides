@@ -25,4 +25,5 @@ class ApplicationController < ActionController::Base
 
     render json: ['successfully logged out']
   end
+  
 end

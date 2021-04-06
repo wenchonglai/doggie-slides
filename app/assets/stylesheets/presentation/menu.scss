@@ -20,7 +20,6 @@ section.dropdown-menu {
 
   > div.dropdown-button {
     border: 1px solid transparent;
-    padding: 8px 16px;
     background-color: #f1f3f4;
   }
 
@@ -33,6 +32,24 @@ section.dropdown-menu {
       > div.dropdown-button {
         background-color: #fff;
       }
+    }
+  }
+}
+
+ul.docs-menu, ul.toolbar-menu{
+  section.dropdown-menu {
+    div.menu-item.no-action {
+      opacity: 0.5;
+    }
+    div.dropdown-button {
+      padding: 8px 16px;
+    }
+    > div.dropdown-body {
+      padding: 8px 0;
+      border: 1px solid transparent;
+      top: 0px;
+      left: 234px;
+      min-width: 234px;
     }
   }
 }
@@ -53,22 +70,14 @@ ul.docs-menu {
     background-position-x: -21px;
     background-position-y: -198px;
   }
-  > li > section.dropdown-menu {
-    > div.dropdown-body {
-      padding: 8px 0;
-      border: 1px solid transparent;
-      top: 0px;
-      left: 234px;
-      min-width: 234px;
-    }
-  }
+  
 
   &.tier-0 {
     > li > section.dropdown-menu {
       > div.dropdown-button {
         padding: 4px 6px;
         border-radius: 4px;
-        background-color: #f1f3f4;
+
         
         .menu-icon{ display: none; }
         .submenu-indicator {display: none;}
@@ -94,17 +103,17 @@ ul.toolbar-menu {
   align-items: center;
   margin: 0 22px;
 
-  hr {
-    width: 1px;
-    height: 28px;
-    display: inline-block;
-    border: none;
-    border-style: none;
-    border-left: 1px solid #dadce0;
-    margin: 0 4px;
-  }
-
+  
   &.tier-0 {
+    > hr {
+      width: 1px;
+      height: 28px;
+      display: inline-block;
+      border: none;
+      border-style: none;
+      border-left: 1px solid #dadce0;
+      margin: 0 4px;
+    }
     li:hover {
       > section.hidden > div > div > .menu-item-name{
         visibility: visible;

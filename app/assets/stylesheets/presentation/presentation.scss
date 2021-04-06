@@ -40,10 +40,24 @@ section.page.presentation{
           height: 20px;
           border-radius: 2px;
           border: 1px solid transparent;
-          color: #777;
+          // color: #777;
 
           &:focus {
             color: #000;
+          }
+        }
+
+        > div:last-child {
+          display: flex;
+          flex-direction: row;
+
+          > div.last-update {
+            margin: 1px 20px;
+            padding: 4px 6px;
+            color: #777;
+            font-family: "Roboto",Helvetica,Arial,sans-serif;
+            font-size: 14px;
+            line-height: 18px;
           }
         }
       }
@@ -57,10 +71,11 @@ section.page.presentation{
 
   > section {
     display: flex;
-    flex: 1;
+    flex: 1 1 auto;
     flex-direction: row;
+    height: calc(100% - 64px);
     border-top: 1px solid #dadce0;
-    height: 100%;
+    box-sizing: border-box;
 
     > section {
       display: flex;
@@ -68,25 +83,26 @@ section.page.presentation{
       flex-direction: column;
 
       > section.toolbar{
-        flex: 0 1 auto;
         height: 40px;
-        border-bottom: 1px solid #dadce0;
         display: flex;
         align-items: center;
       }
 
-      > section {
+      > section.two-panel-layout {
         flex: 1 0 auto;
         display: flex;
         flex-direction: row;
+        border-top: 1px solid #dadce0;
+        height: calc(100% - 40px);
 
         > section.filmstrip {
+          overflow-y: auto;
           flex: 0 1 auto;
           width: 220px;
-          border-right: 1px solid #dadce0;
         }
 
-        > section.slidesview {
+        > section.workspace {
+          border-left: 1px solid #dadce0;
           flex: 1 0 auto;
         }
       }

@@ -16,7 +16,7 @@ const MenuIcon = function({className, icon=[-1, -1]}){
 
 const MenuItem = function({item}){
   return (
-    <div className='menu-item'>
+    <div className={`menu-item ${item.action ? '' : 'no-action'}`}>
       <MenuIcon className='menu-item-icon' icon={item.icon}/>
       <div className='menu-item-name'>{item.name}</div>
       {(item.children ? 

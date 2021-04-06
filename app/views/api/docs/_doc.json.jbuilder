@@ -1,0 +1,1 @@
+json.extract! doc, :id, :owner_id, :filename, :width, :height, :updated_at, :slide_ids

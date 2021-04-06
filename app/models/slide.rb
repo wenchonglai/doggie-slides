@@ -4,15 +4,17 @@
 #
 #  id         :bigint           not null, primary key
 #  doc_id     :integer          not null
-#  order      :integer          not null
+#  page      :integer          not null
 #  skipped    :boolean          default(FALSE), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+
+#
 require 'byebug'
 class Slide < ApplicationRecord
   before_validation :set_default_values
-  validates :doc_id, :order, presence: true
+  validates :doc_id, :page, presence: true
   validates :skipped, inclusion: {in: [true, false]}
 
   belongs_to :doc
@@ -21,5 +23,6 @@ class Slide < ApplicationRecord
   private
   def set_default_values
     self.skipped ||= false
+    self.page ||= 1
   end
 end

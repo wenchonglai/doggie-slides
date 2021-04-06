@@ -1,15 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import SVGSlidePreviewContainer from '../svg/svg_slide_preview_container';
 
-export default function FilmStrip({entities}){
+function SlidePreview({className, slide, clickHandler}){
+  function handleClick(e, slideId){
+    clickHandler(slideId);
+  }
   return (
-    <svg 
-      version="1.1" 
-      className="filmstrip"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlnsXlink="http://www.w3.org/1999/xlink"
-      width="200px"
-      height="600px"
-      xmlSpace="preserve"
-    ></svg>
+    <li className={`filmstrip-item ${className}`} onClick={(e) => handleClick(e, slide.id)}>
+      <div className='page-number'>
+        {slide.page}
+      </div>
+      <div className='box'>
+        <SVGSlidePreviewContainer docId={slide.docId} slideId={slide.id}/>
+      </div>
+    </li>
+  )
+}
+
+export default function FilmStrip({doc, slides, history, updateCurrentSlideHandler}){
+  const [currentSlideId, setCurrentSlideId] = useState(1);
+
+  function clickHandler(slideId){
+    updateCurrentSlideHandler(slideId);
+    setCurrentSlideId(slideId);
+  };
+
+  useEffect(() => {
+    history.replace(`/presentation/${currentSlideId}`);
+  }, [currentSlideId]);
+  
+  return (
+    <ul className='filmstrip'>
+      {(slides || []).map(slide => 
+        ( <SlidePreview 
+            className={slide.id == currentSlideId ? 'active' : ''}
+            key={slide.id}
+            slide={slide}
+            clickHandler={clickHandler}
+          />
+        )
+      )}
+    </ul>
   )
 };

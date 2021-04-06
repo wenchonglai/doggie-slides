@@ -8,7 +8,7 @@ import SignupContainer from './session/signup_page_container';
 import SplashPage from './splash/splash_page'
 import {clearErrors} from '../actions/session_actions'
 import { connect } from 'react-redux';
-import PresentationPage from './presentation/presentation_page';
+import PresentationPageContainer from './presentation/presentation_page_container';
 
 function App({history, clearErrorsHandler}){
   const unListenRef = useRef();
@@ -29,7 +29,7 @@ function App({history, clearErrorsHandler}){
       <AuthRoute path='/signin/identifier' exact component={SigninEmailPageContainer}/>
       <AuthRoute path='/signin/challenge' exact component={SigninPasswordPageContainer}/>
       <AuthRoute path='/signup' exact component={SignupContainer}/>
-      <ProtectedRoute path='/presentation' component={PresentationPage}/>
+      <ProtectedRoute path='/presentation' component={PresentationPageContainer}/>
       <Route path='/signin' render={() => <Redirect to="/signin/identifier"/>}/>
       <Route path='/' render={() => <Redirect to="/slides/about"/>}/>
     </Switch>

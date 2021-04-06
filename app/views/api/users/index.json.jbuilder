@@ -9,7 +9,7 @@ if @user
   json.docs do
     (@user.docs).map do |doc|
       json.set! doc.id do
-        json.extract! doc, :id, :owner_id, :filename, :width, :height, :updated_at
+        json.partial! "api/docs/doc", doc: doc
         json.slide_ids doc.slide_ids
       end
     end
@@ -18,7 +18,7 @@ if @user
   json.slides do
     (@user.slides).map do |slide|
       json.set! slide.id do
-        json.extract! slide, :id, :doc_id, :order, :skipped
+        json.partial! "api/slides/slide", slide: slide
       end
     end
   end

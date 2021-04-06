@@ -1,0 +1,42 @@
+ul.filmstrip{
+  * {
+    font-family: "Roboto",Helvetica,Arial,sans-serif;
+    user-select: none;
+  }
+  > li.filmstrip-item {
+    display: flex;
+    position: relative;
+    margin: 2px 24px 2px 0;
+    padding: 4px;
+
+    > div.page-number {
+      display: flex;
+      justify-content: flex-end;
+      font-size: 12px;
+      width: 24px;
+      margin-right: 10px;
+      
+
+    }
+    > div.box {
+      box-sizing: border-box;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 2px;
+      background: #fff;
+    }
+
+    &:hover {
+      > div.box {
+        box-shadow: 0 0 0 1.5px #dadce0;
+      }
+    }
+    &.active {
+      background: #fdf7e6;
+      > div.box {
+        border-color: #eda912;
+        box-shadow: 0 0 0 1.5px #eda912;
+      }
+    }
+  }
+}
