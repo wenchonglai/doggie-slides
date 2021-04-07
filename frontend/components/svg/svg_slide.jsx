@@ -81,7 +81,7 @@ import SVGTextArea from './svg-textarea';
 export default function SVGSlide({isPreview, containerWidth, width, height, slide = {}}){
   let widthAttr = {};
   if (containerWidth) { widthAttr = {width: containerWidth}; }
-console.log(slide);
+
   return (
     <svg 
       version="1.1" 

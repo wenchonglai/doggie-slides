@@ -34,11 +34,11 @@ export default function SigninEmailPage({history, loginHandler, fetchAccountHand
     });
   }
 
-  function handleBunnyLogin(e){
+  function handleNyanCatLogin(e){
     e.preventDefault();
-    const bunny = {email: "bunny@dmail.com", password: "carrots"};
+    const nyanCat = {email: "nyanCat@nyan.nyan", password: "nyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyan"};
 
-    loginHandler(bunny).then(() => {
+    loginHandler(nyanCat).then(() => {
       history.replace('/presentation');
     });
   }
@@ -65,7 +65,7 @@ export default function SigninEmailPage({history, loginHandler, fetchAccountHand
             <div className="body-subtext">
               Not your computer? Use Demo user to sign in privately.
               <Link className='link' to='#' onClick={(e) => handleDemoLogin(e)}>Demo User</Link>
-              <Link className='link' to='#' onClick={(e) => handleBunnyLogin(e)}>Bunny</Link>
+              <Link className='link' to='#' onClick={(e) => handleNyanCatLogin(e)}>NyanCat</Link>
             </div>
           </SmartInputContainer>
 

@@ -84,7 +84,6 @@ export default function SVGTextArea({className, defaultFont, value, ...props}){
   const [cursorX, cursorY] = (textRef.current.getOffsetByIndex(cursorPosition));
 
   useEffect(() => {
-    console.log(value, textRef.current);
     textRef.current = new DynamicText(value);
     componentsRef.current = textRef.current.toReactComponents();
     forceUpdate();

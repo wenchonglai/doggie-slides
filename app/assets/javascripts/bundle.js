@@ -4422,13 +4422,13 @@ function SigninEmailPage(_ref) {
     });
   }
 
-  function handleBunnyLogin(e) {
+  function handleNyanCatLogin(e) {
     e.preventDefault();
-    var bunny = {
-      email: "bunny@dmail.com",
-      password: "carrots"
+    var nyanCat = {
+      email: "nyanCat@nyan.nyan",
+      password: "nyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyan"
     };
-    loginHandler(bunny).then(function () {
+    loginHandler(nyanCat).then(function () {
       history.replace('/presentation');
     });
   }
@@ -4466,9 +4466,9 @@ function SigninEmailPage(_ref) {
     className: "link",
     to: "#",
     onClick: function onClick(e) {
-      return handleBunnyLogin(e);
+      return handleNyanCatLogin(e);
     }
-  }, "Bunny"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, "NyanCat"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "bottom-bar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_3__.Link, {
     className: "link",
@@ -5280,7 +5280,6 @@ function SVGTextArea(_ref) {
       cursorY = _textRef$current$getO2[1];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    console.log(value, textRef.current);
     textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(value);
     componentsRef.current = textRef.current.toReactComponents();
     forceUpdate();
@@ -5411,7 +5410,6 @@ function SVGSlide(_ref) {
     };
   }
 
-  console.log(slide);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", _extends({
     version: "1.1",
     className: "svg-slide",

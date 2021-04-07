@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_07_183452) do
+ActiveRecord::Schema.define(version: 2021_04_07_190406) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,6 +34,22 @@ ActiveRecord::Schema.define(version: 2021_04_07_183452) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["doc_id", "page"], name: "index_slides_on_doc_id_and_page"
+  end
+
+  create_table "text_styles", force: :cascade do |t|
+    t.integer "textbox_id", null: false
+    t.text "style_string", default: "", null: false
+    t.integer "offset", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["textbox_id", "offset"], name: "index_text_styles_on_textbox_id_and_offset", unique: true
+    t.index ["textbox_id"], name: "index_text_styles_on_textbox_id"
+  end
+
+  create_table "textboxes", force: :cascade do |t|
+    t.text "text", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
