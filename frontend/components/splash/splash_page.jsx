@@ -71,7 +71,7 @@ function Headline({productName, googleProductBodyText}){
       <h1>Thicc {productName[0].toUpperCase() + productName.substring(1,productName.length - 1).toLowerCase()}, So Beautiful, wow~</h1>
       <div className='headline-items'>
         { productName === 'slides' ?
-          ( <HeadLineItem title="Clone" iconUrl="/assets/icons.png" iconIndex={3}>
+          ( <HeadLineItem title="Clone" iconUrl={window.productIconUrl} iconIndex={3}>
               <p>
                 The splash page CSS took me the whole night. Please extend the deadline T_T
               </p>
@@ -79,7 +79,7 @@ function Headline({productName, googleProductBodyText}){
             </HeadLineItem>
           ) : null
         }
-        <HeadLineItem title="Real" iconUrl="/assets/icons.png" iconIndex={5}>
+        <HeadLineItem title="Real" iconUrl={window.productIconUrl} iconIndex={5}>
           <p>{googleProductBodyText}</p>
           <a className='splash button-anchor' href="https://www.google.com/slides/about/">The Real Google Slides</a>
         </HeadLineItem>

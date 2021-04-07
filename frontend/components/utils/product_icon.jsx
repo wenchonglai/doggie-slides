@@ -4,7 +4,7 @@ export default function ProductIcon({className, iconIndex = 0}){
   return (
       <div
         className={`product-icon ${className || ''} icon-${iconIndex}`}
-        src="/assets/icons.png">&nbsp;
+        src={window.productIconUrl}>&nbsp;
       </div>
     );
 }

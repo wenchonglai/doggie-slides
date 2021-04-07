@@ -4958,14 +4958,14 @@ function Headline(_ref3) {
     className: "headline-items"
   }, productName === 'slides' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(HeadLineItem, {
     title: "Clone",
-    iconUrl: "/assets/icons.png",
+    iconUrl: window.productIconUrl,
     iconIndex: 3
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "The splash page CSS took me the whole night. Please extend the deadline T_T"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
     className: "splash button-anchor",
     to: "/presentation/"
   }, "Go to DoggIe Slides")) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(HeadLineItem, {
     title: "Real",
-    iconUrl: "/assets/icons.png",
+    iconUrl: window.productIconUrl,
     iconIndex: 5
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, googleProductBodyText), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
     className: "splash button-anchor",
@@ -5292,7 +5292,7 @@ function DoggieLogo(_ref) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
     href: url
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
-    src: "/assets/logo-".concat(color, ".svg"),
+    src: color == bw ? window.bwLogoUrl : window.crLogoUrl,
     alt: "Doggie Logo"
   })));
 }
@@ -5458,7 +5458,7 @@ function ProductIcon(_ref) {
       iconIndex = _ref$iconIndex === void 0 ? 0 : _ref$iconIndex;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "product-icon ".concat(className || '', " icon-").concat(iconIndex),
-    src: "/assets/icons.png"
+    src: window.productIconUrl
   }, "\xA0");
 }
 

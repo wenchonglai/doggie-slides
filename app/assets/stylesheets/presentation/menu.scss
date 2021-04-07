@@ -67,7 +67,7 @@ ul.docs-menu {
   .submenu-indicator {
     width: 12px;
     height: 18px;
-    background: url(image-url('/assets/sprite.svg'));
+    background: url(image-url('sprite.svg'));
     background-size: 288px 288px;
     background-position-x: -21px;
     background-position-y: -198px;
@@ -141,7 +141,7 @@ ul.toolbar-menu {
         .submenu-indicator {
           width: 12px;
           height: 18px;
-          background: url(image-url('/assets/sprite.svg'));
+          background: url(image-url('sprite.svg'));
           background-size: 288px 288px;
           background-position-x: -3px;
           background-position-y: -198px;

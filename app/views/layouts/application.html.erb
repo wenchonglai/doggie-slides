@@ -5,7 +5,7 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= favicon_link_tag '/assets/favicon.png' %>
+    <%= favicon_link_tag image_url('favicon.png') %>
 
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
@@ -16,6 +16,11 @@
       data-search-pseudo-elements
     ></script>
     <script>
+      window.productIconUrl = "<%= image_url('icons.png') %>";
+      window.bwLogoUrl = "<%= image_url('logo-bw.svg') %>";
+      window.crLogoUrl = "<%= image_url('logo-cr.svg') %>";
+      
+      `logo-${color}.svg`
       <% if current_user %>
         window.currentUser = <%= render(
           "api/users/user.json.jbuilder",
