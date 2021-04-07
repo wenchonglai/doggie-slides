@@ -2966,24 +2966,28 @@ var convertCurry = convert.bind(null, react__WEBPACK_IMPORTED_MODULE_2__.createE
 
 /***/ }),
 
-/***/ "./frontend/actions/presentation_actions.js":
-/*!**************************************************!*\
-  !*** ./frontend/actions/presentation_actions.js ***!
-  \**************************************************/
+/***/ "./frontend/actions/item_thunk_actions.js":
+/*!************************************************!*\
+  !*** ./frontend/actions/item_thunk_actions.js ***!
+  \************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "RECEIVE_DOCS": () => (/* binding */ RECEIVE_DOCS),
-/* harmony export */   "RECEIVE_DOC": () => (/* binding */ RECEIVE_DOC),
-/* harmony export */   "RECEIVE_SLIDES": () => (/* binding */ RECEIVE_SLIDES),
-/* harmony export */   "fetchPresentation": () => (/* binding */ fetchPresentation),
-/* harmony export */   "updateDoc": () => (/* binding */ updateDoc),
-/* harmony export */   "moveSlide": () => (/* binding */ moveSlide)
+/* harmony export */   "newSlide": () => (/* binding */ newSlide),
+/* harmony export */   "deleteSlide": () => (/* binding */ deleteSlide),
+/* harmony export */   "skipSlide": () => (/* binding */ skipSlide)
 /* harmony export */ });
-/* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
-/* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
+/* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -2998,9 +3002,93 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
+
+var newSlide = function newSlide() {
+  return function (dispatch, getState) {
+    var _getState = getState(),
+        ui = _getState.ui,
+        entities = _getState.entities;
+
+    var reqSlide = {
+      docId: ui.docId,
+      page: entities.slides[ui.slideId].page + 1,
+      skipped: false
+    };
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncAddSlide(reqSlide).then(function (resSlides) {
+      var newSlideId = Math.max.apply(Math, _toConsumableArray(Object.keys(resSlides)));
+      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlides(resSlides));
+      dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.receiveCurrentSlide(newSlideId));
+    }, function (err) {
+      console.log(err);
+    });
+  };
+};
+var deleteSlide = function deleteSlide() {
+  return function (dispatch, getState) {
+    var _getState2 = getState(),
+        ui = _getState2.ui,
+        entities = _getState2.entities;
+
+    var slideId = ui.slideId;
+    var page = entities.slides[slideId].page;
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncDeleteSlide(slideId).then(function (resSlides) {
+      var newSlideId = Object.values(resSlides).filter(function (slide) {
+        return slide.page == page;
+      })[0].id;
+      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlides(resSlides));
+      dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.receiveCurrentSlide(newSlideId));
+    }, function (err) {
+      console.log(err);
+    });
+  };
+};
+var skipSlide = function skipSlide() {
+  return function (dispatch, getState) {
+    var _getState3 = getState(),
+        ui = _getState3.ui,
+        entities = _getState3.entities;
+
+    var reqSlide = _objectSpread({}, entities.slides[ui.slideId]);
+
+    reqSlide.skipped = !reqSlide.skipped;
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateSlide(reqSlide).then(function (resSlide) {
+      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resSlide));
+    }, function (err) {
+      console.log(err);
+    });
+  };
+};
+
+/***/ }),
+
+/***/ "./frontend/actions/presentation_actions.js":
+/*!**************************************************!*\
+  !*** ./frontend/actions/presentation_actions.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "RECEIVE_DOCS": () => (/* binding */ RECEIVE_DOCS),
+/* harmony export */   "RECEIVE_DOC": () => (/* binding */ RECEIVE_DOC),
+/* harmony export */   "RECEIVE_SLIDES": () => (/* binding */ RECEIVE_SLIDES),
+/* harmony export */   "RECEIVE_SLIDE": () => (/* binding */ RECEIVE_SLIDE),
+/* harmony export */   "receiveSlides": () => (/* binding */ receiveSlides),
+/* harmony export */   "receiveSlide": () => (/* binding */ receiveSlide),
+/* harmony export */   "fetchPresentation": () => (/* binding */ fetchPresentation),
+/* harmony export */   "updateDoc": () => (/* binding */ updateDoc),
+/* harmony export */   "moveSlide": () => (/* binding */ moveSlide),
+/* harmony export */   "addSlide": () => (/* binding */ addSlide)
+/* harmony export */ });
+/* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
+/* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+
+
 var RECEIVE_DOCS = 'RECEIVE_DOCS';
 var RECEIVE_DOC = 'RECEIVE_DOC';
 var RECEIVE_SLIDES = 'RECEIVE_SLIDES';
+var RECEIVE_SLIDE = 'RECEIVE_SLIDE';
 
 var receiveDocs = function receiveDocs(docs) {
   return {
@@ -3022,25 +3110,18 @@ var receiveSlides = function receiveSlides(slides) {
     slides: slides
   };
 };
-
+var receiveSlide = function receiveSlide(slide) {
+  return {
+    type: RECEIVE_SLIDE,
+    slide: slide
+  };
+};
 var fetchPresentation = function fetchPresentation() {
   return function (dispatch, getState) {
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncFetchPresentation().then(function (entities) {
       var doc = Object.values(entities.docs)[0];
-      var ui = getState();
-
-      if (!doc.slideIds.includes(ui.slideId)) {
-        var locationArr = window.location.href.split('/');
-        var newSlideId = Object.values(entities.slides).sort(function (a, b) {
-          return a.page - b.page;
-        })[0].id;
-        var href = locationArr.join('/');
-        var newHref = [].concat(_toConsumableArray(locationArr.slice(0, -1)), [newSlideId]).join('/');
-        dispatch((0,_ui_actions__WEBPACK_IMPORTED_MODULE_1__.receiveCurrentSlide)(newSlideId));
-        location.replace("#/presentation/".concat(newSlideId));
-      }
-
-      dispatch((0,_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updatePageSettings)({
+      doc && dispatch((0,_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updatePageSettings)({
+        docId: doc.id,
         pageWidth: doc.width,
         pageHeight: doc.height
       }));
@@ -3074,6 +3155,14 @@ var moveSlide = function moveSlide(_ref) {
     });
   };
 };
+var addSlide = function addSlide(formSlide) {
+  return function (dispatch) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncAddSlide(formSlide).then(function (slide) {
+      dispatch(receiveSlide(slide));
+      return slide;
+    });
+  };
+};
 
 /***/ }),
 
@@ -3102,7 +3191,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "signup": () => (/* binding */ signup)
 /* harmony export */ });
 /* harmony import */ var _utils_session_util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/session_util */ "./frontend/utils/session_util.js");
-/* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./presentation_actions */ "./frontend/actions/presentation_actions.js");
+/* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+
 
 
 var RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
@@ -3166,8 +3257,10 @@ var login = function login(formUser) {
 var logout = function logout() {
   return function (dispatch) {
     return _utils_session_util__WEBPACK_IMPORTED_MODULE_0__.asyncLogout().then(function () {
+      return _presentation_actions__WEBPACK_IMPORTED_MODULE_1__.fetchPresentation()(dispatch);
+    }).then(function () {
       dispatch(logoutCurrentUser());
-      dispatch(_ui_actions__WEBPACK_IMPORTED_MODULE_1__.clearUI());
+      dispatch(_ui_actions__WEBPACK_IMPORTED_MODULE_2__.clearUI());
     }, function (_ref3) {
       var responseJSON = _ref3.responseJSON;
       return dispatch(receiveErrors(responseJSON));
@@ -3229,8 +3322,15 @@ var clearUI = function clearUI() {
   };
 };
 var updateCurrentSlide = function updateCurrentSlide(slideId) {
-  return function (dispatch) {
-    return dispatch(receiveCurrentSlide(slideId));
+  return function (dispatch, getState) {
+    if (!slideId) {
+      var slides = getState().entities.slides;
+      slideId = Object.values(slides).sort(function (a, b) {
+        return a.page - b.page;
+      })[0].id;
+    }
+
+    dispatch(receiveCurrentSlide(slideId));
   };
 };
 var updatePageSettings = function updatePageSettings(slideId) {
@@ -3309,13 +3409,9 @@ function App(_ref) {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_route_utils__WEBPACK_IMPORTED_MODULE_1__.ProtectedRoute, {
     path: "/presentation/:slideId",
     component: _presentation_presentation_page_container__WEBPACK_IMPORTED_MODULE_8__.default
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Route, {
-    path: "/presentation",
-    render: function render() {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Redirect, {
-        to: "/presentation/1"
-      });
-    }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_route_utils__WEBPACK_IMPORTED_MODULE_1__.ProtectedRoute, {
+    path: "/presentation/",
+    component: _presentation_presentation_page_container__WEBPACK_IMPORTED_MODULE_8__.default
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Route, {
     path: "/signin",
     render: function render() {
@@ -3428,6 +3524,13 @@ function SlidePreviewListItem(_ref) {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_preview_container__WEBPACK_IMPORTED_MODULE_1__.default, {
     containerWidth: width,
     slide: slide
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    x: -2,
+    y: 6,
+    className: "skip-box",
+    width: width + 4,
+    height: height + 4,
+    rx: 4
   }))));
 }
 
@@ -3487,14 +3590,14 @@ function FilmStrip(_ref2) {
     setMoveToPage(-1);
   }
 
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    history.replace("/presentation/".concat(currentSlideId));
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {// console.log(currentSlideId);
+    // history.replace(`/presentation/${currentSlideId}`);
   }, [currentSlideId]);
   var slidesComponents = Object.values(slides).sort(function (a, b) {
     return a.page - b.page;
   }).map(function (slide) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SlidePreviewListItem, {
-      className: slide.id == currentSlideId ? 'active' : '',
+      className: "".concat(slide.id == currentSlideId ? 'active' : '', " ").concat(slide.skipped ? 'skipped' : ''),
       key: slide.id,
       slide: slide,
       pageWidth: pageWidth,
@@ -3586,59 +3689,61 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TEXTBOX_TOOLBAR_ITEMS": () => (/* binding */ TEXTBOX_TOOLBAR_ITEMS),
 /* harmony export */   "IMAGE_TOOLBAR_ITEMS": () => (/* binding */ IMAGE_TOOLBAR_ITEMS)
 /* harmony export */ });
+/* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
+
 var NEW_SLIDE = {
   name: "New Slide",
   icon: [6, 11],
   shortCut: undefined,
-  action: undefined
+  actionName: 'newSlide'
 };
 var CUT = {
   name: "Cut",
   icon: [2, 1],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var COPY = {
   name: "Copy",
   icon: [3, 1],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var PASTE = {
   name: "Paste",
   icon: [4, 1],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var PASTE_WITHOUT_FORMATTING = {
   name: "Paste without formatting",
   icon: [5, 1],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var SELECT_ALL = {
   name: "Select all",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var PRESENT = {
   name: "Present",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var MASTER = {
   name: "Master",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var GRID_VIEW = {
   name: "Grid View",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var ZOOM = {
   name: "Zoom",
@@ -3647,180 +3752,180 @@ var ZOOM = {
     name: "Fit",
     icon: [0, 2],
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }, {
     name: "50%",
     icon: undefined,
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }, {
     name: "100%",
     icon: undefined,
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }, {
     name: "200%",
     icon: undefined,
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }, undefined, {
     name: "Zoom in",
     icon: undefined,
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }, {
     name: "Zoom out",
     icon: undefined,
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }]
 };
 var SPEAKER_NOTES = {
   name: "speaker notes",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var FULL_SCREEN = {
   name: "Full Screen",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var IMAGE = {
   name: "Image",
   icon: [0, 3],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var TEXTBOX = {
   name: "Text Box",
   icon: [7, 3],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var SHAPE = {
   name: "Shape",
   icon: [10, 3],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var DUPLICATE_SLIDE = {
   name: "Duplicate Slide",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var DELETE_SLIDE = {
   name: "Delete Slide",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: "deleteSlide"
 };
 var SKIP_SLIDE = {
   name: "Skip Slide",
   icon: undefined,
   shortCut: undefined,
-  action: undefined
+  actionName: "skipSlide"
 };
 var SELECT = {
   name: "Select",
   icon: [7, 8],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var FILL_COLOR = {
   name: "Fill color",
   icon: [0, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var BORDER_COLOR = {
   name: "Border color",
   icon: [1, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var BORDER_WEIGHT = {
   name: "Border weight",
   icon: [2, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var BORDER_DASH = {
   name: "Border dash",
   icon: [3, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var BOLD = {
   name: "Bold",
   icon: [4, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var ITALIC = {
   name: "Italic",
   icon: [5, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var UNDERLINE = {
   name: "Underline",
   icon: [6, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var TEXT_COLOR = {
   name: "Text color",
   icon: [7, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var HIGHLIGHT_COLOR = {
   name: "Highlight color",
   icon: [8, 9],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var ALIGN = {
   name: "Align",
   icon: [11, 9],
   shortCut: undefined,
-  action: undefined,
+  actionName: undefined,
   children: [{
     name: "Left",
     icon: [0, 6],
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }, {
     name: "Center",
     icon: [1, 6],
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }, {
     name: "Right",
     icon: [2, 6],
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }, {
     name: "Justify",
     icon: [3, 6],
     shortCut: undefined,
-    action: undefined
+    actionName: undefined
   }]
 };
 var CROP_IMAGE = {
   name: "Crop image",
   icon: [5, 10],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var RESET_IMAGE = {
   name: "Reset image",
   icon: [6, 10],
   shortCut: undefined,
-  action: undefined
+  actionName: undefined
 };
 var MENU_ITEMS = [{
   name: "Edit",
@@ -3857,7 +3962,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ Menu)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _utils_dropdown_menu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/dropdown_menu */ "./frontend/components/utils/dropdown_menu.jsx");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _utils_dropdown_menu__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/dropdown_menu */ "./frontend/components/utils/dropdown_menu.jsx");
+/* harmony import */ var _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../actions/item_thunk_actions */ "./frontend/actions/item_thunk_actions.js");
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+
+
 
 
 
@@ -3875,10 +3986,21 @@ var MenuIcon = function MenuIcon(_ref) {
 };
 
 var MenuItem = function MenuItem(_ref2) {
-  var item = _ref2.item;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-    className: "menu-item ".concat(item.action ? '' : 'no-action')
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(MenuIcon, {
+  var item = _ref2.item,
+      dispatch = _ref2.dispatch;
+  var clickAttribute = {};
+
+  if (typeof item.actionName == 'string') {
+    clickAttribute.onClick = function (e) {
+      console.log(e);
+      console.log(item.actionName);
+      dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_3__[item.actionName]());
+    };
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", _extends({
+    className: "menu-item ".concat(item.actionName ? '' : 'no-action')
+  }, clickAttribute), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(MenuIcon, {
     className: "menu-item-icon",
     icon: item.icon
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -3888,6 +4010,15 @@ var MenuItem = function MenuItem(_ref2) {
   }) : null);
 };
 
+var MenuItemContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(function (state) {
+  return {
+    state: state
+  };
+}, function (dispatch) {
+  return {
+    dispatch: dispatch
+  };
+})(MenuItem);
 function Menu(_ref3) {
   var _ref3$className = _ref3.className,
       className = _ref3$className === void 0 ? "" : _ref3$className,
@@ -3901,10 +4032,9 @@ function Menu(_ref3) {
   }, items.map(function (item, i) {
     return item ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", {
       key: item.name
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_dropdown_menu__WEBPACK_IMPORTED_MODULE_1__.default, {
-      className: items.className || "",
-      requireClick: requireClick
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(MenuItem, {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_dropdown_menu__WEBPACK_IMPORTED_MODULE_2__.default, {
+      className: items.className || ""
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(MenuItemContainer, {
       item: item
     }), item.children ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Menu, {
       tier: tier + 1,
@@ -3975,10 +4105,6 @@ function PresentationPage(_ref) {
       fetchPresentationHandler = _ref.fetchPresentationHandler,
       updateCurrentSlideHandler = _ref.updateCurrentSlideHandler,
       saveDocHandler = _ref.saveDocHandler;
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    fetchPresentationHandler();
-    updateCurrentSlideHandler(currentSlideId);
-  }, []);
 
   var _docHook = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({});
 
@@ -3986,10 +4112,31 @@ function PresentationPage(_ref) {
       _doc = _docHook2[0],
       _setDoc = _docHook2[1];
 
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true),
+      _useState2 = _slicedToArray(_useState, 2),
+      _loading = _useState2[0],
+      _setLoading = _useState2[1];
+
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    fetchPresentationHandler();
+
+    _setLoading(true);
+  }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    // console.log(doc);
+    // updateCurrentSlideHandler(currentSlideId);
+    if (doc) {
+      if (!currentSlideId) {
+        console.log(doc);
+        updateCurrentSlideHandler();
+      }
+
+      _setLoading(false);
+    }
+
     _setDoc(_objectSpread(_objectSpread({}, _doc), doc));
   }, [doc]);
-  return _doc.id && slides.length ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
+  return _loading ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "page presentation"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "icon-wrapper"
@@ -4028,7 +4175,7 @@ function PresentationPage(_ref) {
     slideId: currentSlideId
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "app-switcher"
-  }, "appswitcher"))) : null;
+  }, "appswitcher")));
 }
 
 /***/ }),
@@ -4095,7 +4242,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Workspace(_ref) {
-  var slide = _ref.slide;
+  var slide = _ref.slide,
+      ui = _ref.ui,
+      slideId = _ref.slideId,
+      entities = _ref.entities;
+  // console.log(ui, slideId, entities)
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "workspace"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_container__WEBPACK_IMPORTED_MODULE_1__.default, {
@@ -4120,10 +4271,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _workspace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./workspace */ "./frontend/components/presentation/workspace.jsx");
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, ownProps) {
-  var entities = _ref.entities;
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref) {
+  var entities = _ref.entities,
+      ui = _ref.ui;
   return {
-    slide: entities.slides[ownProps.slideId]
+    entities: entities,
+    slide: entities.slides[ui.slideId],
+    ui: ui
   };
 }, null)(_workspace__WEBPACK_IMPORTED_MODULE_1__.default));
 
@@ -5075,7 +5229,8 @@ function SVGSlide(_ref) {
       containerWidth = _ref.containerWidth,
       width = _ref.width,
       height = _ref.height,
-      slide = _ref.slide;
+      _ref$slide = _ref.slide,
+      slide = _ref$slide === void 0 ? {} : _ref$slide;
   var widthAttr = {};
 
   if (containerWidth) {
@@ -5242,7 +5397,7 @@ function AutosaveInput(_ref) {
     className: "autosave ".concat(className),
     type: type,
     name: key,
-    value: _docHook[0].filename,
+    value: _doc.filename,
     onChange: function onChange(e) {
       return handleChange(e);
     }
@@ -5499,6 +5654,9 @@ var SlidesReducer = function SlidesReducer() {
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_SLIDES:
       return action.slides;
 
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_SLIDE:
+      return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.slide.id, action.slide));
+
     default:
       return state;
   }
@@ -5514,7 +5672,7 @@ var DocsReducer = function DocsReducer() {
       return action.docs;
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_DOC:
-      return _defineProperty({}, action.doc.id, _objectSpread({}, action.doc));
+      return _defineProperty({}, action.doc.id, action.doc);
 
     default:
       return state;
@@ -5688,10 +5846,7 @@ function UIReducer() {
 
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_PAGE_SETTINGS:
       {
-        return _objectSpread(_objectSpread({}, state), {}, {
-          pageWidth: action.pageSettings.pageWidth,
-          pageHeight: action.pageSettings.pageHeight
-        });
+        return _objectSpread(_objectSpread({}, state), action.pageSettings);
       }
       ;
 
@@ -5728,7 +5883,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var configureStore = function configureStore() {
   var preloadedState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default, (redux_logger__WEBPACK_IMPORTED_MODULE_0___default())));
+  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default));
 };
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (configureStore);
@@ -5781,10 +5936,13 @@ var asyncDeleteSlide = function asyncDeleteSlide(slideId) {
     url: "/api/slides/".concat(slideId)
   });
 };
-var asyncUpdateSlide = function asyncUpdateSlide(slideId) {
+var asyncUpdateSlide = function asyncUpdateSlide(slide) {
   return $.ajax({
     method: 'PATCH',
-    url: "/api/slides/".concat(slideId)
+    url: "/api/slides/".concat(slide.id),
+    data: {
+      slide: slide
+    }
   });
 };
 var asyncMoveSlide = function asyncMoveSlide(data) {

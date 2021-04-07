@@ -77,7 +77,7 @@ import React, {useState, useEffect} from 'react';
 //   null
 // )(SVGWrapper);
 
-export default function SVGSlide({isPreview, containerWidth, width, height, slide}){
+export default function SVGSlide({isPreview, containerWidth, width, height, slide = {}}){
   let widthAttr = {};
   if (containerWidth) { widthAttr = {width: containerWidth}; }
 

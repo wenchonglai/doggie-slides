@@ -9,19 +9,30 @@ import FilmStripContainer from './filmstrip_container';
 import WorkspaceContainer from './workspace_container';
 
 export default function PresentationPage({state, ownProps, currentSlideId, doc, slides, fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler}){
-  useEffect(() => {
-    fetchPresentationHandler();
-    updateCurrentSlideHandler(currentSlideId);
-  }, []);
-
   const _docHook = useState({});
   const [_doc, _setDoc] = _docHook;
+  const [_loading, _setLoading] = useState(true);
 
   useEffect(() => {
+    fetchPresentationHandler();
+    _setLoading(true);
+  }, []);
+
+  useEffect(() => {
+    // console.log(doc);
+    // updateCurrentSlideHandler(currentSlideId);
+    
+    if (doc){
+      if (!currentSlideId){
+        console.log(doc);
+        updateCurrentSlideHandler();
+      }
+      _setLoading(false);
+    }
     _setDoc({..._doc, ...doc});
   }, [doc]);
 
-  return ( _doc.id && slides.length ? 
+  return ( _loading ? null :
     (<section className='page presentation'>
       <header>
         <div className='icon-wrapper'>
@@ -75,6 +86,6 @@ export default function PresentationPage({state, ownProps, currentSlideId, doc, 
         </section>
         <section className='app-switcher'>appswitcher</section>
       </section>
-    </section>) : null
+    </section>)
   );
 }

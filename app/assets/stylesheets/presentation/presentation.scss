@@ -94,6 +94,7 @@ section.page.presentation{
       }
 
       > section.two-panel-layout {
+        z-index: 0;
         flex: 1 0 auto;
         display: flex;
         flex-direction: row;

@@ -1,51 +1,56 @@
-const NEW_SLIDE = { name: "New Slide", icon: [6, 11], shortCut: undefined, action: undefined};
-const CUT = { name: "Cut", icon: [2, 1], shortCut: undefined, action: undefined};
-const COPY = { name: "Copy", icon: [3, 1], shortCut: undefined, action: undefined};
-const PASTE = { name: "Paste", icon: [4, 1], shortCut: undefined, action: undefined};
-const PASTE_WITHOUT_FORMATTING = { name: "Paste without formatting", icon: [5, 1], shortCut: undefined, action: undefined};
-const SELECT_ALL = { name: "Select all", icon: undefined, shortCut: undefined, action: undefined};
-const PRESENT = { name: "Present", icon: undefined, shortCut: undefined, action: undefined};
-const MASTER = { name: "Master", icon: undefined, shortCut: undefined, action: undefined};
-const GRID_VIEW = { name: "Grid View", icon: undefined, shortCut: undefined, action: undefined};
+import {addSlide} from '../../actions/presentation_actions';
+
+const NEW_SLIDE = {
+  name: "New Slide", icon: [6, 11], shortCut: undefined, actionName: 'newSlide'
+};
+
+const CUT = { name: "Cut", icon: [2, 1], shortCut: undefined, actionName: undefined};
+const COPY = { name: "Copy", icon: [3, 1], shortCut: undefined, actionName: undefined};
+const PASTE = { name: "Paste", icon: [4, 1], shortCut: undefined, actionName: undefined};
+const PASTE_WITHOUT_FORMATTING = { name: "Paste without formatting", icon: [5, 1], shortCut: undefined, actionName: undefined};
+const SELECT_ALL = { name: "Select all", icon: undefined, shortCut: undefined, actionName: undefined};
+const PRESENT = { name: "Present", icon: undefined, shortCut: undefined, actionName: undefined};
+const MASTER = { name: "Master", icon: undefined, shortCut: undefined, actionName: undefined};
+const GRID_VIEW = { name: "Grid View", icon: undefined, shortCut: undefined, actionName: undefined};
 const ZOOM = { name: "Zoom", icon: [5, 8], children: [
-  { name: "Fit", icon: [0, 2], shortCut: undefined, action: undefined},
-  { name: "50%", icon: undefined, shortCut: undefined, action: undefined},
-  { name: "100%", icon: undefined, shortCut: undefined, action: undefined},
-  { name: "200%", icon: undefined, shortCut: undefined, action: undefined},
+  { name: "Fit", icon: [0, 2], shortCut: undefined, actionName: undefined},
+  { name: "50%", icon: undefined, shortCut: undefined, actionName: undefined},
+  { name: "100%", icon: undefined, shortCut: undefined, actionName: undefined},
+  { name: "200%", icon: undefined, shortCut: undefined, actionName: undefined},
   undefined,
-  { name: "Zoom in", icon: undefined, shortCut: undefined, action: undefined},
-  { name: "Zoom out", icon: undefined, shortCut: undefined, action: undefined},
+  { name: "Zoom in", icon: undefined, shortCut: undefined, actionName: undefined},
+  { name: "Zoom out", icon: undefined, shortCut: undefined, actionName: undefined},
 ]};
-const SPEAKER_NOTES = { name: "speaker notes", icon: undefined, shortCut: undefined, action: undefined};
-const FULL_SCREEN = { name: "Full Screen", icon: undefined, shortCut: undefined, action: undefined};
-const IMAGE = { name: "Image", icon: [0, 3], shortCut: undefined, action: undefined};
-const TEXTBOX = { name: "Text Box", icon: [7, 3], shortCut: undefined, action: undefined};
-const SHAPE = { name: "Shape", icon: [10, 3], shortCut: undefined, action: undefined};
-const DUPLICATE_SLIDE = { name: "Duplicate Slide", icon: undefined, shortCut: undefined, action: undefined};
-const DELETE_SLIDE = { name: "Delete Slide", icon: undefined, shortCut: undefined, action: undefined};
-const SKIP_SLIDE = { name: "Skip Slide", icon: undefined, shortCut: undefined, action: undefined};
-const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, action: undefined};
+const SPEAKER_NOTES = { name: "speaker notes", icon: undefined, shortCut: undefined, actionName: undefined};
+const FULL_SCREEN = { name: "Full Screen", icon: undefined, shortCut: undefined, actionName: undefined};
+const IMAGE = { name: "Image", icon: [0, 3], shortCut: undefined, actionName: undefined};
+const TEXTBOX = { name: "Text Box", icon: [7, 3], shortCut: undefined, actionName: undefined};
+const SHAPE = { name: "Shape", icon: [10, 3], shortCut: undefined, actionName: undefined};
+const DUPLICATE_SLIDE = { name: "Duplicate Slide", icon: undefined, shortCut: undefined, actionName: undefined};
+const DELETE_SLIDE = { name: "Delete Slide", icon: undefined, shortCut: undefined, actionName: "deleteSlide"};
+const SKIP_SLIDE = { name: "Skip Slide", icon: undefined, shortCut: undefined, actionName: "skipSlide"};
+const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, actionName: undefined};
 
-const FILL_COLOR = { name: "Fill color", icon: [0, 9], shortCut: undefined, action: undefined};
-const BORDER_COLOR = { name: "Border color", icon: [1, 9], shortCut: undefined, action: undefined};
-const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined, action: undefined};
-const BORDER_DASH = { name: "Border dash", icon: [3, 9], shortCut: undefined, action: undefined};
+const FILL_COLOR = { name: "Fill color", icon: [0, 9], shortCut: undefined, actionName: undefined};
+const BORDER_COLOR = { name: "Border color", icon: [1, 9], shortCut: undefined, actionName: undefined};
+const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined, actionName: undefined};
+const BORDER_DASH = { name: "Border dash", icon: [3, 9], shortCut: undefined, actionName: undefined};
 
-const BOLD = { name: "Bold", icon: [4, 9], shortCut: undefined, action: undefined};
-const ITALIC = { name: "Italic", icon: [5, 9], shortCut: undefined, action: undefined};
-const UNDERLINE = { name: "Underline", icon: [6, 9], shortCut: undefined, action: undefined};
-const TEXT_COLOR = { name: "Text color", icon: [7, 9], shortCut: undefined, action: undefined};
-const HIGHLIGHT_COLOR = { name: "Highlight color", icon: [8, 9], shortCut: undefined, action: undefined};
+const BOLD = { name: "Bold", icon: [4, 9], shortCut: undefined, actionName: undefined};
+const ITALIC = { name: "Italic", icon: [5, 9], shortCut: undefined, actionName: undefined};
+const UNDERLINE = { name: "Underline", icon: [6, 9], shortCut: undefined, actionName: undefined};
+const TEXT_COLOR = { name: "Text color", icon: [7, 9], shortCut: undefined, actionName: undefined};
+const HIGHLIGHT_COLOR = { name: "Highlight color", icon: [8, 9], shortCut: undefined, actionName: undefined};
 
-const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, action: undefined, children: [
-  { name: "Left", icon: [0, 6], shortCut: undefined, action: undefined},
-  { name: "Center", icon: [1, 6], shortCut: undefined, action: undefined},
-  { name: "Right", icon: [2, 6], shortCut: undefined, action: undefined},
-  { name: "Justify", icon: [3, 6], shortCut: undefined, action: undefined},
+const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, actionName: undefined, children: [
+  { name: "Left", icon: [0, 6], shortCut: undefined, actionName: undefined},
+  { name: "Center", icon: [1, 6], shortCut: undefined, actionName: undefined},
+  { name: "Right", icon: [2, 6], shortCut: undefined, actionName: undefined},
+  { name: "Justify", icon: [3, 6], shortCut: undefined, actionName: undefined},
 ]};
 
-const CROP_IMAGE = { name: "Crop image", icon: [5, 10], shortCut: undefined, action: undefined};
-const RESET_IMAGE = { name: "Reset image", icon: [6, 10], shortCut: undefined, action: undefined};
+const CROP_IMAGE = { name: "Crop image", icon: [5, 10], shortCut: undefined, actionName: undefined};
+const RESET_IMAGE = { name: "Reset image", icon: [6, 10], shortCut: undefined, actionName: undefined};
 
 
 export const MENU_ITEMS = [

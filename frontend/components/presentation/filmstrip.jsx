@@ -21,6 +21,7 @@ function SlidePreviewListItem({pageWidth, pageHeight, className, slide, clickHan
         <g transform="translate(40 0)" >
           <rect x={-2} y={6} className="box" width={width + 4} height={height + 4} rx={4}></rect>
           <SVGSlidePreviewContainer containerWidth={width} slide={slide}/>
+          <rect x={-2} y={6} className="skip-box" width={width + 4} height={height + 4} rx={4}></rect>
         </g>
       </svg>
     </li>
@@ -63,12 +64,13 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
   }
 
   useEffect(() => {
-    history.replace(`/presentation/${currentSlideId}`);
+    // console.log(currentSlideId);
+    // history.replace(`/presentation/${currentSlideId}`);
   }, [currentSlideId]);
 
   const slidesComponents = Object.values(slides).sort((a, b) => a.page - b.page).map(slide => 
         ( <SlidePreviewListItem 
-            className={slide.id == currentSlideId ? 'active' : ''}
+            className={`${slide.id == currentSlideId ? 'active' : ''} ${slide.skipped ? 'skipped' : ''}`}
             key={slide.id}
             {...{slide, pageWidth, pageHeight, clickHandler, dragOverHandler, dragStartHandler, dragEndHandler}}
           />

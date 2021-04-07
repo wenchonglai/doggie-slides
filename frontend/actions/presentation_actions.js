@@ -4,6 +4,7 @@ import { receiveCurrentSlide, updatePageSettings } from './ui_actions';
 export const RECEIVE_DOCS = 'RECEIVE_DOCS';
 export const RECEIVE_DOC = 'RECEIVE_DOC';
 export const RECEIVE_SLIDES = 'RECEIVE_SLIDES';
+export const RECEIVE_SLIDE = 'RECEIVE_SLIDE';
 
 const receiveDocs = (docs) => ({
   type: RECEIVE_DOCS,
@@ -16,29 +17,21 @@ const receiveDoc = (doc) => ({
 });
 
 
-const receiveSlides = (slides) => ({
+export const receiveSlides = (slides) => ({
   type: RECEIVE_SLIDES,
   slides
 });
 
+export const receiveSlide = (slide) => ({
+  type: RECEIVE_SLIDE,
+  slide
+});
+
 export const fetchPresentation = () => (dispatch, getState) =>
   PresentationUtils.asyncFetchPresentation()
-    .then((entities) => {
+    .then((entities, ...args) => {
       const doc = Object.values(entities.docs)[0];
-      const ui = getState();
-
-      if (!doc.slideIds.includes(ui.slideId)){
-        const locationArr = window.location.href.split('/');
-        const newSlideId = Object.values(entities.slides).sort((a, b) => a.page - b.page)[0].id;
-        const href = locationArr.join('/');
-        const newHref = [...locationArr.slice(0, -1), newSlideId].join('/');
-
-        dispatch(receiveCurrentSlide(newSlideId));
-
-        location.replace(`#/presentation/${newSlideId}`);
-      }
-      
-      dispatch(updatePageSettings({pageWidth: doc.width, pageHeight: doc.height}));
+      doc && dispatch(updatePageSettings({docId: doc.id, pageWidth: doc.width, pageHeight: doc.height}));
       dispatch(receiveDocs(entities.docs));
       dispatch(receiveSlides(entities.slides));
       
@@ -57,4 +50,11 @@ export const moveSlide = ({start, end=start, offset}) => (dispatch) =>
     .then((slides) => {
       dispatch(receiveSlides(slides));
       return slides;
+    });
+
+export const addSlide = (formSlide) => (dispatch) => 
+  PresentationUtils.asyncAddSlide(formSlide)
+    .then((slide) => {
+      dispatch(receiveSlide(slide));
+      return slide;
     });

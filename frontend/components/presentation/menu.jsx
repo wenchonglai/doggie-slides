@@ -1,5 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import DropdownMenu from '../utils/dropdown_menu';
+import * as ItemThunkActions from '../../actions/item_thunk_actions'
 
 const MenuIcon = function({className, icon=[-1, -1]}){
   return (
@@ -14,9 +16,22 @@ const MenuIcon = function({className, icon=[-1, -1]}){
   )
 }
 
-const MenuItem = function({item}){
+const MenuItem = function({item, dispatch}){
+  const clickAttribute = {}
+
+  if (typeof item.actionName == 'string'){
+    clickAttribute.onClick = (e) => {
+      console.log(e);
+      console.log(item.actionName);
+      dispatch(ItemThunkActions[item.actionName]())
+    };
+  }
+
   return (
-    <div className={`menu-item ${item.action ? '' : 'no-action'}`}>
+    <div 
+      className={`menu-item ${item.actionName ? '' : 'no-action'}`}
+      {...clickAttribute}
+    >
       <MenuIcon className='menu-item-icon' icon={item.icon}/>
       <div className='menu-item-name'>{item.name}</div>
       {(item.children ? 
@@ -27,6 +42,15 @@ const MenuItem = function({item}){
   );
 }
 
+const MenuItemContainer = connect(
+  state => ({
+    state
+  }),
+  dispatch => ({
+    dispatch
+  })
+)(MenuItem)
+
 export default function Menu({className = "", items, tier = 0, requireClick=true}){
   return (
     <ul className={`menu tier-${tier} ${className}`}>
@@ -34,9 +58,8 @@ export default function Menu({className = "", items, tier = 0, requireClick=true
           ( item ? ( <li key={item.name}>
                 <DropdownMenu
                   className={items.className || ""}
-                  requireClick={requireClick}
                 >
-                  <MenuItem item={item}/>
+                  <MenuItemContainer item={item}/>
                   { item.children ?
                     <Menu
                       tier={tier + 1}

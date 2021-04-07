@@ -1,5 +1,3 @@
-
-
 class Api::SlidesController < ApplicationController
   before_action :ensure_current_user
 
@@ -12,7 +10,7 @@ class Api::SlidesController < ApplicationController
         .where("page >= ? and id <> ?", @slide.page, @slide.id)
         .in_batches.update_all("page = page + 1");
 
-      redirect_to api_slide_url(@slide), status: 303
+      redirect_to api_slides_url, status: 303
     else
       render json: @slide.errors.full_messages, status: 422
     end
@@ -22,22 +20,21 @@ class Api::SlidesController < ApplicationController
     @slide = Slide.find_by(id: params[:id])
 
     if @slide
-      old_page = @slide.page
-      
-      if (@slide.doc_id != params[:slide][:doc_id])
+      if (@slide.doc_id != params[:slide][:doc_id].to_i)
         render json: ["Cannot move a slide to another document"], status: 403
+      elsif (@slide.page != params[:slide][:page].to_i)
+        render json: ["Cannot change page number using this action"], status: 403
       elsif (@slide.update(slide_params))
         new_page = @slide.page
-
-        if (new_page > old_page)
-          @slides
-            .where("page > ? and page <= ? and id <> ?", old_page, new_page, @slide.id)
-            .in_batches.update_all("page = page - 1");
-        elsif (new_page < old_page)
-          @slides
-            .where("page < ? and page >= ? and id <> ?", old_page, new_page, @slide.id)
-            .in_batches.update_all("page = page + 1");
-        end
+        # if (new_page > old_page)
+        #   @slides
+        #     .where("page > ? and page <= ? and id <> ?", old_page, new_page, @slide.id)
+        #     .in_batches.update_all("page = page - 1");
+        # elsif (new_page < old_page)
+        #   @slides
+        #     .where("page < ? and page >= ? and id <> ?", old_page, new_page, @slide.id)
+        #     .in_batches.update_all("page = page + 1");
+        # end
 
         redirect_to api_slide_url(@slide), status: 303
       else
@@ -49,20 +46,25 @@ class Api::SlidesController < ApplicationController
   end
 
   def destroy
-    @slide = Slide.find_by(id: params[:id]);
     
-    if @slide
-      if @slide.destroy
-        @slides
-          .where("page >= ?", @slide.page)
-          .in_batches.update_all("page = page - 1");
-          
-        redirect_to api_slides_url, status: 303
+    
+    if @slides.count == 1
+      render json: ['Cannot delete the last slide'], status: 403
+    else 
+      @slide = @slides.find_by(id: params[:id]);
+      if @slide
+        if @slide.destroy
+          @slides
+            .where("page >= ?", @slide.page)
+            .in_batches.update_all("page = page - 1");
+            
+          redirect_to api_slides_url, status: 303
+        else
+          render json: @slide.errors.full_messages, status: 422
+        end
       else
-        render json: @slide.errors.full_messages, status: 422
+        render json: ['Slide not found'], status: 404
       end
-    else
-      render json: ['Slide not found'], status: 403
     end
   end
 

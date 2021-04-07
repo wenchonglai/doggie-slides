@@ -16,8 +16,14 @@ export const clearUI = () => ({
   type: CLEAR_UI
 })
 
-export const updateCurrentSlide = slideId => dispatch =>
+export const updateCurrentSlide = slideId => (dispatch, getState) => {
+  if (!slideId){
+    const slides = getState().entities.slides;
+    slideId = Object.values(slides).sort((a, b) => a.page - b.page)[0].id;
+  }
+ 
   dispatch(receiveCurrentSlide(slideId));
+}
 
 export const updatePageSettings = slideId => dispatch =>
   dispatch(receivePageSettings(slideId));

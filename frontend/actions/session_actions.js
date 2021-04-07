@@ -1,4 +1,5 @@
-import * as SessionUtil from '../utils/session_util'
+import * as SessionUtil from '../utils/session_util';
+import * as PresentationActions from './presentation_actions';
 import * as UIActions from './ui_actions';
 
 export const RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
@@ -52,6 +53,9 @@ export const login = (formUser) => (dispatch) =>
 
 export const logout = () => (dispatch) =>
   SessionUtil.asyncLogout()
+    .then( () => {
+      return PresentationActions.fetchPresentation()(dispatch);
+    })
     .then(
       () => {
         dispatch(logoutCurrentUser());

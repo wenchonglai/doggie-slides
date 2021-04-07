@@ -32,7 +32,7 @@ function App({errors, history, clearErrorsHandler}){
       <AuthRoute path='/signin/challenge' exact component={SigninPasswordPageContainer}/>
       <AuthRoute path='/signup' exact component={SignupContainer}/>
       <ProtectedRoute path='/presentation/:slideId' component={PresentationPageContainer}/>
-      <Route path='/presentation' render={(...props) => {return (<Redirect to={`/presentation/1`}/>)}}/>
+      <ProtectedRoute path='/presentation/' component={PresentationPageContainer}/>
       <Route path='/signin' render={() => <Redirect to="/signin/identifier"/>}/>
       <Route path='/' render={() => <Redirect to="/slides/about"/>}/>
     </Switch>

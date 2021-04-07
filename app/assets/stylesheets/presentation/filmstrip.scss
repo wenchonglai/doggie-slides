@@ -35,6 +35,11 @@ ul.filmstrip{
       fill: none;
     }
 
+    rect.skip-box {
+      fill: none;
+      opacity: 0.35;
+    }
+
     &:hover, &.active {
       rect.box { stroke-width: 2px; }
     }
@@ -42,6 +47,12 @@ ul.filmstrip{
     &.active {
       background: #fdf7e6;
       rect.box { stroke: #eda912; }
+    }
+
+    &.skipped {
+      rect.skip-box {
+        fill: #000;
+      }
     }
   }
 
