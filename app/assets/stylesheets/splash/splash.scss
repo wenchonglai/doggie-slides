@@ -86,7 +86,7 @@ section.splash {
   section.section-intro{
     color: #626262;
     min-height: calc(100vh - 67px);
-    background: url("/assets/background-splash.jpg");
+    background: url(image-url("/assets/background-splash.jpg"));
     background-repeat: no-repeat;
     background-position: 50% 80%;
     background-size: cover;
