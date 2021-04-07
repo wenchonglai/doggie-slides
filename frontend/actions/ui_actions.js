@@ -17,12 +17,21 @@ export const clearUI = () => ({
 })
 
 export const updateCurrentSlide = slideId => (dispatch, getState) => {
+  let {ui} = getState();
+  let newURL = '';
+
   if (!slideId){
     const slides = getState().entities.slides;
-    slideId = Object.values(slides).sort((a, b) => a.page - b.page)[0].id;
+    const slide = Object.values(slides).sort((a, b) => a.page - b.page)[0];
+    slideId = slide.id;
+    
+    newURL = `/#/presentation/${slide.docId}/slides/${slideId}`;
+  } else {
+    newURL = `/#/presentation/${ui.docId}/slides/${slideId}`;
   }
  
   dispatch(receiveCurrentSlide(slideId));
+  window.location.replace(newURL);
 }
 
 export const updatePageSettings = slideId => dispatch =>

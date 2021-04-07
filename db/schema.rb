@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_05_044628) do
+ActiveRecord::Schema.define(version: 2021_04_07_183452) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,22 @@ ActiveRecord::Schema.define(version: 2021_04_05_044628) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["session_token"], name: "index_users_on_session_token", unique: true
+  end
+
+  create_table "wrappers", force: :cascade do |t|
+    t.integer "group_id"
+    t.integer "slide_id", null: false
+    t.integer "object_id", null: false
+    t.integer "order", null: false
+    t.string "type", null: false
+    t.integer "width", default: 150, null: false
+    t.integer "height", default: 100, null: false
+    t.string "transform_string"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_id"], name: "index_wrappers_on_group_id"
+    t.index ["slide_id"], name: "index_wrappers_on_slide_id"
+    t.index ["type", "object_id"], name: "index_wrappers_on_type_and_object_id", unique: true
   end
 
 end

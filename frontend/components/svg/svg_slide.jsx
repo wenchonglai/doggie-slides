@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import SVGTextArea from './svg-textarea';
 
 // const CONTROL_POINT_SETTINGS = {
 //   radius: 4
@@ -80,7 +81,7 @@ import React, {useState, useEffect} from 'react';
 export default function SVGSlide({isPreview, containerWidth, width, height, slide = {}}){
   let widthAttr = {};
   if (containerWidth) { widthAttr = {width: containerWidth}; }
-
+console.log(slide);
   return (
     <svg 
       version="1.1" 
@@ -98,10 +99,12 @@ export default function SVGSlide({isPreview, containerWidth, width, height, slid
           // <SVGNoWrapperContainer wrapperId={wrapperId} />
         )
       } */}
-      <text x={800} y={400} alignmentBaseline="middle" textAnchor="middle" fontSize="60">{`Slide #${slide.id} (Page ${slide.page})`}</text>
+      <text x={width - 100} y={height - 100} alignmentBaseline="middle" textAnchor="middle" fontSize="20">{`Page ${slide.page}`}</text>
       <rect x='200' width="1200" y ="300" height="200" stroke='#777' fill="none">
         
       </rect>
+      <SVGTextArea transform={"translate(400 420)"} value={`Title for Slide #${slide.id}`}/>
+      <SVGTextArea transform={"translate(400 720)"} value={`Subtitle for ${slide.id}`}/>
       <rect x='500' width="600" y ="600" height="200" stroke='#777' fill="none"></rect>
     </svg>
   )

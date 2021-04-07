@@ -3,8 +3,8 @@ import SVGSlidePreviewContainer from '../svg/svg_slide_preview_container';
 
 function SlidePreviewListItem({pageWidth, pageHeight, className, slide, clickHandler, dragStartHandler, dragOverHandler, dragEndHandler}){
   const width = 150;
-  const height = 150 * pageHeight / pageWidth | 0
-  ;
+  const height = 150 * pageHeight / pageWidth | 0;
+
   return (
     <li className={`filmstrip-item ${className}`}
       draggable={true}
@@ -20,7 +20,7 @@ function SlidePreviewListItem({pageWidth, pageHeight, className, slide, clickHan
         
         <g transform="translate(40 0)" >
           <rect x={-2} y={6} className="box" width={width + 4} height={height + 4} rx={4}></rect>
-          <SVGSlidePreviewContainer containerWidth={width} slide={slide}/>
+          <SVGSlidePreviewContainer containerWidth={width} slideId={slide.id}/>
           <rect x={-2} y={6} className="skip-box" width={width + 4} height={height + 4} rx={4}></rect>
         </g>
       </svg>

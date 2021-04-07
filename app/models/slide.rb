@@ -20,6 +20,8 @@ class Slide < ApplicationRecord
   belongs_to :doc
   delegate :user, to: :doc
 
+  has_many :wrappers
+
   private
   def set_default_values
     self.skipped ||= false

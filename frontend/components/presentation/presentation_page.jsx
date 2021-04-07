@@ -24,7 +24,6 @@ export default function PresentationPage({state, ownProps, currentSlideId, doc, 
     
     if (doc){
       if (!currentSlideId){
-        console.log(doc);
         updateCurrentSlideHandler();
       }
       _setLoading(false);

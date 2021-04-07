@@ -73,7 +73,7 @@ function Headline({productName, googleProductBodyText}){
         { productName === 'slides' ?
           ( <HeadLineItem title="Clone" iconUrl={window.productIconUrl} iconIndex={3}>
               <p>
-                The splash page CSS took me the whole night. Please extend the deadline T_T
+                One little bug took me the whole night... Is it me or the database is slow??? Good person please extend the deadline T_T
               </p>
               <Link className='splash button-anchor' to={`/presentation/`} >Go to DoggIe Slides</Link>
             </HeadLineItem>
