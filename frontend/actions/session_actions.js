@@ -1,4 +1,5 @@
 import * as SessionUtil from '../utils/session_util'
+import * as UIActions from './ui_actions';
 
 export const RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
 export const RECEIVE_ACCOUNT = 'RECEIVE_ACCOUNT';
@@ -54,7 +55,7 @@ export const logout = () => (dispatch) =>
     .then(
       () => {
         dispatch(logoutCurrentUser());
-        dispatch(clearUI())
+        dispatch(UIActions.clearUI())
       },
       ({responseJSON}) => dispatch(receiveErrors(responseJSON))
     );

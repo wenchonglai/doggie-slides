@@ -3102,6 +3102,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "signup": () => (/* binding */ signup)
 /* harmony export */ });
 /* harmony import */ var _utils_session_util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/session_util */ "./frontend/utils/session_util.js");
+/* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+
 
 var RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
 var RECEIVE_ACCOUNT = 'RECEIVE_ACCOUNT';
@@ -3165,7 +3167,7 @@ var logout = function logout() {
   return function (dispatch) {
     return _utils_session_util__WEBPACK_IMPORTED_MODULE_0__.asyncLogout().then(function () {
       dispatch(logoutCurrentUser());
-      dispatch(clearUI());
+      dispatch(_ui_actions__WEBPACK_IMPORTED_MODULE_1__.clearUI());
     }, function (_ref3) {
       var responseJSON = _ref3.responseJSON;
       return dispatch(receiveErrors(responseJSON));
@@ -5292,7 +5294,7 @@ function DoggieLogo(_ref) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
     href: url
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
-    src: color == bw ? window.bwLogoUrl : window.crLogoUrl,
+    src: color == "bw" ? window.bwLogoUrl : window.crLogoUrl,
     alt: "Doggie Logo"
   })));
 }

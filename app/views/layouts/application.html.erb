@@ -20,7 +20,6 @@
       window.bwLogoUrl = "<%= image_url('logo-bw.svg') %>";
       window.crLogoUrl = "<%= image_url('logo-cr.svg') %>";
       
-      `logo-${color}.svg`
       <% if current_user %>
         window.currentUser = <%= render(
           "api/users/user.json.jbuilder",
