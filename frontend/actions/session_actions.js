@@ -45,14 +45,17 @@ export const fetchAccount = (formUser) => (dispatch) =>
 export const login = (formUser) => (dispatch) =>
   SessionUtil.asyncLogin(formUser)
     .then(
-      (user) => dispatch(receiveCurrentUser(user)),
+      (user) => {dispatch(receiveCurrentUser(user))},
       ({responseJSON}) => dispatch(receiveErrors(responseJSON))
     );
 
 export const logout = () => (dispatch) =>
   SessionUtil.asyncLogout()
     .then(
-      () => dispatch(logoutCurrentUser()),
+      () => {
+        dispatch(logoutCurrentUser());
+        dispatch(clearUI())
+      },
       ({responseJSON}) => dispatch(receiveErrors(responseJSON))
     );
 

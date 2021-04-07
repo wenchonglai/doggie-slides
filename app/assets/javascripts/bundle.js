@@ -2984,6 +2984,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
 /* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 
 
 var RECEIVE_DOCS = 'RECEIVE_DOCS';
@@ -3012,9 +3024,22 @@ var receiveSlides = function receiveSlides(slides) {
 };
 
 var fetchPresentation = function fetchPresentation() {
-  return function (dispatch) {
+  return function (dispatch, getState) {
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncFetchPresentation().then(function (entities) {
       var doc = Object.values(entities.docs)[0];
+      var ui = getState();
+
+      if (!doc.slideIds.includes(ui.slideId)) {
+        var locationArr = window.location.href.split('/');
+        var newSlideId = Object.values(entities.slides).sort(function (a, b) {
+          return a.page - b.page;
+        })[0].id;
+        var href = locationArr.join('/');
+        var newHref = [].concat(_toConsumableArray(locationArr.slice(0, -1)), [newSlideId]).join('/');
+        dispatch((0,_ui_actions__WEBPACK_IMPORTED_MODULE_1__.receiveCurrentSlide)(newSlideId));
+        location.replace("#/presentation/".concat(newSlideId));
+      }
+
       dispatch((0,_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updatePageSettings)({
         pageWidth: doc.width,
         pageHeight: doc.height
@@ -3022,9 +3047,7 @@ var fetchPresentation = function fetchPresentation() {
       dispatch(receiveDocs(entities.docs));
       dispatch(receiveSlides(entities.slides));
       return entities;
-    }, function (err) {
-      console.log(err);
-    });
+    }, function (err) {});
   };
 };
 var updateDoc = function updateDoc(formDoc) {
@@ -3131,7 +3154,7 @@ var fetchAccount = function fetchAccount(formUser) {
 var login = function login(formUser) {
   return function (dispatch) {
     return _utils_session_util__WEBPACK_IMPORTED_MODULE_0__.asyncLogin(formUser).then(function (user) {
-      return dispatch(receiveCurrentUser(user));
+      dispatch(receiveCurrentUser(user));
     }, function (_ref2) {
       var responseJSON = _ref2.responseJSON;
       return dispatch(receiveErrors(responseJSON));
@@ -3141,7 +3164,8 @@ var login = function login(formUser) {
 var logout = function logout() {
   return function (dispatch) {
     return _utils_session_util__WEBPACK_IMPORTED_MODULE_0__.asyncLogout().then(function () {
-      return dispatch(logoutCurrentUser());
+      dispatch(logoutCurrentUser());
+      dispatch(clearUI());
     }, function (_ref3) {
       var responseJSON = _ref3.responseJSON;
       return dispatch(receiveErrors(responseJSON));
@@ -3174,12 +3198,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "RECEIVE_PAGE_SETTINGS": () => (/* binding */ RECEIVE_PAGE_SETTINGS),
 /* harmony export */   "RECEIVE_CURRENT_SLIDE": () => (/* binding */ RECEIVE_CURRENT_SLIDE),
+/* harmony export */   "CLEAR_UI": () => (/* binding */ CLEAR_UI),
+/* harmony export */   "receiveCurrentSlide": () => (/* binding */ receiveCurrentSlide),
+/* harmony export */   "clearUI": () => (/* binding */ clearUI),
 /* harmony export */   "updateCurrentSlide": () => (/* binding */ updateCurrentSlide),
 /* harmony export */   "updatePageSettings": () => (/* binding */ updatePageSettings)
 /* harmony export */ });
 var RECEIVE_PAGE_SETTINGS = 'RECEIVE_PAGE_SETTINGS';
 var RECEIVE_CURRENT_SLIDE = 'RECEIVE_CURRENT_SLIDE';
-
+var CLEAR_UI = 'CLEAR_UI';
 var receiveCurrentSlide = function receiveCurrentSlide(slideId) {
   return {
     type: RECEIVE_CURRENT_SLIDE,
@@ -3194,6 +3221,11 @@ var receivePageSettings = function receivePageSettings(pageSettings) {
   };
 };
 
+var clearUI = function clearUI() {
+  return {
+    type: CLEAR_UI
+  };
+};
 var updateCurrentSlide = function updateCurrentSlide(slideId) {
   return function (dispatch) {
     return dispatch(receiveCurrentSlide(slideId));
@@ -3303,6 +3335,7 @@ function App(_ref) {
 
 var mapSTP = function mapSTP(state) {
   return {
+    ui: state.ui,
     errors: state.errors.session
   };
 };
@@ -3392,33 +3425,28 @@ function SlidePreviewListItem(_ref) {
     rx: 4
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_preview_container__WEBPACK_IMPORTED_MODULE_1__.default, {
     containerWidth: width,
-    docId: slide.docId,
-    slideId: slide.id
+    slide: slide
   }))));
 }
 
 function FilmStrip(_ref2) {
   var pageWidth = _ref2.pageWidth,
       pageHeight = _ref2.pageHeight,
+      currentSlideId = _ref2.currentSlideId,
       slides = _ref2.slides,
       history = _ref2.history,
-      moveSlideHandler = _ref2.moveSlideHandler;
+      moveSlideHandler = _ref2.moveSlideHandler,
+      updateCurrentSlideHandler = _ref2.updateCurrentSlideHandler;
 
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(1),
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(-1),
       _useState2 = _slicedToArray(_useState, 2),
-      activeSlideId = _useState2[0],
-      setActiveSlideId = _useState2[1];
-
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(-1),
-      _useState4 = _slicedToArray(_useState3, 2),
-      moveToPage = _useState4[0],
-      setMoveToPage = _useState4[1];
+      moveToPage = _useState2[0],
+      setMoveToPage = _useState2[1];
 
   var animationFrameRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
-  console.log(slides, Object.values(slides));
 
   function clickHandler(e, slideId) {
-    setActiveSlideId(slideId);
+    updateCurrentSlideHandler(slideId);
   }
 
   ;
@@ -3447,24 +3475,24 @@ function FilmStrip(_ref2) {
   ;
 
   function dragEndHandler(e, slideId) {
-    var page = slides[activeSlideId].page;
+    var page = slides[currentSlideId].page;
     cancelAnimationFrame(animationFrameRef.current);
     moveSlideHandler({
       start: page,
       end: page,
-      offset: moveToPage - page
+      offset: moveToPage - page - (moveToPage - page > 0 ? 1 : 0)
     });
     setMoveToPage(-1);
   }
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    history.replace("/presentation/".concat(activeSlideId));
-  }, [activeSlideId]);
+    history.replace("/presentation/".concat(currentSlideId));
+  }, [currentSlideId]);
   var slidesComponents = Object.values(slides).sort(function (a, b) {
     return a.page - b.page;
   }).map(function (slide) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SlidePreviewListItem, {
-      className: slide.id == activeSlideId ? 'active' : '',
+      className: slide.id == currentSlideId ? 'active' : '',
       key: slide.id,
       slide: slide,
       pageWidth: pageWidth,
@@ -3505,9 +3533,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
-/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
+/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
-/* harmony import */ var _filmstrip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./filmstrip */ "./frontend/components/presentation/filmstrip.jsx");
+/* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../actions/ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _filmstrip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./filmstrip */ "./frontend/components/presentation/filmstrip.jsx");
+
 
 
 
@@ -3519,19 +3549,23 @@ var mapSTP = function mapSTP(_ref) {
   return {
     slides: entities.slides,
     pageWidth: ui.pageWidth,
-    pageHeight: ui.pageHeight
+    pageHeight: ui.pageHeight,
+    currentSlideId: ui.slideId
   };
 };
 
 var mapDTP = function mapDTP(dispatch) {
   return {
+    updateCurrentSlideHandler: function updateCurrentSlideHandler(slideId) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateCurrentSlide)(slideId));
+    },
     moveSlideHandler: function moveSlideHandler(data) {
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.moveSlide)(data));
     }
   };
 };
 
-var FilmStripContainer = (0,react_router__WEBPACK_IMPORTED_MODULE_3__.withRouter)((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTP, mapDTP)(_filmstrip__WEBPACK_IMPORTED_MODULE_2__.default));
+var FilmStripContainer = (0,react_router__WEBPACK_IMPORTED_MODULE_4__.withRouter)((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTP, mapDTP)(_filmstrip__WEBPACK_IMPORTED_MODULE_3__.default));
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FilmStripContainer);
 
 /***/ }),
@@ -4018,7 +4052,9 @@ __webpack_require__.r(__webpack_exports__);
 
 var PresentationPageContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (state, ownProps) {
   return {
-    currentSlideId: ownProps.match.params.slideId,
+    state: state,
+    ownProps: ownProps,
+    currentSlideId: state.ui.slideId,
     doc: Object.values(state.entities.docs)[0],
     slides: Object.values(state.entities.slides).sort(function (a, b) {
       return a.page - b.page;
@@ -4061,8 +4097,7 @@ function Workspace(_ref) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "workspace"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_container__WEBPACK_IMPORTED_MODULE_1__.default, {
-    docId: slide.docId,
-    slideId: slide.id
+    slide: slide
   }));
 }
 
@@ -4188,7 +4223,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function SigninEmailPage(_ref) {
   var history = _ref.history,
-      demoLoginHandler = _ref.demoLoginHandler,
+      loginHandler = _ref.loginHandler,
       fetchAccountHandler = _ref.fetchAccountHandler,
       errors = _ref.errors;
   var localStorageObject = JSON.parse(localStorage.getItem("doggieSlides")) || {
@@ -4218,7 +4253,18 @@ function SigninEmailPage(_ref) {
       email: "demo@dmail.com",
       password: "123456"
     };
-    demoLoginHandler(demoUser).then(function () {
+    loginHandler(demoUser).then(function () {
+      history.replace('/presentation');
+    });
+  }
+
+  function handleBunnyLogin(e) {
+    e.preventDefault();
+    var bunny = {
+      email: "bunny@dmail.com",
+      password: "carrots"
+    };
+    loginHandler(bunny).then(function () {
       history.replace('/presentation');
     });
   }
@@ -4252,7 +4298,13 @@ function SigninEmailPage(_ref) {
     onClick: function onClick(e) {
       return handleDemoLogin(e);
     }
-  }, "Demo User"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, "Demo User"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_3__.Link, {
+    className: "link",
+    to: "#",
+    onClick: function onClick(e) {
+      return handleBunnyLogin(e);
+    }
+  }, "Bunny"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "bottom-bar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_3__.Link, {
     className: "link",
@@ -4296,7 +4348,7 @@ var mapDTP = function mapDTP(dispatch) {
     fetchAccountHandler: function fetchAccountHandler(user) {
       return dispatch((0,_actions_session_actions__WEBPACK_IMPORTED_MODULE_2__.fetchAccount)(user));
     },
-    demoLoginHandler: function demoLoginHandler(user) {
+    loginHandler: function loginHandler(user) {
       return dispatch((0,_actions_session_actions__WEBPACK_IMPORTED_MODULE_2__.login)(user));
     }
   };
@@ -4493,8 +4545,6 @@ function SignupPage(_ref) {
       user = _React$useState2[0],
       setUser = _React$useState2[1];
 
-  console.log(user);
-
   var handleChange = function handleChange(e, key) {
     setUser(_objectSpread(_objectSpread({}, user), {}, _defineProperty({}, key, e.target.value)));
   };
@@ -4502,7 +4552,6 @@ function SignupPage(_ref) {
   var handleSubmit = function handleSubmit(e) {
     e.preventDefault();
     signupHandler(user).then(function (res) {
-      console.log(res);
       localStorage.setItem('doggieSlides', JSON.stringify(_objectSpread(_objectSpread({}, localStorageObject), {}, {
         user: Object.assign({}, user)
       })));
@@ -5087,12 +5136,10 @@ __webpack_require__.r(__webpack_exports__);
 var SVGSlidePreviewContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, ownProps) {
   var entities = _ref.entities,
       ui = _ref.ui;
-  console.log('----', ui);
   return {
     isPreview: false,
     width: ui.pageWidth || 0,
-    height: ui.pageHeight || 0,
-    slide: entities.slides[ownProps.slideId]
+    height: ui.pageHeight || 0
   };
 }, function (dispatch, ownProps) {
   return {};
@@ -5117,12 +5164,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var SVGSlidePreviewContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, ownProps) {
-  var entities = _ref.entities;
+  var entities = _ref.entities,
+      ui = _ref.ui;
   return {
     isPreview: true,
-    width: entities.docs[ownProps.docId].width,
-    height: entities.docs[ownProps.docId].height,
-    slide: entities.slides[ownProps.slideId]
+    width: ui.pageWidth || 0,
+    height: ui.pageHeight || 0
   };
 }, function (dispatch, ownProps) {
   return {};
@@ -5644,6 +5691,10 @@ function UIReducer() {
           pageHeight: action.pageSettings.pageHeight
         });
       }
+      ;
+
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.CLEAR_UI:
+      return {};
 
     default:
       return state;

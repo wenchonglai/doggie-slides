@@ -81,7 +81,6 @@ export default function SVGSlide({isPreview, containerWidth, width, height, slid
   let widthAttr = {};
   if (containerWidth) { widthAttr = {width: containerWidth}; }
 
-
   return (
     <svg 
       version="1.1" 

@@ -32,7 +32,7 @@ function App({errors, history, clearErrorsHandler}){
       <AuthRoute path='/signin/challenge' exact component={SigninPasswordPageContainer}/>
       <AuthRoute path='/signup' exact component={SignupContainer}/>
       <ProtectedRoute path='/presentation/:slideId' component={PresentationPageContainer}/>
-      <Route path='/presentation' render={() => <Redirect to="/presentation/1"/>}/>
+      <Route path='/presentation' render={(...props) => {return (<Redirect to={`/presentation/1`}/>)}}/>
       <Route path='/signin' render={() => <Redirect to="/signin/identifier"/>}/>
       <Route path='/' render={() => <Redirect to="/slides/about"/>}/>
     </Switch>
@@ -40,6 +40,7 @@ function App({errors, history, clearErrorsHandler}){
 };
 
 const mapSTP = state => ({
+  ui: state.ui,
   errors: state.errors.session
 });
 

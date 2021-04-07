@@ -3,12 +3,10 @@ import SVGSlide from "./svg_slide";
 
 const SVGSlidePreviewContainer = connect(
   ({entities, ui}, ownProps) => {
-    console.log('----', ui);
     return ({
     isPreview: false,
     width: ui.pageWidth || 0,
-    height: ui.pageHeight || 0,
-    slide: entities.slides[ownProps.slideId],
+    height: ui.pageHeight || 0
   })
 },
   (dispatch, ownProps) => ({

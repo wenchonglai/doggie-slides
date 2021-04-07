@@ -1,5 +1,5 @@
 import * as PresentationUtils from '../utils/presentation_utils';
-import { updatePageSettings } from './ui_actions';
+import { receiveCurrentSlide, updatePageSettings } from './ui_actions';
 
 export const RECEIVE_DOCS = 'RECEIVE_DOCS';
 export const RECEIVE_DOC = 'RECEIVE_DOC';
@@ -21,15 +21,29 @@ const receiveSlides = (slides) => ({
   slides
 });
 
-export const fetchPresentation = () => (dispatch) =>
+export const fetchPresentation = () => (dispatch, getState) =>
   PresentationUtils.asyncFetchPresentation()
     .then((entities) => {
-      let doc = Object.values(entities.docs)[0];
+      const doc = Object.values(entities.docs)[0];
+      const ui = getState();
+
+      if (!doc.slideIds.includes(ui.slideId)){
+        const locationArr = window.location.href.split('/');
+        const newSlideId = Object.values(entities.slides).sort((a, b) => a.page - b.page)[0].id;
+        const href = locationArr.join('/');
+        const newHref = [...locationArr.slice(0, -1), newSlideId].join('/');
+
+        dispatch(receiveCurrentSlide(newSlideId));
+
+        location.replace(`#/presentation/${newSlideId}`);
+      }
+      
       dispatch(updatePageSettings({pageWidth: doc.width, pageHeight: doc.height}));
       dispatch(receiveDocs(entities.docs));
       dispatch(receiveSlides(entities.slides));
+      
       return entities;
-    }, (err) => {console.log(err)});
+    }, (err) => {});
 
 export const updateDoc = (formDoc) => (dispatch) => 
   PresentationUtils.asyncUpdateDoc(formDoc)

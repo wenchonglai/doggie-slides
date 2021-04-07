@@ -13,14 +13,14 @@ export default function PresentationPage({state, ownProps, currentSlideId, doc, 
     fetchPresentationHandler();
     updateCurrentSlideHandler(currentSlideId);
   }, []);
-  
+
   const _docHook = useState({});
   const [_doc, _setDoc] = _docHook;
 
   useEffect(() => {
     _setDoc({..._doc, ...doc});
   }, [doc]);
-  
+
   return ( _doc.id && slides.length ? 
     (<section className='page presentation'>
       <header>

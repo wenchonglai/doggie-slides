@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import SessionWrapper from './session_wrapper';
 import SmartInputContainer from './smart_input';
 
-export default function SigninEmailPage({history, demoLoginHandler, fetchAccountHandler, errors}){
+export default function SigninEmailPage({history, loginHandler, fetchAccountHandler, errors}){
   const localStorageObject = JSON.parse(localStorage.getItem("doggieSlides")) || {user: {}};
   const [user, setUser] = React.useState({...localStorageObject.user});
 
@@ -29,7 +29,16 @@ export default function SigninEmailPage({history, demoLoginHandler, fetchAccount
     e.preventDefault();
     const demoUser = {email: "demo@dmail.com", password: "123456"};
 
-    demoLoginHandler(demoUser).then(() => {
+    loginHandler(demoUser).then(() => {
+      history.replace('/presentation');
+    });
+  }
+
+  function handleBunnyLogin(e){
+    e.preventDefault();
+    const bunny = {email: "bunny@dmail.com", password: "carrots"};
+
+    loginHandler(bunny).then(() => {
       history.replace('/presentation');
     });
   }
@@ -56,6 +65,7 @@ export default function SigninEmailPage({history, demoLoginHandler, fetchAccount
             <div className="body-subtext">
               Not your computer? Use Demo user to sign in privately.
               <Link className='link' to='#' onClick={(e) => handleDemoLogin(e)}>Demo User</Link>
+              <Link className='link' to='#' onClick={(e) => handleBunnyLogin(e)}>Bunny</Link>
             </div>
           </SmartInputContainer>
 

@@ -12,7 +12,6 @@ export default function SignupPage({history, signupHandler, errors}){
     email: '',
     password: ''
   });
-  console.log(user);
   
   const handleChange = (e, key) => {
     setUser({...user, [key]: e.target.value});
@@ -22,7 +21,6 @@ export default function SignupPage({history, signupHandler, errors}){
     e.preventDefault();
 
     signupHandler(user).then(res => {
-      console.log(res);
       localStorage.setItem(
         'doggieSlides',
         JSON.stringify({

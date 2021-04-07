@@ -4,7 +4,6 @@ import * as PresentationActions from '../actions/presentation_actions';
 
 const SlidesReducer = (state = {}, action) => {
   Object.freeze(state);
-
   switch (action.type){
     case PresentationActions.RECEIVE_SLIDES: 
       return action.slides;

@@ -10,7 +10,7 @@ const mapSTP = (state) => ({
 
 const mapDTP = (dispatch) => ({
   fetchAccountHandler: (user) => dispatch(fetchAccount(user)),
-  demoLoginHandler: (user) => dispatch(login(user))
+  loginHandler: (user) => dispatch(login(user))
 });
 
 export default withRouter(connect(mapSTP, mapDTP)(SigninEmailPage));

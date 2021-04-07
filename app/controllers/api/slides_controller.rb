@@ -67,14 +67,14 @@ class Api::SlidesController < ApplicationController
   end
 
   def move
-p [params]
+
     count = @slides.count
     startPage = slide_move_params[:start].to_i
     endPage = slide_move_params[:end].to_i
     length = endPage - startPage + 1
     offset = slide_move_params[:offset].to_i
 
-    if length < 1 || startPage < 0 || startPage + offset < 0 || endPage >= count || endPage + offset >= count
+    if length < 1 || startPage <= 0 || startPage + offset <= 0 || endPage > count || endPage + offset > count
       render json: ["Invalid slide move parameter {startPage: #{startPage}), endPage: #{endPage}, offset: #{offset}"], status: 422
     else
       @slides.where("page >= ? and page <= ?", startPage, endPage)

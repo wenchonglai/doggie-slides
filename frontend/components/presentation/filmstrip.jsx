@@ -20,20 +20,19 @@ function SlidePreviewListItem({pageWidth, pageHeight, className, slide, clickHan
         
         <g transform="translate(40 0)" >
           <rect x={-2} y={6} className="box" width={width + 4} height={height + 4} rx={4}></rect>
-          <SVGSlidePreviewContainer containerWidth={width} docId={slide.docId} slideId={slide.id}/>
+          <SVGSlidePreviewContainer containerWidth={width} slide={slide}/>
         </g>
       </svg>
     </li>
   )
 }
 
-export default function FilmStrip({pageWidth, pageHeight, slides, history, moveSlideHandler}){
-  const [activeSlideId, setActiveSlideId] = useState(1);
+export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides, history, moveSlideHandler, updateCurrentSlideHandler}){
   const [moveToPage, setMoveToPage] = useState(-1);
   const animationFrameRef = useRef();
-console.log(slides, Object.values(slides));
+
   function clickHandler(e, slideId){
-    setActiveSlideId(slideId);
+    updateCurrentSlideHandler(slideId);
   };
 
   function dragStartHandler(e, slideId){
@@ -56,20 +55,20 @@ console.log(slides, Object.values(slides));
   };
 
   function dragEndHandler(e, slideId){
-    const page = slides[activeSlideId].page;
+    const page = slides[currentSlideId].page;
 
     cancelAnimationFrame(animationFrameRef.current);
-    moveSlideHandler({start: page, end: page, offset: moveToPage - page});
+    moveSlideHandler({start: page, end: page, offset: moveToPage - page - (moveToPage - page > 0 ? 1 : 0) });
     setMoveToPage(-1);
   }
 
   useEffect(() => {
-    history.replace(`/presentation/${activeSlideId}`);
-  }, [activeSlideId]);
+    history.replace(`/presentation/${currentSlideId}`);
+  }, [currentSlideId]);
 
   const slidesComponents = Object.values(slides).sort((a, b) => a.page - b.page).map(slide => 
         ( <SlidePreviewListItem 
-            className={slide.id == activeSlideId ? 'active' : ''}
+            className={slide.id == currentSlideId ? 'active' : ''}
             key={slide.id}
             {...{slide, pageWidth, pageHeight, clickHandler, dragOverHandler, dragStartHandler, dragEndHandler}}
           />
