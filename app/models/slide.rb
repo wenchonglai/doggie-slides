@@ -11,7 +11,7 @@
 #
 
 #
-require 'byebug'
+
 class Slide < ApplicationRecord
   before_validation :set_default_values
   validates :doc_id, :page, presence: true

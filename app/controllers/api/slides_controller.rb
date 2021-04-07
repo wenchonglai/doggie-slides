@@ -1,4 +1,4 @@
-require 'byebug';
+
 
 class Api::SlidesController < ApplicationController
   before_action :ensure_current_user
