@@ -7,7 +7,7 @@ const KEYCODE_MAP = {
   13: '\n',  //return
 };
 
-export default function SVGTextArea({className, defaultFont, value, ...props}){
+export default function SVGTextArea({className, defaultFont, value, textStyles, ...props}){
   function handleKeyDown(e){
     if (e.metaKey){
       
@@ -32,7 +32,7 @@ export default function SVGTextArea({className, defaultFont, value, ...props}){
       } else if (KEYCODE_MAP[e.keyCode]) {
         inputCacheRef.current += KEYCODE_MAP[e.keyCode];
       } else if (e.key.length > 1){
-        
+
         switch (e.keyCode){
           case 37: { //left arrow
             cursorPositionRef.current = Math.max(
@@ -42,7 +42,11 @@ export default function SVGTextArea({className, defaultFont, value, ...props}){
             0);
           }; break; 
           case 39: { //right arrow
-            if (cursorPositionRef.current < textRef.current.length) cursorPositionRef.current += 1;
+            cursorPositionRef.current = Math.min(
+              altKey ? 
+                textRef.current.getSegmentEndIndex(cursorPositionRef.current) :
+                cursorPositionRef.current + 1,
+            textRef.current.lastOffset - 1)
           }; break; 
           default: {console.log(e.keyCode);}
         }
@@ -86,6 +90,7 @@ export default function SVGTextArea({className, defaultFont, value, ...props}){
   useEffect(() => {
     textRef.current = new DynamicText(value);
     componentsRef.current = textRef.current.toReactComponents();
+
     forceUpdate();
   }, [value])
 
@@ -96,16 +101,15 @@ export default function SVGTextArea({className, defaultFont, value, ...props}){
       onKeyDown={(e) => handleKeyDown(e)}
       onClick={(e) => handleClick(e)}
     >
-      <a xlinkHref="#" onClick={e => {e.preventDefault()}}>
+      <a xlinkHref="#" onClick={e => {e.preventDefault()}} width="100%" height="100%">
         <rect 
-          y={-60}
           height={Math.max(textRef.current._offsetMap.last[1] + 60, 60)}
           width='800' fill="#ddd"
         ></rect>
         { componentsRef.current }
       </a>
       <rect className="cursor"
-        width="1"
+        width="2"
         height="60"
         x={cursorX} y={cursorY - 60}
         fill="#777"

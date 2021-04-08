@@ -3070,12 +3070,28 @@ var skipSlide = function skipSlide() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "RECEIVE_ENTITIES": () => (/* binding */ RECEIVE_ENTITIES),
+/* harmony export */   "receiveEntities": () => (/* binding */ receiveEntities),
 /* harmony export */   "RECEIVE_DOCS": () => (/* binding */ RECEIVE_DOCS),
 /* harmony export */   "RECEIVE_DOC": () => (/* binding */ RECEIVE_DOC),
+/* harmony export */   "receiveDocs": () => (/* binding */ receiveDocs),
+/* harmony export */   "receiveDoc": () => (/* binding */ receiveDoc),
 /* harmony export */   "RECEIVE_SLIDES": () => (/* binding */ RECEIVE_SLIDES),
 /* harmony export */   "RECEIVE_SLIDE": () => (/* binding */ RECEIVE_SLIDE),
 /* harmony export */   "receiveSlides": () => (/* binding */ receiveSlides),
 /* harmony export */   "receiveSlide": () => (/* binding */ receiveSlide),
+/* harmony export */   "RECEIVE_WRAPPERS": () => (/* binding */ RECEIVE_WRAPPERS),
+/* harmony export */   "RECEIVE_WRAPPER": () => (/* binding */ RECEIVE_WRAPPER),
+/* harmony export */   "receiveWrappers": () => (/* binding */ receiveWrappers),
+/* harmony export */   "receiveWrapper": () => (/* binding */ receiveWrapper),
+/* harmony export */   "RECEIVE_TEXTBOXES": () => (/* binding */ RECEIVE_TEXTBOXES),
+/* harmony export */   "RECEIVE_TEXTBOX": () => (/* binding */ RECEIVE_TEXTBOX),
+/* harmony export */   "receiveTextboxes": () => (/* binding */ receiveTextboxes),
+/* harmony export */   "receiveTextbox": () => (/* binding */ receiveTextbox),
+/* harmony export */   "RECEIVE_TEXTSTYLES": () => (/* binding */ RECEIVE_TEXTSTYLES),
+/* harmony export */   "RECEIVE_TEXTSTYLE": () => (/* binding */ RECEIVE_TEXTSTYLE),
+/* harmony export */   "receiveTextstyles": () => (/* binding */ receiveTextstyles),
+/* harmony export */   "receiveTextstyle": () => (/* binding */ receiveTextstyle),
 /* harmony export */   "fetchPresentation": () => (/* binding */ fetchPresentation),
 /* harmony export */   "updateDoc": () => (/* binding */ updateDoc),
 /* harmony export */   "moveSlide": () => (/* binding */ moveSlide),
@@ -3085,25 +3101,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
 
 
+
+function actionCreatorCreator(_ref) {
+  var _ref$verb = _ref.verb,
+      verb = _ref$verb === void 0 ? 'receive' : _ref$verb,
+      noun = _ref.noun,
+      _ref$nouns = _ref.nouns,
+      nouns = _ref$nouns === void 0 ? noun + 's' : _ref$nouns;
+  var verbNoun = verb.toLowerCase() + noun[0].toUpperCase() + noun.substring(1).toLowerCase();
+  var verbNouns = verb.toLowerCase() + nouns[0].toUpperCase() + nouns.substring(1).toLowerCase();
+  var VERB_NOUN = [verb, noun].map(function (x) {
+    return x.toUpperCase();
+  }).join('_');
+  var VERB_NOUNS = [verb, nouns].map(function (x) {
+    return x.toUpperCase();
+  }).join('_');
+  return "export const ".concat(VERB_NOUNS, " = \"").concat(VERB_NOUNS, "\";\nexport const ").concat(VERB_NOUN, " = \"").concat(VERB_NOUN, "\";\n\nexport const ").concat(verbNouns, " = (").concat(nouns, ") => ({type: ").concat(VERB_NOUNS, ", ").concat(nouns, "});\nexport const ").concat(verbNoun, " = (").concat(noun, ") => ({type: ").concat(VERB_NOUN, ", ").concat(noun, "});\n");
+}
+
+var RECEIVE_ENTITIES = 'RECEIVE_ENTITIES';
+var receiveEntities = function receiveEntities(entities) {
+  return {
+    type: RECEIVE_ENTITIES,
+    entities: entities
+  };
+};
 var RECEIVE_DOCS = 'RECEIVE_DOCS';
 var RECEIVE_DOC = 'RECEIVE_DOC';
-var RECEIVE_SLIDES = 'RECEIVE_SLIDES';
-var RECEIVE_SLIDE = 'RECEIVE_SLIDE';
-
 var receiveDocs = function receiveDocs(docs) {
   return {
     type: RECEIVE_DOCS,
     docs: docs
   };
 };
-
 var receiveDoc = function receiveDoc(doc) {
   return {
     type: RECEIVE_DOC,
     doc: doc
   };
 };
-
+var RECEIVE_SLIDES = 'RECEIVE_SLIDES';
+var RECEIVE_SLIDE = 'RECEIVE_SLIDE';
 var receiveSlides = function receiveSlides(slides) {
   return {
     type: RECEIVE_SLIDES,
@@ -3116,17 +3154,60 @@ var receiveSlide = function receiveSlide(slide) {
     slide: slide
   };
 };
+var RECEIVE_WRAPPERS = "RECEIVE_WRAPPERS";
+var RECEIVE_WRAPPER = "RECEIVE_WRAPPER";
+var receiveWrappers = function receiveWrappers(wrappers) {
+  return {
+    type: RECEIVE_WRAPPERS,
+    wrappers: wrappers
+  };
+};
+var receiveWrapper = function receiveWrapper(wrapper) {
+  return {
+    type: RECEIVE_WRAPPER,
+    wrapper: wrapper
+  };
+};
+var RECEIVE_TEXTBOXES = "RECEIVE_TEXTBOXES";
+var RECEIVE_TEXTBOX = "RECEIVE_TEXTBOX";
+var receiveTextboxes = function receiveTextboxes(textboxes) {
+  return {
+    type: RECEIVE_TEXTBOXES,
+    textboxes: textboxes
+  };
+};
+var receiveTextbox = function receiveTextbox(textbox) {
+  return {
+    type: RECEIVE_TEXTBOX,
+    textbox: textbox
+  };
+};
+var RECEIVE_TEXTSTYLES = "RECEIVE_TEXTSTYLES";
+var RECEIVE_TEXTSTYLE = "RECEIVE_TEXTSTYLE";
+var receiveTextstyles = function receiveTextstyles(textstyles) {
+  return {
+    type: RECEIVE_TEXTSTYLES,
+    textstyles: textstyles
+  };
+};
+var receiveTextstyle = function receiveTextstyle(textstyle) {
+  return {
+    type: RECEIVE_TEXTSTYLE,
+    textstyle: textstyle
+  };
+}; // thunk action creators below
+
 var fetchPresentation = function fetchPresentation() {
   return function (dispatch, getState) {
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncFetchPresentation().then(function (entities) {
-      var doc = Object.values(entities.docs)[0];
-      doc && dispatch((0,_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updatePageSettings)({
-        docId: doc.id,
-        pageWidth: doc.width,
-        pageHeight: doc.height
-      }));
-      dispatch(receiveDocs(entities.docs));
-      dispatch(receiveSlides(entities.slides));
+      dispatch(receiveEntities(entities)); // const doc = Object.values(entities.docs)[0];
+      // doc && dispatch(updatePageSettings({docId: doc.id, pageWidth: doc.width, pageHeight: doc.height}));
+      // dispatch(receiveDocs(entities.docs));
+      // dispatch(receiveSlides(entities.slides));
+      // dispatch(receiveWrappers(entities.wrappers));
+      // dispatch(receiveTextstyles(entities.textstyles));
+      // dispatch(receiveTextboxes(entities.textboxes));
+
       return entities;
     }, function (err) {});
   };
@@ -3139,11 +3220,11 @@ var updateDoc = function updateDoc(formDoc) {
     });
   };
 };
-var moveSlide = function moveSlide(_ref) {
-  var start = _ref.start,
-      _ref$end = _ref.end,
-      end = _ref$end === void 0 ? start : _ref$end,
-      offset = _ref.offset;
+var moveSlide = function moveSlide(_ref2) {
+  var start = _ref2.start,
+      _ref2$end = _ref2.end,
+      end = _ref2$end === void 0 ? start : _ref2$end,
+      offset = _ref2.offset;
   return function (dispatch) {
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncMoveSlide({
       start: start,
@@ -3472,7 +3553,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ FilmStrip)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _svg_svg_slide_preview_container__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../svg/svg_slide_preview_container */ "./frontend/components/svg/svg_slide_preview_container.js");
+/* harmony import */ var _svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../svg/svg_slide_containers */ "./frontend/components/svg/svg_slide_containers.jsx");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -3531,7 +3612,7 @@ function SlidePreviewListItem(_ref) {
     width: width + 4,
     height: height + 4,
     rx: 4
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_preview_container__WEBPACK_IMPORTED_MODULE_1__.default, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlidePreviewContainer, {
     containerWidth: width,
     slideId: slide.id
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
@@ -3575,6 +3656,7 @@ function FilmStrip(_ref2) {
   }
 
   function dragOverHandler(e, page) {
+    e.preventDefault();
     cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = requestAnimationFrame(function () {
       var y = e.nativeEvent.offsetY;
@@ -4247,7 +4329,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ Workspace)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _svg_svg_slide_container__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../svg/svg_slide_container */ "./frontend/components/svg/svg_slide_container.jsx");
+/* harmony import */ var _svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../svg/svg_slide_containers */ "./frontend/components/svg/svg_slide_containers.jsx");
 
 
 function Workspace(_ref) {
@@ -4257,7 +4339,7 @@ function Workspace(_ref) {
   console.log(ui, slideId);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "workspace"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_container__WEBPACK_IMPORTED_MODULE_1__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlideContainer, {
     slideId: slideId
   }));
 }
@@ -5197,7 +5279,8 @@ function SVGTextArea(_ref) {
   var className = _ref.className,
       defaultFont = _ref.defaultFont,
       value = _ref.value,
-      props = _objectWithoutProperties(_ref, ["className", "defaultFont", "value"]);
+      textStyles = _ref.textStyles,
+      props = _objectWithoutProperties(_ref, ["className", "defaultFont", "value", "textStyles"]);
 
   function handleKeyDown(e) {
     if (e.metaKey) {} else {
@@ -5226,7 +5309,7 @@ function SVGTextArea(_ref) {
           case 39:
             {
               //right arrow
-              if (cursorPositionRef.current < textRef.current.length) cursorPositionRef.current += 1;
+              cursorPositionRef.current = Math.min(altKey ? textRef.current.getSegmentEndIndex(cursorPositionRef.current) : cursorPositionRef.current + 1, textRef.current.lastOffset - 1);
             }
             ;
             break;
@@ -5296,15 +5379,16 @@ function SVGTextArea(_ref) {
     xlinkHref: "#",
     onClick: function onClick(e) {
       e.preventDefault();
-    }
+    },
+    width: "100%",
+    height: "100%"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-    y: -60,
     height: Math.max(textRef.current._offsetMap.last[1] + 60, 60),
     width: "800",
     fill: "#ddd"
   }), componentsRef.current), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     className: "cursor",
-    width: "1",
+    width: "2",
     height: "60",
     x: cursorX,
     y: cursorY - 60,
@@ -5326,82 +5410,137 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ SVGSlide)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _svg_textarea__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg-textarea */ "./frontend/components/svg/svg-textarea.jsx");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _svg_textarea__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg-textarea */ "./frontend/components/svg/svg-textarea.jsx");
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
- // const CONTROL_POINT_SETTINGS = {
-//   radius: 4
-// }
-// const SVGControlPoint = function({x, y}){
-//   function handleDrag(e) {
-//   }
-//   return (
-//     <g>
-//       <a onDrag={e => handleDrag(e)}>
-//         <circle cx={0} cy={0} radius={CONTROL_POINT_SETTINGS.radius}/>
-//       </a>
-//     </g>
-//   );
-// }
-// const SVGEditFrame = function({width, height, rotation=0}){
-//   const halfWidth = width / 2;
-//   const halfHeight = height / 2;
-//   const controlPoints = [
-//     <SVGControlPoint key={0} type="vertex" transform={`translate(${-halfWidth} ${-halfHeight}`}/>,
-//     <SVGControlPoint key={1} type="edge" transform={`translate(${0} ${-halfHeight}`}/>,
-//     <SVGControlPoint key={2} type="vertex" transform={`translate(${halfWidth} ${-halfHeight}`}/>,
-//     <SVGControlPoint key={3} type="edge" transform={`translate(${-halfWidth} ${0}`}/>,
-//     <SVGControlPoint key={4} type="edge" transform={`translate(${0} ${-halfHeight - 30}`}/>,
-//     <SVGControlPoint key={5} type="edge" transform={`translate(${halfWidth} ${0}`}/>,
-//     <SVGControlPoint key={6} type="vertex" transform={`translate(${-halfWidth} ${halfHeight}`}/>,
-//     <SVGControlPoint key={7} type="edge" transform={`translate(${0} ${halfHeight}`}/>,
-//     <SVGControlPoint key={8} type="vertex" transform={`translate(${halfWidth} ${halfHeight}`}/>
-//   ];
-//   return (
-//     <g className='svg-edit-frame'>
-//       <rect width={width} height={height} trasform={`rotate(${rotation}deg) translate(${-halfWidth} ${-halfHeight})`}/>
-//       <path path="M0 0 L0 -30" transform={}/>
-//       {controlPoints}
-//     </g>
-//   )
-// }
-// const SVGWrapper = function({wrapper, textboxes, images, shapes, allowEdit, ...props}){
-//   function getComponent(){
-//     let {type, id} = wrapper;
-//     switch (type){
-//       case 'textbox': return <SVGTextbox id={id} allowEdit={allowEdit}/>;
-//       case 'image': return <SVGImage id={id} allowEdit={allowEdit}/>;
-//       case 'diagram': return <SVGShape id={id} allowEdit={allowEdit}/>;
-//     }
-//   }
-//   return (
-//     <g className='SVGNoWrapper' transform={wrapper.transformString}>
-//       {allowEdit ? <SVGEditFrame />: null}
-//       {getComponent()}
-//     </g>
-//   )
-// }
-// const mapSTPCreator = allowEdit => ({entities}, ownProps) => ({
-//   allowEdit,
-//   wrapper: entities.wrapper[ownProps.wrapperId],
-// });
-// const SVGWrapperContainer = connect(
-//   mapSTPCreator(true),
-//   null
-// )(SVGWrapper);
-// const SVGNoWrapperContainer = connect(
-//   mapSTPCreator(false),
-//   null
-// )(SVGWrapper);
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 
-function SVGSlide(_ref) {
-  var isPreview = _ref.isPreview,
-      containerWidth = _ref.containerWidth,
-      width = _ref.width,
-      height = _ref.height,
-      _ref$slide = _ref.slide,
-      slide = _ref$slide === void 0 ? {} : _ref$slide;
+
+
+
+var CONTROL_POINT_SETTINGS = {
+  radius: 4
+};
+
+var SVGControlPoint = function SVGControlPoint(_ref) {
+  var x = _ref.x,
+      y = _ref.y;
+
+  function handleDrag(e) {}
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
+    onDrag: function onDrag(e) {
+      return handleDrag(e);
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("circle", {
+    cx: 0,
+    cy: 0,
+    radius: CONTROL_POINT_SETTINGS.radius
+  })));
+};
+
+var SVGEditFrame = function SVGEditFrame(_ref2) {
+  var width = _ref2.width,
+      height = _ref2.height,
+      _ref2$rotation = _ref2.rotation,
+      rotation = _ref2$rotation === void 0 ? 0 : _ref2$rotation;
+  var halfWidth = width / 2;
+  var halfHeight = height / 2;
+  var controlPoints = [/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 0,
+    type: "vertex",
+    transform: "translate(".concat(-halfWidth, " ").concat(-halfHeight)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 1,
+    type: "edge",
+    transform: "translate(".concat(0, " ", -halfHeight)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 2,
+    type: "vertex",
+    transform: "translate(".concat(halfWidth, " ").concat(-halfHeight)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 3,
+    type: "edge",
+    transform: "translate(".concat(-halfWidth, " ", 0)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 4,
+    type: "edge",
+    transform: "translate(".concat(0, " ", -halfHeight - 30)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 5,
+    type: "edge",
+    transform: "translate(".concat(halfWidth, " ", 0)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 6,
+    type: "vertex",
+    transform: "translate(".concat(-halfWidth, " ").concat(halfHeight)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 7,
+    type: "edge",
+    transform: "translate(".concat(0, " ", halfHeight)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    key: 8,
+    type: "vertex",
+    transform: "translate(".concat(halfWidth, " ").concat(halfHeight)
+  })];
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: "svg-edit-frame"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    width: width,
+    height: height,
+    trasform: "rotate(".concat(rotation, "deg) translate(").concat(-halfWidth, " ").concat(-halfHeight, ")")
+  }), controlPoints);
+};
+
+var SVGWrapper = function SVGWrapper(_ref3) {
+  var wrapper = _ref3.wrapper,
+      allowEdit = _ref3.allowEdit,
+      props = _objectWithoutProperties(_ref3, ["wrapper", "allowEdit"]);
+
+  var slideObjectType = wrapper.slideObjectType,
+      slideObject = wrapper.slideObject,
+      transformString = wrapper.transformString;
+
+  function getComponent() {
+    switch (slideObjectType) {
+      case 'Textbox':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea__WEBPACK_IMPORTED_MODULE_2__.default, {
+          value: slideObject.text,
+          textStyles: slideObject.textStyles
+        });
+      // case 'image': return <SVGImage id={id} allowEdit={allowEdit}/>;
+      // case 'diagram': return <SVGShape id={id} allowEdit={allowEdit}/>;
+    }
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: "SVGNoWrapper",
+    transform: transformString
+  }, allowEdit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGEditFrame, null) : null, getComponent());
+};
+
+var mapSTPCreator = function mapSTPCreator(allowEdit) {
+  return function (_ref4, ownProps) {
+    var entities = _ref4.entities;
+    return {
+      allowEdit: allowEdit
+    };
+  };
+};
+
+var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(mapSTPCreator(true), null)(SVGWrapper);
+var SVGNoWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(mapSTPCreator(false), null)(SVGWrapper);
+function SVGSlide(_ref5) {
+  var isPreview = _ref5.isPreview,
+      containerWidth = _ref5.containerWidth,
+      width = _ref5.width,
+      height = _ref5.height,
+      _ref5$slide = _ref5.slide,
+      slide = _ref5$slide === void 0 ? {} : _ref5$slide,
+      wrappers = _ref5.wrappers;
   var widthAttr = {};
 
   if (containerWidth) {
@@ -5415,102 +5554,96 @@ function SVGSlide(_ref) {
     className: "svg-slide",
     xmlns: "http://www.w3.org/2000/svg",
     xmlnsXlink: "http://www.w3.org/1999/xlink",
+    width: "100%",
+    height: "100%",
     viewBox: "0 0 ".concat(width, " ").concat(height),
     xmlSpace: "preserve"
   }, widthAttr), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     width: width,
     height: height,
     fill: "#FFFFFF"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("text", {
-    x: width - 100,
-    y: height - 100,
-    alignmentBaseline: "middle",
-    textAnchor: "middle",
-    fontSize: "20"
-  }, "Page ".concat(slide.page)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-    x: "200",
-    width: "1200",
-    y: "300",
-    height: "200",
-    stroke: "#777",
-    fill: "none"
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea__WEBPACK_IMPORTED_MODULE_1__.default, {
-    transform: "translate(400 420)",
-    value: "Title for Slide #".concat(slide.id)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea__WEBPACK_IMPORTED_MODULE_1__.default, {
-    transform: "translate(400 720)",
-    value: "Subtitle for ".concat(slide.id)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-    x: "500",
-    width: "600",
-    y: "600",
-    height: "200",
-    stroke: "#777",
-    fill: "none"
+  })), wrappers.map(function (wrapper) {
+    return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGNoWrapperContainer, {
+      key: wrapper.id,
+      wrapper: wrapper
+    }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGWrapperContainer, {
+      key: wrapper.id,
+      wrapper: wrapper
+    });
   }));
 }
 
 /***/ }),
 
-/***/ "./frontend/components/svg/svg_slide_container.jsx":
-/*!*********************************************************!*\
-  !*** ./frontend/components/svg/svg_slide_container.jsx ***!
-  \*********************************************************/
+/***/ "./frontend/components/svg/svg_slide_containers.jsx":
+/*!**********************************************************!*\
+  !*** ./frontend/components/svg/svg_slide_containers.jsx ***!
+  \**********************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "SVGSlideContainer": () => (/* binding */ SVGSlideContainer),
+/* harmony export */   "SVGSlidePreviewContainer": () => (/* binding */ SVGSlidePreviewContainer)
 /* harmony export */ });
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _svg_slide__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_slide */ "./frontend/components/svg/svg_slide.jsx");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
-var SVGSlideContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, ownProps) {
-  var entities = _ref.entities,
-      ui = _ref.ui;
-  return {
-    isPreview: false,
-    slide: entities.slides[ownProps.slideId],
-    width: ui.pageWidth || 0,
-    height: ui.pageHeight || 0
+
+
+var generateSTP = function generateSTP(isPreview) {
+  return function (_ref, ownProps) {
+    var entities = _ref.entities,
+        ui = _ref.ui;
+    var slide = entities.slides[ownProps.slideId];
+    var wrappers = slide.wrapperIds.map(function (id) {
+      var wrapper = entities.wrappers[id];
+      var slideObject = undefined;
+
+      switch (wrapper.slideObjectType) {
+        case 'Textbox':
+          {
+            slideObject = entities.textboxes[wrapper.slideObjectId];
+            var textStyles = slideObject.textstyleIds.map(function (id) {
+              return entities.textstyles[id];
+            });
+            return _objectSpread(_objectSpread({}, wrapper), {}, {
+              slideObject: _objectSpread(_objectSpread({}, slideObject), {}, {
+                textStyles: textStyles
+              })
+            });
+          }
+          ;
+
+        default:
+          return wrapper;
+      }
+    });
+    return {
+      isPreview: isPreview,
+      slide: slide,
+      wrappers: wrappers.sort(function (a, b) {
+        return a.sequence - b.sequence;
+      }),
+      width: ui.pageWidth || 0,
+      height: ui.pageHeight || 0
+    };
   };
-}, function (dispatch, ownProps) {
+};
+
+var SVGSlideContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(generateSTP(false), function (dispatch, ownProps) {
   return {};
 })(_svg_slide__WEBPACK_IMPORTED_MODULE_1__.default);
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SVGSlideContainer);
-
-/***/ }),
-
-/***/ "./frontend/components/svg/svg_slide_preview_container.js":
-/*!****************************************************************!*\
-  !*** ./frontend/components/svg/svg_slide_preview_container.js ***!
-  \****************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
-/* harmony import */ var _svg_slide__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_slide */ "./frontend/components/svg/svg_slide.jsx");
-
-
-var SVGSlidePreviewContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, ownProps) {
-  var entities = _ref.entities,
-      ui = _ref.ui;
-  return {
-    isPreview: false,
-    slide: entities.slides[ownProps.slideId],
-    width: ui.pageWidth || 0,
-    height: ui.pageHeight || 0
-  };
-}, function (dispatch, ownProps) {
+var SVGSlidePreviewContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(generateSTP(true), function (dispatch, ownProps) {
   return {};
 })(_svg_slide__WEBPACK_IMPORTED_MODULE_1__.default);
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SVGSlidePreviewContainer);
 
 /***/ }),
 
@@ -5824,12 +5957,76 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+var TextStyleReducer = function TextStyleReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+  Object.freeze(state);
+
+  switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
+      return action.entities.textstyles;
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXTSTYLES:
+      return action.textstyles;
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXTSTYLE:
+      return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.textstyle.id, action.textstyle));
+
+    default:
+      return state;
+  }
+};
+
+var TextboxsReducer = function TextboxsReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+  Object.freeze(state);
+
+  switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
+      return action.entities.textboxes;
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXTBOXES:
+      return action.textboxes;
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXTBOX:
+      return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.textbox.id, action.textbox));
+
+    default:
+      return state;
+  }
+};
+
+var WrapperReducer = function WrapperReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+  Object.freeze(state);
+  console.log(action.entities);
+
+  switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
+      return action.entities.wrappers;
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_WRAPPERS:
+      return action.wrappers;
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_WRAPPER:
+      return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.wrapper.id, action.wrapper));
+
+    default:
+      return state;
+  }
+};
+
 var SlidesReducer = function SlidesReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var action = arguments.length > 1 ? arguments[1] : undefined;
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
+      return action.entities.slides;
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_SLIDES:
       return action.slides;
 
@@ -5847,6 +6044,9 @@ var DocsReducer = function DocsReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
+      return action.entities.docs;
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_DOCS:
       return action.docs;
 
@@ -5860,7 +6060,10 @@ var DocsReducer = function DocsReducer() {
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,redux__WEBPACK_IMPORTED_MODULE_2__.combineReducers)({
   docs: DocsReducer,
-  slides: SlidesReducer
+  slides: SlidesReducer,
+  wrappers: WrapperReducer,
+  textboxes: TextboxsReducer,
+  textstyles: TextStyleReducer
 }));
 
 /***/ }),
@@ -6005,11 +6208,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ UIReducer)
 /* harmony export */ });
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 function UIReducer() {
@@ -6018,6 +6223,16 @@ function UIReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
+      {
+        var doc = Object.values(action.entities.docs)[0];
+        return doc ? _objectSpread(_objectSpread({}, state), {}, {
+          docId: doc.id,
+          pageWidth: doc.width,
+          pageHeight: doc.height
+        }) : {};
+      }
+
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_CURRENT_SLIDE:
       return _objectSpread(_objectSpread({}, state), {}, {
         slideId: action.slideId
@@ -6185,7 +6400,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 var CTX = document.createElement('canvas').getContext('2d');
-var COMMON_CHAR_WIDTH_MAP = {};
+var COMMON_CHAR_SIZE_MAP = {};
+var DEFAULT_LINE_HEIGHT = 60;
 CTX.font = '60px Helvetica';
 
 var DynamicText = /*#__PURE__*/function () {
@@ -6195,7 +6411,7 @@ var DynamicText = /*#__PURE__*/function () {
 
     _classCallCheck(this, DynamicText);
 
-    this._text = text;
+    this._text = '';
     this._bufferSize = 256;
     this._indices = {
       spaces: new _sorted_array__WEBPACK_IMPORTED_MODULE_3__.default(),
@@ -6205,6 +6421,7 @@ var DynamicText = /*#__PURE__*/function () {
     this._styleMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_4__.default();
     this._offsetMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_4__.default();
     this._defaultFont = CTX.font || style.defaultFont;
+    this.insert(text + '\0');
   }
 
   _createClass(DynamicText, [{
@@ -6213,13 +6430,13 @@ var DynamicText = /*#__PURE__*/function () {
       return this._text.length;
     }
   }, {
-    key: "getCommonCharWidth",
-    value: function getCommonCharWidth(ch) {
+    key: "getCommonCharSize",
+    value: function getCommonCharSize(ch) {
       var font = CTX.font;
-      if (COMMON_CHAR_WIDTH_MAP[font]) COMMON_CHAR_WIDTH_MAP[font] = {};
-      var width = COMMON_CHAR_WIDTH_MAP[font][ch];
+      if (COMMON_CHAR_SIZE_MAP[font]) COMMON_CHAR_SIZE_MAP[font] = {};
+      var width = COMMON_CHAR_SIZE_MAP[font][ch];
       if (width) return width;else {
-        return COMMON_CHAR_WIDTH_MAP[font][ch] = CTX.measureText(ch).width;
+        return COMMON_CHAR_SIZE_MAP[font][ch] = CTX.measureText(ch);
       }
     }
   }, {
@@ -6309,6 +6526,18 @@ var DynamicText = /*#__PURE__*/function () {
       return this._offsetMap.getLeftKey(index - 1);
     }
   }, {
+    key: "getSegmentEndIndex",
+    value: function getSegmentEndIndex(index) {
+      // right arrow
+      var keys = this._offsetMap.keys;
+      return this._offsetMap.getRightKey(index + 1) - 1;
+    }
+  }, {
+    key: "lastOffset",
+    get: function get() {
+      return this._offsetMap.lastKey;
+    }
+  }, {
     key: "setStyle",
     value: function setStyle(index1, index2, style) {
       var sortedKeys = Array.from(this._styleMap).sort(function (a, b) {
@@ -6337,21 +6566,24 @@ var DynamicText = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "measureSubstringWidth",
-    value: function measureSubstringWidth(substring, style) {
+    key: "measureSubstringSize",
+    value: function measureSubstringSize(substring) {
+      var style = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var oldFont = CTX.font,
-          width;
+          size;
 
       if (style !== undefined) {
-        oldFont = CTX.font;
         CTX.font = [style.fontWeight || '', style.fontSize || '', style.fontFamily || ''].join(' ');
-        width = CTX.measureText(substring).width;
+        size = CTX.measureText(substring);
         CTX.font = oldFont;
       } else {
-        width = CTX.measureText(substring).width;
+        size = CTX.measureText(substring);
       }
 
-      return width;
+      return {
+        width: size.width,
+        height: style.lineHeight || DEFAULT_LINE_HEIGHT
+      };
     }
   }, {
     key: "toReactComponents",
@@ -6364,45 +6596,78 @@ var DynamicText = /*#__PURE__*/function () {
 
       // helper function
       // process the substring starting at l and ending at r, create an React element for this substring, and update offsets
-      function _processSubstring(l, r) {
-        var substring = this._text.substring(l, r);
-
-        var lastChar = substring.at(-1);
-        var width = this.measureSubstringWidth(substring);
-
-        if (![' ', '\n', '\t'].includes(substring)) {
-          if (offsetX > 0 && offsetX + width > maxWidth) {
-            offsetX = 0;
-            offsetY += 60;
-          }
-
-          results.push(this.toReactComponent(substring, l, r, offsetX, offsetY));
-        }
-
-        this._offsetMap.set(l, [offsetX, offsetY]);
-
-        if (lastChar === '\n') {
-          offsetX = 0;
-          offsetY += 60; // } else if (lastChar === ' '){
-        } else {
-          offsetX += width;
-
-          if (lastChar === '\t') {
-            offsetX = (offsetX / tabValue | 0) * tabValue + tabValue;
-          } else {//ring);
-          }
-        }
-      }
-
-      var results = [];
-      var arrs = [this._styleMap.keys].concat(_toConsumableArray(Object.values(this._indices)));
-      var positions = [0, 0, 0, 0];
       var l = 0,
           r = 0;
       var offsetX = 0,
           offsetY = 0;
+      var maxLineHeight = 0;
 
       this._offsetMap.clear();
+
+      var tempQueue = [];
+      var results = [];
+
+      function _changeLine() {
+        offsetX = 0;
+        offsetY += maxLineHeight;
+        maxLineHeight = 0;
+
+        for (var i = 0, len = tempQueue.length; i < len; i++) {
+          var el = tempQueue[i];
+          var reactComponent = this.toReactComponent(el.substring, el.l, el.offsetX, offsetY);
+          results.push(reactComponent);
+
+          this._offsetMap.set(el.l, [el.offsetX, offsetY]);
+        }
+
+        tempQueue.length = 0;
+      }
+
+      function _processSubstring(l, r) {
+        var substring = this._text.substring(l, r);
+
+        var lastChar = substring.at(-1);
+
+        var style = this._styleMap.getLeftValue(l);
+
+        var _this$measureSubstrin = this.measureSubstringSize(substring, style),
+            width = _this$measureSubstrin.width,
+            height = _this$measureSubstrin.height;
+
+        console.log(substring, height, offsetY);
+
+        if (![' ', '\n', '\t'].includes(substring)) {
+          // if the last character is not a break character
+          if (tempQueue.length > 0 && offsetX + width > maxWidth) {
+            // if a line has more than one segment and the last segment exceeds the right boundary
+            _changeLine.call(this);
+          } else {
+            if (height > maxLineHeight) maxLineHeight = height; // tempQueue.push({substring, l, r, offsetX})
+          }
+        }
+
+        if (lastChar === '\n') {
+          _changeLine.call(this);
+        } else {
+          if (height > maxLineHeight) maxLineHeight = height;
+          tempQueue.push({
+            substring: substring,
+            l: l,
+            r: r,
+            offsetX: offsetX
+          });
+          offsetX += width;
+
+          if (lastChar === '\t') {
+            offsetX = (offsetX / tabValue | 0) * tabValue + tabValue;
+          } else {// last char is ' '
+          }
+        }
+      }
+
+      var arrs = [this._styleMap.keys].concat(_toConsumableArray(Object.values(this._indices))); // four sorted maps documenting the indices of styles, returns, tabs, and spaces
+
+      var positions = [0, 0, 0, 0];
 
       while (positions.some(function (pos, i) {
         return pos < arrs[i].length;
@@ -6425,11 +6690,14 @@ var DynamicText = /*#__PURE__*/function () {
 
         l = r;
         positions[typeIndex] += 1;
-      }
+      } // process the remaining characters on the right of the last break character or style index
+
 
       _processSubstring.call(this, l, this.length);
 
       this._offsetMap.set(this.length, [offsetX, offsetY]);
+
+      _changeLine.call(this);
 
       return results;
     }
@@ -6445,11 +6713,12 @@ var DynamicText = /*#__PURE__*/function () {
           leftX = _this$_offsetMap$getL3[0],
           y = _this$_offsetMap$getL3[1];
 
-      return [leftX + this.measureSubstringWidth(this._text.substring(leftIndex, index), style), y];
+      var size = this.measureSubstringSize(this._text.substring(leftIndex, index), style);
+      return [leftX + size.width, y];
     }
   }, {
     key: "toReactComponent",
-    value: function toReactComponent(substring, l, r, offsetX, offsetY) {
+    value: function toReactComponent(substring, l, offsetX, offsetY) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5__.createElement("text", {
         key: [substring, l, offsetX, offsetY].join('-'),
         x: offsetX,
@@ -6659,15 +6928,21 @@ var SortedMap = /*#__PURE__*/function (_Map) {
   _createClass(SortedMap, [{
     key: "getLeftKey",
     value: function getLeftKey(key) {
+      // the greatest index less than or equal to key
       var keys = this.keys;
-      var leftKey = keys[Math.max((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectRight)(keys, key) - 1, 0)];
-      return leftKey;
+      return keys[Math.max((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectRight)(keys, key) - 1, 0)];
+    }
+  }, {
+    key: "getRightKey",
+    value: function getRightKey(key) {
+      // the smallest index greater than or equal to key
+      var keys = this.keys;
+      return keys[Math.min((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectLeft)(keys, key + 1), this.size - 1)];
     }
   }, {
     key: "getLeftValue",
     value: function getLeftValue(key) {
-      var leftKey = this.getLeftKey(key);
-      return Map.prototype.get.call(this, leftKey);
+      return Map.prototype.get.call(this, this.getLeftKey(key));
     }
   }, {
     key: "getLeftEntry",
@@ -6676,11 +6951,15 @@ var SortedMap = /*#__PURE__*/function (_Map) {
       return [leftKey, Map.prototype.get.call(this, leftKey)];
     }
   }, {
-    key: "setLeft",
-    value: function setLeft(key, val) {
+    key: "setLeftValue",
+    value: function setLeftValue(key, val) {
       var keys = this.keys;
-      var leftKey = keys[Math.max((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectRight)(keys, key) - 1, 0)];
-      return Map.prototype.set.call(this, leftKey, val);
+      return Map.prototype.set.call(this, this.getLeftKey(key), val);
+    }
+  }, {
+    key: "lastKey",
+    get: function get() {
+      return this.keys.at(-1);
     }
   }, {
     key: "last",
@@ -6859,6 +7138,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "asyncUpdateSlide": () => (/* binding */ asyncUpdateSlide),
 /* harmony export */   "asyncMoveSlide": () => (/* binding */ asyncMoveSlide)
 /* harmony export */ });
+// Textbox.create!({
+//   text: 0,
+//   wrapper_attributes: {slide_id: 103,
+//     sequence: 1,
+//     width: 100,
+//     height: 100,
+//     transform_string: ""},
+//   text_styles_attributes: [{
+//     style_string: "a",
+//     offset: 0
+//   }]
+// });
 var asyncFetchPresentation = function asyncFetchPresentation() {
   return $.ajax({
     method: 'GET',
@@ -43475,6 +43766,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var _store_store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./store/store */ "./frontend/store/store.js");
 /* harmony import */ var _components_root__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/root */ "./frontend/components/root.jsx");
+/* harmony import */ var _utils_data_structure_bisect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils/data-structure/bisect */ "./frontend/utils/data-structure/bisect.js");
+/* harmony import */ var _utils_data_structure_sorted_map__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils/data-structure/sorted-map */ "./frontend/utils/data-structure/sorted-map.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -43485,6 +43778,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
+
+window.bisectLeft = _utils_data_structure_bisect__WEBPACK_IMPORTED_MODULE_4__.bisectLeft;
+window.bisectRight = _utils_data_structure_bisect__WEBPACK_IMPORTED_MODULE_4__.bisectRight;
 document.addEventListener('DOMContentLoaded', function () {
   var store;
 

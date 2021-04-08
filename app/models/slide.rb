@@ -17,10 +17,12 @@ class Slide < ApplicationRecord
   validates :doc_id, :page, presence: true
   validates :skipped, inclusion: {in: [true, false]}
 
-  belongs_to :doc
+  belongs_to :doc, touch: true
   delegate :user, to: :doc
 
-  has_many :wrappers
+  has_many :wrappers, dependent: :destroy, inverse_of: :slide
+  has_many :textboxes, through: :wrappers, source: :slide_object, source_type: 'Textbox'
+  has_many :textstyles, through: :textboxes
 
   private
   def set_default_values

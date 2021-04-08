@@ -1,6 +1,6 @@
-# == Schema Information
+#=== Schema Information
 #
-# Table name: text_styles
+# Table name: textstyles
 #
 #  id           :bigint           not null, primary key
 #  textbox_id   :integer          not null
@@ -9,17 +9,18 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #
-class TextStyle < ApplicationRecord
-  validates :textbox_id, :style_string, :offset, presence: true
+class Textstyle < ApplicationRecord
+  validates :style_string, :offset, presence: true
   validates :offset, uniqueness: {scope: :textbox_id}
 
-  belongs_to :textbox
+  belongs_to :textbox, inverse_of: :textstyles
+  validates_presence_of :textbox
 
   delegate :user, to: :textbox
 
   private 
   def set_default_values
-    self.style_string = ""
+    self.style_string = "14px Times"
     self.offset ||= 0
   end
 end

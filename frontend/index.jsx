@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom'
 
 import configureStore from './store/store';
 import Root from './components/root'
+import { bisectLeft, bisectRight } from './utils/data-structure/bisect';
+import SortedMap from './utils/data-structure/sorted-map';
+
+window.bisectLeft = bisectLeft;
+window.bisectRight = bisectRight;
 
 document.addEventListener('DOMContentLoaded', () => {
   let store;

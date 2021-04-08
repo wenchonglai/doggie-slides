@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class Api::TextStylesControllerTest < ActionDispatch::IntegrationTest
+class TextstyleTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

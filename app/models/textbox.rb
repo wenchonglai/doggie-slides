@@ -8,14 +8,16 @@
 #  updated_at :datetime         not null
 #
 class Textbox < ApplicationRecord
+  include SlideObject
+
   before_validation :set_default_values
 
   validates :text, presence: true
 
-  has_many :text_styles, dependent: :destroy
-  has_one :wrapper, dependent: :destroy
+  has_many :textstyles, dependent: :destroy, inverse_of: :textbox
+  has_one :slide, through: :wrapper
 
-  delegate :user, to: :wrapper
+  accepts_nested_attributes_for :textstyles
 
   private 
   def set_default_values

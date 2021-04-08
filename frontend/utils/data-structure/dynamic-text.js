@@ -6,13 +6,14 @@ import SortedMap from './sorted-map';
 import React from 'react';
 
 const CTX = document.createElement('canvas').getContext('2d');
-const COMMON_CHAR_WIDTH_MAP = {};
+const COMMON_CHAR_SIZE_MAP = {};
+const DEFAULT_LINE_HEIGHT = 60;
 
 CTX.font = '60px Helvetica';
 
 export default class DynamicText{
   constructor(text = '', style){
-    this._text = text;
+    this._text = '';
     this._bufferSize = 256;
     this._indices = {
       spaces: new SortedArray(),
@@ -21,20 +22,24 @@ export default class DynamicText{
     };
     this._styleMap = new SortedMap();
     this._offsetMap = new SortedMap();
-    this._defaultFont = CTX.font || style.defaultFont
+    this._defaultFont = CTX.font || style.defaultFont;
+
+    this.insert(text + '\0');
   }
 
   get length(){ return this._text.length; }
 
-  getCommonCharWidth(ch){
+  getCommonCharSize(ch){
     let font = CTX.font;
 
-    if (COMMON_CHAR_WIDTH_MAP[font]) COMMON_CHAR_WIDTH_MAP[font] = {};
+    if (COMMON_CHAR_SIZE_MAP[font]) COMMON_CHAR_SIZE_MAP[font] = {};
 
-    let width = COMMON_CHAR_WIDTH_MAP[font][ch];
+    let width = COMMON_CHAR_SIZE_MAP[font][ch];
 
     if (width) return width;
-    else { return COMMON_CHAR_WIDTH_MAP[font][ch] = CTX.measureText(ch).width; }
+    else {
+      return COMMON_CHAR_SIZE_MAP[font][ch] = CTX.measureText(ch);
+    }
   }
 
   insert(text, index = this.length){
@@ -98,6 +103,15 @@ export default class DynamicText{
     return this._offsetMap.getLeftKey(index - 1);
   }
 
+  getSegmentEndIndex(index){ // right arrow
+    const keys = this._offsetMap.keys;
+    return this._offsetMap.getRightKey(index + 1) - 1;
+  }
+
+  get lastOffset(){
+    return this._offsetMap.lastKey;
+  }
+
   setStyle(index1, index2, style){
     const sortedKeys = Array.from(this._styleMap).sort((a, b) => a - b);
     const i2 = bisectLeft(sortedKeys, index2);
@@ -111,60 +125,82 @@ export default class DynamicText{
         this._styleMap.delete(i);
   }
 
-  measureSubstringWidth(substring, style){
-    let oldFont = CTX.font, width;
+  measureSubstringSize(substring, style = {}){
+    let oldFont = CTX.font, size;
 
     if (style !== undefined){
-      oldFont = CTX.font;
       CTX.font = [style.fontWeight || '', style.fontSize || '', style.fontFamily || ''].join(' ');
-      width = CTX.measureText(substring).width;
+      size = CTX.measureText(substring);
       CTX.font = oldFont;
-    } else { width = CTX.measureText(substring).width; }
+    } else { size = CTX.measureText(substring); }
 
-    return width;
+    return {width: size.width, height: style.lineHeight || DEFAULT_LINE_HEIGHT};
   }
 
   toReactComponents(maxWidth = 800, {tabValue = 72} = {}){
     // helper function
     // process the substring starting at l and ending at r, create an React element for this substring, and update offsets
+
+    let l = 0, r = 0;
+    let offsetX = 0, offsetY = 0;
+    let maxLineHeight = 0;
+
+    this._offsetMap.clear();
+
+    const tempQueue = [];
+    const results = [];
+
+    function _changeLine(){
+      offsetX = 0;
+      offsetY += maxLineHeight;
+      maxLineHeight = 0;
+
+      for (let i = 0, len = tempQueue.length; i < len; i++){
+        let el = tempQueue[i];
+        let reactComponent = this.toReactComponent(el.substring, el.l, el.offsetX, offsetY);
+        
+        results.push(reactComponent);
+        this._offsetMap.set(el.l, [el.offsetX, offsetY]);
+      }
+
+      tempQueue.length = 0;
+    }
+
     function _processSubstring(l, r){
       const substring = this._text.substring(l, r);
-      const lastChar = substring.at(-1)
-      const width = this.measureSubstringWidth(substring);
-      
-      if (![' ', '\n', '\t'].includes(substring)){
-        if (offsetX > 0 && offsetX + width > maxWidth){
-          offsetX = 0;
-          offsetY += 60;
-        }
+      const lastChar = substring.at(-1);
+      const style = this._styleMap.getLeftValue(l);
+      const {width, height} = this.measureSubstringSize(substring, style);
+      console.log(substring, height, offsetY);
 
-        results.push(this.toReactComponent(substring, l, r, offsetX, offsetY));
+      if (![' ', '\n', '\t'].includes(substring)){               // if the last character is not a break character
+        if (tempQueue.length > 0 && offsetX + width > maxWidth){  // if a line has more than one segment and the last segment exceeds the right boundary
+          _changeLine.call(this);
+        } else {
+          if (height > maxLineHeight) maxLineHeight = height; 
+          // tempQueue.push({substring, l, r, offsetX})
+        }
       }
-      this._offsetMap.set(l, [offsetX, offsetY]);
 
       if (lastChar === '\n'){
-        offsetX = 0;
-        offsetY += 60;
-      // } else if (lastChar === ' '){
+        _changeLine.call(this);
       } else {
+        if (height > maxLineHeight) maxLineHeight = height; 
+
+        tempQueue.push({substring, l, r, offsetX})
         offsetX += width;
 
         if (lastChar === '\t'){
           offsetX = ( ( offsetX / tabValue ) | 0 ) * tabValue + tabValue;
         } else {
-          //ring);
+          // last char is ' '
         }
+
       }
     }
 
-    const results = [];
-    const arrs = [ this._styleMap.keys, ...Object.values(this._indices) ];
+    const arrs = [ this._styleMap.keys, ...Object.values(this._indices) ]; // four sorted maps documenting the indices of styles, returns, tabs, and spaces
     const positions = [0, 0, 0, 0];
-
-    let l = 0, r = 0;
-    let offsetX = 0, offsetY = 0;
-
-    this._offsetMap.clear();
 
     while (positions.some( (pos, i) => pos < arrs[i].length )){
       let typeIndex = 0;
@@ -186,10 +222,13 @@ export default class DynamicText{
       l = r;
       positions[typeIndex] += 1;
     }
-
+    
+    // process the remaining characters on the right of the last break character or style index
     _processSubstring.call(this, l, this.length);
 
     this._offsetMap.set(this.length, [offsetX, offsetY]);
+
+    _changeLine.call(this);
 
     return results;
   }
@@ -197,11 +236,12 @@ export default class DynamicText{
   getOffsetByIndex(index){
     let style = this._styleMap.getLeftValue(index);
     let [leftIndex, [leftX, y]] = this._offsetMap.getLeftEntry(index);
+    let size = this.measureSubstringSize(this._text.substring(leftIndex, index), style);
     
-    return [leftX + this.measureSubstringWidth(this._text.substring(leftIndex, index), style), y];
+    return [leftX + size.width, y];
   }
 
-  toReactComponent(substring, l, r, offsetX, offsetY){
+  toReactComponent(substring, l, offsetX, offsetY){
     return (<text key={[substring, l, offsetX, offsetY].join('-')} x={offsetX} y={offsetY}>{substring}</text>)
   }
   

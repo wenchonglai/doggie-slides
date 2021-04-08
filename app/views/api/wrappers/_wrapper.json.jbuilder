@@ -1,0 +1,1 @@
+json.extract! wrapper, :id, :slide_id, :group_id, :slide_object_id, :slide_object_type, :sequence, :width, :height, :transform_string

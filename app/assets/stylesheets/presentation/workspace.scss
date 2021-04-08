@@ -6,7 +6,7 @@ section.page.presentation {
     align-items: center;
     padding: 20px;
     
-    svg.svg-slide {
+    svg.svg-slide > g:first-child{
       background: #fff;
       box-shadow: 0 1px 3px 1px #3c40430f;
       border: 1px solid #d1d1d1;

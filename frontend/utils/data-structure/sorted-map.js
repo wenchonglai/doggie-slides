@@ -2,32 +2,36 @@ import { bisectLeft, bisectRight } from './bisect';
 
 export default class SortedMap extends Map{
   constructor(...args){ super(...args) }
-  getLeftKey(key){
-    const keys = this.keys;
-    const leftKey = keys[Math.max(bisectRight(keys, key) - 1, 0)];
 
-    return leftKey;
+  getLeftKey(key){  // the greatest index less than or equal to key
+    const keys = this.keys;
+    return keys[Math.max(bisectRight(keys, key) - 1, 0)];
+  }
+
+  getRightKey(key){ // the smallest index greater than or equal to key
+    const keys = this.keys;
+    return keys[Math.min(bisectLeft(keys, key + 1), this.size - 1)];
   }
 
   getLeftValue(key){
-   const leftKey = this.getLeftKey(key);
-
-    return Map.prototype.get.call(this, leftKey);
+    return Map.prototype.get.call(this, this.getLeftKey(key));
   }
-
 
   getLeftEntry(key){
     const leftKey = this.getLeftKey(key);
-
     return [leftKey, Map.prototype.get.call(this, leftKey)];
   }
 
-  setLeft(key, val){
+  setLeftValue(key, val){
     const keys = this.keys;
-    const leftKey = keys[Math.max(bisectRight(keys, key) - 1, 0)];
 
-    return Map.prototype.set.call(this, leftKey, val);
+    return Map.prototype.set.call(this, this.getLeftKey(key), val);
   }
+
+  get lastKey(){
+    return this.keys.at(-1)
+  }
+
   get last(){
     return Map.prototype.get.call(this, this.keys.at(-1));
   }

@@ -1,3 +1,16 @@
+// Textbox.create!({
+//   text: 0,
+//   wrapper_attributes: {slide_id: 103,
+//     sequence: 1,
+//     width: 100,
+//     height: 100,
+//     transform_string: ""},
+//   text_styles_attributes: [{
+//     style_string: "a",
+//     offset: 0
+//   }]
+// });
+
 export const asyncFetchPresentation = () => $.ajax({
   method: 'GET',
   url: '/api/users'

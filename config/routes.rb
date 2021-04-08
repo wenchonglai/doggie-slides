@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   namespace :api, defaults: {format: :json} do
     resources :wrappers, only: [:create, :destroy, :update]
     resources :textbox_styles, only: [:create, :destroy, :update]
-    resources :textboxes, only: [:create, :destroy, :update]
+    resources :textboxes, only: [:create, :destroy, :update, :show]
 
     patch '/slides/move', to: 'slides#move'
     resources :slides, only: [:create, :destroy, :update, :show, :index]

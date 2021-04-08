@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import SVGSlidePreviewContainer from '../svg/svg_slide_preview_container';
+import {SVGSlidePreviewContainer} from '../svg/svg_slide_containers';
 
 function SlidePreviewListItem({pageWidth, pageHeight, className, slide, clickHandler, dragStartHandler, dragOverHandler, dragEndHandler}){
   const width = 150;
@@ -45,6 +45,8 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
   }
 
   function dragOverHandler(e, page){
+    e.preventDefault();
+    
     cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = requestAnimationFrame(() => {
       const y = e.nativeEvent.offsetY;

@@ -1,1 +1,1 @@
-json.extract! slide, :id, :doc_id, :page, :skipped
+json.extract! slide, :id, :doc_id, :page, :skipped, :wrapper_ids
