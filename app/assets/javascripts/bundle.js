@@ -3293,7 +3293,7 @@ var updateText = function updateText(textboxId, textboxData) {
 };
 var updateWrapper = function updateWrapper(formWrapper) {
   return function (dispatch) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateText(formWrapper).then(function (resData) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncTransformWrapper(formWrapper).then(function (resData) {
       dispatch(receiveWrapper(resData));
       return resData;
     });
@@ -3643,7 +3643,14 @@ function SlidePreviewListItem(_ref) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", {
     width: "200px",
     height: height + 16
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("text", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("defs", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("clipPath", {
+    id: "clipping-mask"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    x: 0,
+    y: 8,
+    width: width,
+    height: height
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("text", {
     x: 24,
     y: 16,
     fontSize: "12",
@@ -3657,10 +3664,12 @@ function SlidePreviewListItem(_ref) {
     width: width + 4,
     height: height + 4,
     rx: 4
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlidePreviewContainer, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    clipPath: "url(#clipping-mask)"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlidePreviewContainer, {
     containerWidth: width,
     slideId: slide.id
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     x: -2,
     y: 6,
     className: "skip-box",
@@ -5279,6 +5288,305 @@ function SplashPage(props) {
 
 /***/ }),
 
+/***/ "./frontend/components/svg/svg-focusable.jsx":
+/*!***************************************************!*\
+  !*** ./frontend/components/svg/svg-focusable.jsx ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Focusable)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+function Focusable(_ref) {
+  var onBlur = _ref.onBlur,
+      onFocus = _ref.onFocus,
+      children = _ref.children;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
+    xlinkHref: "#",
+    onClick: function onClick(e) {
+      return e.preventDefault();
+    },
+    onMouseDown: onFocus,
+    onBlur: onBlur
+  }, children);
+}
+
+/***/ }),
+
+/***/ "./frontend/components/svg/svg-wrapper.jsx":
+/*!*************************************************!*\
+  !*** ./frontend/components/svg/svg-wrapper.jsx ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ SVGWrapper)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _svg_textarea_container__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_textarea_container */ "./frontend/components/svg/svg_textarea_container.js");
+/* harmony import */ var _svg_edit_frame__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_edit_frame */ "./frontend/components/svg/svg_edit_frame.jsx");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+
+
+
+
+function throttle(e, timeoutRef, func) {
+  for (var _len = arguments.length, args = new Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+    args[_key - 3] = arguments[_key];
+  }
+
+  switch (e.type) {
+    case 'mouseup':
+      {
+        timeoutRef.current = setTimeout(function () {
+          return func.apply(void 0, args);
+        }, 500);
+      }
+      ;
+      break;
+
+    default:
+      {
+        clearTimeout(timeoutRef.current);
+      }
+  }
+}
+
+function SVGWrapper(_ref) {
+  var wrapper = _ref.wrapper,
+      editable = _ref.editable,
+      svgDOM = _ref.svgDOM,
+      pageWidth = _ref.pageWidth,
+      pageHeight = _ref.pageHeight,
+      updateWrapperHandler = _ref.updateWrapperHandler,
+      props = _objectWithoutProperties(_ref, ["wrapper", "editable", "svgDOM", "pageWidth", "pageHeight", "updateWrapperHandler"]);
+
+  var slideObjectId = wrapper.slideObjectId,
+      slideObjectType = wrapper.slideObjectType,
+      _wrapper$translateX = wrapper.translateX,
+      translateX = _wrapper$translateX === void 0 ? 0 : _wrapper$translateX,
+      _wrapper$translateY = wrapper.translateY,
+      translateY = _wrapper$translateY === void 0 ? 0 : _wrapper$translateY,
+      _wrapper$rotate = wrapper.rotate,
+      rotate = _wrapper$rotate === void 0 ? 0 : _wrapper$rotate,
+      _wrapper$width = wrapper.width,
+      width = _wrapper$width === void 0 ? 300 : _wrapper$width,
+      _wrapper$height = wrapper.height,
+      height = _wrapper$height === void 0 ? 200 : _wrapper$height;
+
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    width: width,
+    height: height
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      _size = _useState2[0],
+      _setSize = _useState2[1];
+
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    x: translateX,
+    y: translateY
+  }),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _translate = _useState4[0],
+      _setTranslate = _useState4[1];
+
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(rotate),
+      _useState6 = _slicedToArray(_useState5, 2),
+      _rotate = _useState6[0],
+      _setRotate = _useState6[1];
+
+  var timeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+
+  function handleMove(e) {
+    e.stopPropagation();
+    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    var scale = pageWidth / clientRect.width;
+    var dx = e.dx,
+        dy = e.dy;
+    var translateX = _translate.x + dx * scale;
+    var translateY = _translate.y + dy * scale;
+
+    _setTranslate({
+      x: translateX,
+      y: translateY
+    });
+
+    throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), {}, {
+      translateX: translateX,
+      translateY: translateY,
+      width: _size.width,
+      height: _size.height,
+      rotate: _rotate
+    }));
+  }
+
+  function handleRotate(e) {
+    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    var scale = pageWidth / clientRect.width;
+    var centerX = (_size.width / 2 + _translate.x) / scale + clientRect.x;
+    var centerY = (_size.height / 2 + _translate.y) / scale + clientRect.y;
+    var dx = e.clientX - centerX;
+    var dy = e.clientY - centerY;
+    var tan = dx / dy;
+    if (Math.abs(tan) < 0.125) dx = 0;else if (Math.abs(tan) > 8) dy = 0;
+    if (Math.abs(tan) > 0.8 && Math.abs(tan) < 1.25) dx = dy * tan / Math.abs(tan);
+    var rotate = Math.atan2(dx, -dy) * 180 / Math.PI | 0;
+
+    _setRotate(rotate);
+
+    throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), {}, {
+      translateX: _translate.x,
+      translateY: _translate.y,
+      width: _size.width,
+      height: _size.height,
+      rotate: rotate
+    }));
+  }
+
+  function handleResize(e) {
+    var horiz = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var vert = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    var scale = pageWidth / clientRect.width;
+    var angle = _rotate * Math.PI / 180;
+    var COS = Math.cos(angle);
+    var SIN = Math.sin(angle);
+    var dx = e.dx,
+        dy = e.dy;
+    var width = _size.width,
+        height = _size.height;
+    var x = _translate.x,
+        y = _translate.y;
+    var dW = 0,
+        dH = 0;
+
+    if (horiz !== 0) {
+      dW += (dx * COS + dy * SIN) * scale;
+      width += dW * horiz;
+
+      if (width < 10) {
+        dW += (10 - width) * horiz;
+        width = 10;
+      }
+
+      x += dW * (COS - horiz) / 2;
+      y += dW * SIN / 2;
+    }
+
+    if (vert != 0) {
+      dH += (-dx * SIN + dy * COS) * scale;
+      height += dH * vert;
+
+      if (height < 10) {
+        dH += (10 - height) * vert;
+        height = 10;
+      }
+
+      x -= dH * SIN / 2;
+      y += dH * (COS - vert) / 2;
+    }
+
+    _setSize({
+      width: width,
+      height: height
+    });
+
+    _setTranslate({
+      x: x,
+      y: y
+    });
+
+    throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), {}, {
+      width: width,
+      height: height,
+      translateX: x,
+      translateY: y,
+      rotate: _rotate
+    }));
+  }
+
+  function getComponent() {
+    switch (slideObjectType) {
+      case 'Textbox':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea_container__WEBPACK_IMPORTED_MODULE_1__.default, {
+          editable: editable,
+          textboxId: slideObjectId,
+          width: _size.width,
+          height: _size.height
+        });
+      // case 'image': return <SVGImage id={id} editable={editable}/>;
+      // case 'diagram': return <SVGShape id={id} editable={editable}/>;
+    }
+  }
+
+  var component = getComponent();
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var _wrapper$translateX2 = wrapper.translateX,
+        translateX = _wrapper$translateX2 === void 0 ? 0 : _wrapper$translateX2,
+        _wrapper$translateY2 = wrapper.translateY,
+        translateY = _wrapper$translateY2 === void 0 ? 0 : _wrapper$translateY2,
+        _wrapper$rotate2 = wrapper.rotate,
+        rotate = _wrapper$rotate2 === void 0 ? 0 : _wrapper$rotate2,
+        _wrapper$width2 = wrapper.width,
+        width = _wrapper$width2 === void 0 ? 300 : _wrapper$width2,
+        _wrapper$height2 = wrapper.height,
+        height = _wrapper$height2 === void 0 ? 200 : _wrapper$height2;
+
+    _setTranslate({
+      x: translateX,
+      y: translateY
+    });
+
+    _setRotate(rotate);
+
+    _setSize({
+      width: width,
+      height: height
+    });
+  }, [wrapper]);
+  return wrapper ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: "SVGWrapper",
+    transform: "rotate(".concat(_rotate, ") translate(").concat(_translate.x, ", ").concat(_translate.y, ")"),
+    "transform-origin": "".concat(_translate.x + _size.width / 2, " ").concat(_translate.y + _size.height / 2)
+  }, editable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_edit_frame__WEBPACK_IMPORTED_MODULE_2__.default, {
+    svgDOM: svgDOM,
+    handleMove: handleMove,
+    handleRotate: handleRotate,
+    handleResize: handleResize,
+    width: _size.width,
+    height: _size.height
+  }, component) : component) : null;
+}
+
+/***/ }),
+
 /***/ "./frontend/components/svg/svg_draggable.jsx":
 /*!***************************************************!*\
   !*** ./frontend/components/svg/svg_draggable.jsx ***!
@@ -5410,7 +5718,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _svg_draggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_draggable */ "./frontend/components/svg/svg_draggable.jsx");
+/* harmony import */ var _svg_focusable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg-focusable */ "./frontend/components/svg/svg-focusable.jsx");
+/* harmony import */ var _svg_draggable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_draggable */ "./frontend/components/svg/svg_draggable.jsx");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+
 
 
 
@@ -5421,13 +5749,13 @@ var SVGControlPoint = function SVGControlPoint(_ref) {
       y = _ref.y,
       transform = _ref.transform,
       onDrag = _ref.onDrag;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_draggable__WEBPACK_IMPORTED_MODULE_1__.default, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_draggable__WEBPACK_IMPORTED_MODULE_2__.default, {
     svgDOM: svgDOM,
     className: "control-point ".concat(type),
     transform: transform,
     onDrag: onDrag,
     onDragEnd: onDrag
-  }, type === 'rotation' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("circle", {
+  }, type === 'rotate' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("circle", {
     cx: "0",
     cy: "0",
     r: "4"
@@ -5443,13 +5771,15 @@ var SVGMoveControl = function SVGMoveControl(_ref2) {
   var svgDOM = _ref2.svgDOM,
       width = _ref2.width,
       height = _ref2.height,
-      onDrag = _ref2.onDrag;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_draggable__WEBPACK_IMPORTED_MODULE_1__.default, {
+      onDrag = _ref2.onDrag,
+      props = _objectWithoutProperties(_ref2, ["svgDOM", "width", "height", "onDrag"]);
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_draggable__WEBPACK_IMPORTED_MODULE_2__.default, _extends({
     svgDOM: svgDOM,
     className: "control-box move-control",
     onDrag: onDrag,
     onDragEnd: onDrag
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+  }, props), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     width: width,
     height: height,
     stroke: "2px"
@@ -5461,29 +5791,74 @@ var SVGEditFrame = function SVGEditFrame(_ref3) {
       height = _ref3.height,
       handleMove = _ref3.handleMove,
       handleRotate = _ref3.handleRotate,
+      handleResize = _ref3.handleResize,
       svgDOM = _ref3.svgDOM,
-      children = _ref3.children;
+      children = _ref3.children,
+      scale = _ref3.scale;
   var halfWidth = width / 2;
   var halfHeight = height / 2;
+
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      _active = _useState2[0],
+      _setActive = _useState2[1];
+
+  var timeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+
+  function onFocus(e) {
+    e.stopPropagation();
+    clearTimeout(timeoutRef.current);
+    svgDOM.addEventListener('mousedown', handleBlur);
+
+    _setActive(true); // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._offsetMap);
+
+  }
+
+  function handleBlur(e) {
+    // e.preventDefault();
+    timeoutRef.current = setTimeout(function () {
+      _setActive(false);
+    }, 0);
+    svgDOM.removeEventListener('mousedown', handleBlur);
+  }
+
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    // if (_active){
+    //   svgDOM.addEventListener('mousedown', handleBlur);
+    // }
+    console.log(_active);
+  }, [_active]);
   var controlPoints = [/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
     svgDOM: svgDOM,
     key: 0,
     type: "nwse-resize",
+    onDrag: function onDrag(e) {
+      return handleResize(e, -1, -1);
+    },
     transform: "translate(0 0)"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
     svgDOM: svgDOM,
     key: 1,
     type: "ns-resize",
+    onDrag: function onDrag(e) {
+      return handleResize(e, 0, -1);
+    },
     transform: "translate(".concat(halfWidth, " 0)")
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
     svgDOM: svgDOM,
     key: 2,
     type: "nesw-resize",
+    onDrag: function onDrag(e) {
+      return handleResize(e, 1, -1);
+    },
     transform: "translate(".concat(width, " 0)")
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
     svgDOM: svgDOM,
     key: 3,
     type: "ew-resize",
+    onDrag: function onDrag(e) {
+      return handleResize(e, -1, 0);
+    },
     transform: "translate(0 ".concat(halfHeight, ")")
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
     svgDOM: svgDOM,
@@ -5497,24 +5872,47 @@ var SVGEditFrame = function SVGEditFrame(_ref3) {
     svgDOM: svgDOM,
     key: 5,
     type: "ew-resize",
+    onDrag: function onDrag(e) {
+      return handleResize(e, 1, 0);
+    },
     transform: "translate(".concat(width, " ").concat(halfHeight, ")")
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
     svgDOM: svgDOM,
     key: 6,
     type: "nesw-resize",
+    onDrag: function onDrag(e) {
+      return handleResize(e, -1, 1);
+    },
     transform: "translate(0 ".concat(height, ")")
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
     svgDOM: svgDOM,
     key: 7,
     type: "ns-resize",
+    onDrag: function onDrag(e) {
+      return handleResize(e, 0, 1);
+    },
     transform: "translate(".concat(halfWidth, " ").concat(height, ")")
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
     svgDOM: svgDOM,
     key: 8,
     type: "nwse-resize",
+    onDrag: function onDrag(e) {
+      return handleResize(e, 1, 1);
+    },
     transform: "translate(".concat(width, " ").concat(height, ")")
   })];
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: "edit-frame ".concat(_active ? 'active' : ''),
+    onMouseDown: onFocus
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGMoveControl, {
+    className: "control-background",
+    svgDOM: svgDOM,
+    width: width,
+    height: height,
+    onDrag: function onDrag(e) {
+      return handleMove(e);
+    }
+  }), children, _active ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     className: "svg-edit-frame"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGMoveControl, {
     svgDOM: svgDOM,
@@ -5522,10 +5920,12 @@ var SVGEditFrame = function SVGEditFrame(_ref3) {
     height: height,
     onDrag: function onDrag(e) {
       return handleMove(e);
-    }
+    } // pointerEvents="stroke"
+
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
+    className: "control-line",
     d: "M".concat(halfWidth, " 0 l 0 -30")
-  }), controlPoints), children);
+  }), controlPoints) : null);
 };
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SVGEditFrame);
@@ -5544,11 +5944,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ SVGSlide)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
-/* harmony import */ var _svg_textarea_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_textarea_container */ "./frontend/components/svg/svg_textarea_container.js");
-/* harmony import */ var _svg_edit_frame__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./svg_edit_frame */ "./frontend/components/svg/svg_edit_frame.jsx");
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
+/* harmony import */ var _svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_wrapper_containers */ "./frontend/components/svg/svg_wrapper_containers.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -5561,141 +5957,23 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 
 
 
-
-
-
-var SVGWrapper = function SVGWrapper(_ref) {
-  var wrapper = _ref.wrapper,
-      editable = _ref.editable,
-      svgDOM = _ref.svgDOM,
-      pageWidth = _ref.pageWidth,
-      pageHeight = _ref.pageHeight,
-      props = _objectWithoutProperties(_ref, ["wrapper", "editable", "svgDOM", "pageWidth", "pageHeight"]);
-
-  var slideObjectId = wrapper.slideObjectId,
-      slideObjectType = wrapper.slideObjectType,
-      _wrapper$translateX = wrapper.translateX,
-      translateX = _wrapper$translateX === void 0 ? 0 : _wrapper$translateX,
-      _wrapper$translateY = wrapper.translateY,
-      translateY = _wrapper$translateY === void 0 ? 0 : _wrapper$translateY,
-      _wrapper$rotate = wrapper.rotate,
-      rotate = _wrapper$rotate === void 0 ? 0 : _wrapper$rotate,
-      _wrapper$width = wrapper.width,
-      width = _wrapper$width === void 0 ? 300 : _wrapper$width,
-      _wrapper$height = wrapper.height,
-      height = _wrapper$height === void 0 ? 200 : _wrapper$height;
-
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    width: width,
-    height: height
-  }),
-      _useState2 = _slicedToArray(_useState, 2),
-      _size = _useState2[0],
-      _setSize = _useState2[1];
-
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    x: translateX,
-    y: translateY
-  }),
-      _useState4 = _slicedToArray(_useState3, 2),
-      _translate = _useState4[0],
-      _setTranslate = _useState4[1];
-
-  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(rotate),
-      _useState6 = _slicedToArray(_useState5, 2),
-      _rotate = _useState6[0],
-      _setRotate = _useState6[1];
-
-  function handleMove(e) {
-    e.stopPropagation();
-    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    var scale = pageWidth / clientRect.width;
-    var dx = e.dx,
-        dy = e.dy;
-    var angle = _rotate * Math.PI / 180;
-    var COS = Math.cos(angle) * scale;
-    var SIN = Math.sin(angle) * scale;
-
-    _setTranslate({
-      x: _translate.x + dx * scale,
-      y: _translate.y + dy * scale
-    });
-  }
-
-  function handleRotate(e) {
-    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    var scale = pageWidth / clientRect.width;
-    var centerX = (_size.width / 2 + _translate.x) / scale + clientRect.x;
-    var centerY = (_size.height / 2 + _translate.y) / scale + clientRect.y;
-    var dx = e.clientX - centerX;
-    var dy = e.clientY - centerY;
-    var tan = dx / dy;
-    if (Math.abs(tan) < 0.125) dx = 0;else if (Math.abs(tan) > 8) dy = 0;
-    if (Math.abs(tan) > 0.8 && Math.abs(tan) < 1.25) dx = dy * tan / Math.abs(tan);
-
-    _setRotate(Math.atan2(dx, -dy) * 180 / Math.PI | 0);
-  }
-
-  function getComponent() {
-    switch (slideObjectType) {
-      case 'Textbox':
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea_container__WEBPACK_IMPORTED_MODULE_2__.default, {
-          editable: editable,
-          textboxId: slideObjectId,
-          width: _size.width,
-          height: _size.height
-        });
-      // case 'image': return <SVGImage id={id} editable={editable}/>;
-      // case 'diagram': return <SVGShape id={id} editable={editable}/>;
-    }
-  }
-
-  var component = getComponent();
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-    className: "SVGWrapper",
-    transform: "rotate(".concat(_rotate, ") translate(").concat(_translate.x, ", ").concat(_translate.y, ")"),
-    "transform-origin": "".concat(_translate.x + _size.width / 2, " ").concat(_translate.y + _size.height / 2)
-  }, editable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_edit_frame__WEBPACK_IMPORTED_MODULE_3__.default, {
-    svgDOM: svgDOM,
-    handleMove: handleMove,
-    handleRotate: handleRotate,
-    width: _size.width,
-    height: _size.height
-  }, component) : component);
-};
-
-var mapSTPCreator = function mapSTPCreator(editable) {
-  return function (_ref2, _ref3) {
-    var entities = _ref2.entities,
-        ui = _ref2.ui;
-    var wrapperId = _ref3.wrapperId,
-        svgDOM = _ref3.svgDOM;
-    return {
-      editable: editable,
-      svgDOM: editable ? svgDOM : undefined,
-      pageWidth: ui.pageSettings.pageWidth,
-      paggHeight: ui.pageSettings.pageHeight,
-      wrapper: entities.wrappers[wrapperId]
-    };
-  };
-};
-
-var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(mapSTPCreator(true), null)(SVGWrapper);
-var SVGNoWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(mapSTPCreator(false), null)(SVGWrapper);
-var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(function (_ref4, ref) {
-  var children = _ref4.children,
-      isPreview = _ref4.isPreview,
-      containerWidth = _ref4.containerWidth,
-      width = _ref4.width,
-      height = _ref4.height,
-      slide = _ref4.slide,
-      props = _objectWithoutProperties(_ref4, ["children", "isPreview", "containerWidth", "width", "height", "slide"]);
+var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(function (_ref, ref) {
+  var children = _ref.children,
+      isPreview = _ref.isPreview,
+      containerWidth = _ref.containerWidth,
+      width = _ref.width,
+      height = _ref.height,
+      slide = _ref.slide,
+      slideId = _ref.slideId,
+      props = _objectWithoutProperties(_ref, ["children", "isPreview", "containerWidth", "width", "height", "slide", "slideId"]);
 
   var widthAttr = {};
 
@@ -5715,17 +5993,17 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     viewBox: "1000 1000 ".concat(width, " ").concat(height),
     xmlSpace: "preserve",
     ref: ref
-  }, widthAttr), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+  }, widthAttr, props), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     transform: "translate(1000 1000)"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     width: width,
     height: height,
     fill: "#FFFFFF"
   })), slide.wrapperIds.map(function (wrapperId) {
-    return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGNoWrapperContainer, {
+    return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_1__.SVGNoWrapperContainer, {
       key: wrapperId,
       wrapperId: wrapperId
-    }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGWrapperContainer, {
+    }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_1__.SVGWrapperContainer, {
       key: wrapperId,
       wrapperId: wrapperId,
       svgDOM: ref.current
@@ -5734,10 +6012,10 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
 });
 
 var useSVG = function useSVG(svgRef) {
-  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(undefined),
-      _useState8 = _slicedToArray(_useState7, 2),
-      svg = _useState8[0],
-      setSVG = _useState8[1];
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(undefined),
+      _useState2 = _slicedToArray(_useState, 2),
+      svg = _useState2[0],
+      setSVG = _useState2[1];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     setSVG(svgRef.current);
@@ -6162,6 +6440,52 @@ __webpack_require__.r(__webpack_exports__);
     }
   };
 })(_svg_textarea__WEBPACK_IMPORTED_MODULE_2__.default));
+
+/***/ }),
+
+/***/ "./frontend/components/svg/svg_wrapper_containers.js":
+/*!***********************************************************!*\
+  !*** ./frontend/components/svg/svg_wrapper_containers.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SVGWrapperContainer": () => (/* binding */ SVGWrapperContainer),
+/* harmony export */   "SVGNoWrapperContainer": () => (/* binding */ SVGNoWrapperContainer)
+/* harmony export */ });
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
+/* harmony import */ var _svg_wrapper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg-wrapper */ "./frontend/components/svg/svg-wrapper.jsx");
+
+
+
+
+var mapSTPCreator = function mapSTPCreator(editable) {
+  return function (_ref, _ref2) {
+    var entities = _ref.entities,
+        ui = _ref.ui;
+    var wrapperId = _ref2.wrapperId,
+        svgDOM = _ref2.svgDOM;
+    return {
+      editable: editable,
+      svgDOM: editable ? svgDOM : undefined,
+      pageWidth: ui.pageSettings.pageWidth,
+      paggHeight: ui.pageSettings.pageHeight,
+      wrapper: entities.wrappers[wrapperId]
+    };
+  };
+};
+
+var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTPCreator(true), function (dispatch) {
+  return {
+    updateWrapperHandler: function updateWrapperHandler(formData) {
+      return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.updateWrapper)(formData));
+    }
+  };
+})(_svg_wrapper__WEBPACK_IMPORTED_MODULE_2__.default);
+var SVGNoWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTPCreator(false), null)(_svg_wrapper__WEBPACK_IMPORTED_MODULE_2__.default);
 
 /***/ }),
 

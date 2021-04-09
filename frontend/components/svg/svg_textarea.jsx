@@ -159,7 +159,7 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
 
   function clickHandler(e){
     e.preventDefault();
-    _setActive(editable );
+    _setActive(editable);
     // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._offsetMap);
   }
 

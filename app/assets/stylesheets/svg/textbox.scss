@@ -38,25 +38,3 @@ svg g.svg-textarea{
     }
   }
 }
-
-svg {
-  g.svg-edit-frame {
-    stroke: #1a73e8;
-    stroke-width: 1;
-    .control-box {
-      pointer-events: all;
-      cursor: move;
-    }
-    .control-point {
-      transform-origin: center;
-      fill: #1a73e8;
-      stroke: #fff;
-      cursor: crosshair;
-
-      &.nwse-resize { cursor: nwse-resize; }
-      &.nesw-resize { cursor: nesw-resize; }
-      &.ns-resize { cursor: ns-resize; }
-      &.ew-resize { cursor: ew-resize; }
-    }
-  }
-}

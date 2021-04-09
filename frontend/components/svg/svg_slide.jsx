@@ -1,100 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { connect } from 'react-redux';
-import SVGTextAreaContainer from './svg_textarea_container';
-import SVGEditFrame from './svg_edit_frame'
 
-const SVGWrapper = function({wrapper, editable, svgDOM, pageWidth, pageHeight, ...props}){
-  const {slideObjectId, slideObjectType, translateX=0, translateY=0, rotate=0, width = 300, height = 200} = wrapper;
-  const [_size, _setSize] = useState({width, height});
-  const [_translate, _setTranslate] = useState({x: translateX, y: translateY});
-  const [_rotate, _setRotate] = useState(rotate); 
+import {SVGWrapperContainer, SVGNoWrapperContainer} from './svg_wrapper_containers';
 
-  function handleMove(e){
-    e.stopPropagation();
-    const clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    const scale = pageWidth / clientRect.width;
-    const {dx, dy} = e;
-    const angle = _rotate * Math.PI / 180;
-    const COS = Math.cos(angle) * scale;
-    const SIN = Math.sin(angle) * scale;
-  
-    _setTranslate({
-      x: _translate.x + dx * scale,
-      y: _translate.y + dy * scale,
-    });
-  }
-
-  function handleRotate(e){
-    const clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    const scale = pageWidth / clientRect.width;
-    const centerX = (_size.width / 2 + _translate.x) / scale + clientRect.x;
-    const centerY = (_size.height / 2 + _translate.y) / scale + clientRect.y;
-    let dx = e.clientX - centerX;
-    let dy = e.clientY - centerY;
-    let tan = dx / dy
-
-    if (Math.abs(tan) < 0.125) dx = 0;
-    else if (Math.abs(tan) > 8) dy = 0;
-
-    if (Math.abs(tan) > 0.8 && Math.abs(tan) < 1.25)
-      dx = dy * tan / Math.abs(tan);
-
-    _setRotate( (Math.atan2(dx, -dy) * 180 / Math.PI) | 0 );
-  }
-
-  function getComponent(){
-    switch (slideObjectType){
-      case 'Textbox': 
-        return (
-          <SVGTextAreaContainer
-            editable={editable}
-            textboxId={slideObjectId}
-            width={_size.width} height={_size.height}
-          />);
-      // case 'image': return <SVGImage id={id} editable={editable}/>;
-      // case 'diagram': return <SVGShape id={id} editable={editable}/>;
-    }
-  }
-
-  const component = getComponent();
-
-  return (
-    <g className='SVGWrapper'
-      transform={`rotate(${_rotate}) translate(${_translate.x}, ${_translate.y})`}
-      transform-origin={`${_translate.x + _size.width / 2} ${_translate.y +_size.height / 2}`}
-    >
-      { editable ? 
-          <SVGEditFrame
-            {...{svgDOM, handleMove, handleRotate}}
-            width={_size.width} height={_size.height}
-          >
-            {component}
-          </SVGEditFrame> : 
-          component
-      }
-    </g>
-  )
-}
-
-const mapSTPCreator = editable => ({entities, ui}, {wrapperId, svgDOM}) => ({
-  editable,
-  svgDOM: editable ? svgDOM : undefined,
-  pageWidth: ui.pageSettings.pageWidth,
-  paggHeight: ui.pageSettings.pageHeight,
-  wrapper: entities.wrappers[wrapperId]
-});
-
-const SVGWrapperContainer = connect(
-  mapSTPCreator(true),
-  null
-)(SVGWrapper);
-
-const SVGNoWrapperContainer = connect(
-  mapSTPCreator(false),
-  null
-)(SVGWrapper);
-
-const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, height, slide, ...props}, ref) => {
+const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, height, slide, slideId, ...props}, ref) => {
 	let widthAttr = {};
 
   if (containerWidth) { widthAttr = {width: containerWidth}; }
@@ -111,6 +19,7 @@ const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, 
       xmlSpace="preserve"
       ref={ref}
       {...widthAttr}
+      {...props}
     >
       
 			<g transform="translate(1000 1000)">

@@ -14,13 +14,20 @@ function SlidePreviewListItem({pageWidth, pageHeight, className, slide, clickHan
       onDragOver={(e) => dragOverHandler(e, slide.page)}
     >
       <svg width="200px" height={height + 16}>
+        <defs>
+          <clipPath id="clipping-mask">
+            <rect x={0} y={8} width={width} height={height} />
+          </clipPath>
+        </defs>
         <text x={24} y={16} fontSize="12" className='page-number'>
           {slide.page}
         </text>
         
-        <g transform="translate(40 0)" >
+        <g transform="translate(40 0)">
           <rect x={-2} y={6} className="box" width={width + 4} height={height + 4} rx={4}></rect>
-          <SVGSlidePreviewContainer containerWidth={width} slideId={slide.id}/>
+          <g clipPath="url(#clipping-mask)">
+            <SVGSlidePreviewContainer containerWidth={width} slideId={slide.id}/>
+          </g>
           <rect x={-2} y={6} className="skip-box" width={width + 4} height={height + 4} rx={4}></rect>
         </g>
       </svg>

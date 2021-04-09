@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
+import Focusable from './svg-focusable';
 import SVGDraggable from './svg_draggable'
 
 const SVGControlPoint = function({svgDOM, type, x, y, transform, onDrag}){
@@ -9,7 +10,7 @@ const SVGControlPoint = function({svgDOM, type, x, y, transform, onDrag}){
       onDrag={onDrag}
       onDragEnd={onDrag}
     >
-      { type === 'rotation' ?
+      { type === 'rotate' ?
         <circle cx="0" cy="0" r="4"/> :
         <rect x={-4} y={-4} width={8} height={8}/>
       }
@@ -17,47 +18,86 @@ const SVGControlPoint = function({svgDOM, type, x, y, transform, onDrag}){
   );
 }
 
-const SVGMoveControl = function({svgDOM, width, height, onDrag}){
+const SVGMoveControl = function({svgDOM, width, height, onDrag, ...props}){
   return (
     <SVGDraggable svgDOM={svgDOM} className='control-box move-control'
       onDrag={onDrag}
       onDragEnd={onDrag}
+      {...props}
     >
       <rect width={width} height={height} stroke="2px"></rect>
     </SVGDraggable>
   )
 }
 
-const SVGEditFrame = function({width, height, handleMove, handleRotate, svgDOM, children}){
+const SVGEditFrame = function({width, height, handleMove, handleRotate, handleResize, svgDOM, children, scale}){
   const halfWidth = width / 2;
   const halfHeight = height / 2;
+  
+  const [_active, _setActive] = useState(false);
+  const timeoutRef = useRef();
+
+  function onFocus(e){
+    e.stopPropagation();
+
+    clearTimeout(timeoutRef.current);
+    svgDOM.addEventListener('mousedown', handleBlur);
+
+    _setActive(true);
+    // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._offsetMap);
+  }
+
+  function handleBlur(e){
+    // e.preventDefault();
+
+    timeoutRef.current = setTimeout(() => {
+      _setActive(false);
+    }, 0)
+
+    svgDOM.removeEventListener('mousedown', handleBlur);
+  }
+
+
+  useEffect(() => {
+    // if (_active){
+    //   svgDOM.addEventListener('mousedown', handleBlur);
+    // }
+    console.log(_active);
+  }, [_active])
 
   const controlPoints = [
-    <SVGControlPoint svgDOM={svgDOM} key={0} type="nwse-resize" transform={`translate(0 0)`}/>,
-    <SVGControlPoint svgDOM={svgDOM} key={1} type="ns-resize" transform={`translate(${halfWidth} 0)`}/>,
-    <SVGControlPoint svgDOM={svgDOM} key={2} type="nesw-resize" transform={`translate(${width} 0)`}/>,
-    <SVGControlPoint svgDOM={svgDOM} key={3} type="ew-resize" transform={`translate(0 ${halfHeight})`}/>,
+    <SVGControlPoint svgDOM={svgDOM} key={0} type="nwse-resize" onDrag={e => handleResize(e, -1, -1)} transform={`translate(0 0)`}/>,
+    <SVGControlPoint svgDOM={svgDOM} key={1} type="ns-resize" onDrag={e => handleResize(e, 0, -1)} transform={`translate(${halfWidth} 0)`}/>,
+    <SVGControlPoint svgDOM={svgDOM} key={2} type="nesw-resize" onDrag={e => handleResize(e, 1, -1)} transform={`translate(${width} 0)`}/>,
+    <SVGControlPoint svgDOM={svgDOM} key={3} type="ew-resize" onDrag={e => handleResize(e, -1, 0)} transform={`translate(0 ${halfHeight})`}/>,
     <SVGControlPoint 
       svgDOM={svgDOM} key={4} type="rotate"
       transform={`translate(${halfWidth} -30)`}
       onDrag={(e) => handleRotate(e)}
     />,
-    <SVGControlPoint svgDOM={svgDOM} key={5} type="ew-resize" transform={`translate(${width} ${halfHeight})`}/>,
-    <SVGControlPoint svgDOM={svgDOM} key={6} type="nesw-resize" transform={`translate(0 ${height})`}/>,
-    <SVGControlPoint svgDOM={svgDOM} key={7} type="ns-resize" transform={`translate(${halfWidth} ${height})`}/>,
-    <SVGControlPoint svgDOM={svgDOM} key={8} type="nwse-resize" transform={`translate(${width} ${height})`}/>
+    <SVGControlPoint svgDOM={svgDOM} key={5} type="ew-resize" onDrag={e => handleResize(e, 1, 0)} transform={`translate(${width} ${halfHeight})`}/>,
+    <SVGControlPoint svgDOM={svgDOM} key={6} type="nesw-resize" onDrag={e => handleResize(e, -1, 1)} transform={`translate(0 ${height})`}/>,
+    <SVGControlPoint svgDOM={svgDOM} key={7} type="ns-resize"  onDrag={e => handleResize(e, 0, 1)} transform={`translate(${halfWidth} ${height})`}/>,
+    <SVGControlPoint svgDOM={svgDOM} key={8} type="nwse-resize" onDrag={e => handleResize(e, 1, 1)} transform={`translate(${width} ${height})`}/>
   ];
 
   return (
-    <g>
-      <g className='svg-edit-frame'>
-        <SVGMoveControl {...{svgDOM, width, height}}
-          onDrag={e => handleMove(e)}
-        />
-        <path d={`M${halfWidth} 0 l 0 -30`}/>
-        {controlPoints}
-      </g>
+    <g className={`edit-frame ${_active ? 'active' : ''}`} onMouseDown={onFocus} >
+      <SVGMoveControl className='control-background' {...{svgDOM, width, height}}
+        onDrag={e => handleMove(e)}
+      />
       {children}
+      { _active ? (
+          <g className='svg-edit-frame'>
+            <SVGMoveControl {...{svgDOM, width, height}}
+              onDrag={e => handleMove(e)}
+              // pointerEvents="stroke"
+            />
+            <path className='control-line' d={`M${halfWidth} 0 l 0 -30`}/>
+            {controlPoints}
+          </g>
+        ) : null
+      }
     </g>
   )
 }
