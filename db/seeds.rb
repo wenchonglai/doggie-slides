@@ -18,8 +18,8 @@ nyan_doc = nyan.docs[0]
   
   Textbox.create!(
     text: (["Nyan"] * i).join(' '),
-    wrapper_attributes: {slide_id: slide.id, sequence: 1, width: 200, height: 100, transform_string: ""},
-    textstyles_attributes: [{style_string: "font: \"16px Helvetica\"", offset: 0}]
+    wrapper_attributes: {slide_id: slide.id, z_index: 1, width: 800, height: 100},
+    textstyles_attributes: [{style_string: "font: 60px Helvetica", offset: 0}]
   )
 end
   
@@ -28,6 +28,6 @@ doge_slide = doge.slides[0];
 
 Textbox.create!(
     text: "Thicc SVG textarea. So Demo, wow",
-    wrapper_attributes: {slide_id: doge_slide.id, sequence: 1, width: 200, height: 100, transform_string: ""},
-    textstyles_attributes: [{style_string: "font: \"60px Helvetica\"", offset: 0}]
+    wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 400, height: 100, translate_x: 200, translate_y: 200},
+    textstyles_attributes: [{style_string: "font: 48px comic sans ms; fill: green", offset: 0}]
   );

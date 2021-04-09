@@ -6,6 +6,8 @@ const TextStyleReducer = (state = {}, action) => {
   Object.freeze(state);
 
   switch (action.type){
+    case PresentationActions.RECEIVE_TEXT: 
+      return {...state, ...action.data.textstylesAttributes}
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.textstyles; 
     case PresentationActions.RECEIVE_TEXTSTYLES: 
@@ -21,6 +23,8 @@ const TextboxsReducer = (state = {}, action) => {
   Object.freeze(state);
 
   switch (action.type){
+    case PresentationActions.RECEIVE_TEXT: 
+      return {...state, ...action.data}
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.textboxes; 
     case PresentationActions.RECEIVE_TEXTBOXES: 
@@ -34,7 +38,7 @@ const TextboxsReducer = (state = {}, action) => {
 
 const WrapperReducer = (state = {}, action) => {
   Object.freeze(state);
-console.log(action.entities);
+
   switch (action.type){
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.wrappers;

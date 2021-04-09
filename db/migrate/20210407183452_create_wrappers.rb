@@ -4,11 +4,12 @@ class CreateWrappers < ActiveRecord::Migration[5.2]
       t.integer :group_id
       t.integer :slide_id, null: false
       t.references :slide_object, polymorphic: true
-      t.integer :sequence, null: false
-      t.integer :width, null: false, default: 150
-      t.integer :height, null: false, default: 100
-      t.string :transform_string
-
+      t.integer :z_index, null: false
+      t.float :width, null: false, default: 300.0
+      t.float :height, null: false, default: 200.0
+      t.float :translate_x, null: false, default: 0.0
+      t.float :translate_y, null: false, default: 0.0
+      t.float :rotate, null: false, default: 0.0
       t.timestamps
     end
 

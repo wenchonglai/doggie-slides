@@ -33,6 +33,9 @@ export const RECEIVE_WRAPPER = "RECEIVE_WRAPPER";
 export const receiveWrappers = (wrappers) => ({type: RECEIVE_WRAPPERS, wrappers});
 export const receiveWrapper = (wrapper) => ({type: RECEIVE_WRAPPER, wrapper});
 
+export const RECEIVE_TEXT = "RECEIVE_TEXT";
+export const receiveText = (data) => ({type: RECEIVE_TEXT, data});
+
 export const RECEIVE_TEXTBOXES = "RECEIVE_TEXTBOXES";
 export const RECEIVE_TEXTBOX = "RECEIVE_TEXTBOX";
 
@@ -82,4 +85,25 @@ export const addSlide = (formSlide) => (dispatch) =>
     .then((slide) => {
       dispatch(receiveSlide(slide));
       return slide;
+    });
+
+export const createText = (textboxData) => (dispatch) => 
+  PresentationUtils.asyncUpdateText(textboxData)
+    .then((resData) => {
+      dispatch(receiveText(resData));
+      return resData;
+    });
+
+export const updateText = (textboxId, textboxData) => (dispatch) => 
+  PresentationUtils.asyncUpdateText(textboxId, textboxData)
+    .then((resData) => {
+      dispatch(receiveText(resData));
+      return resData;
+    });
+
+export const updateWrapper = (formWrapper) => (dispatch) => 
+  PresentationUtils.asyncUpdateText(formWrapper)
+    .then((resData) => {
+      dispatch(receiveWrapper(resData));
+      return resData;
     });

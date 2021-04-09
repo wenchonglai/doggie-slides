@@ -3,6 +3,16 @@ import { bisectLeft, bisectRight } from './bisect';
 export default class SortedMap extends Map{
   constructor(...args){ super(...args) }
 
+  getLeftIndex(key){
+    const keys = this.keys;
+    return Math.max(bisectRight(keys, key) - 1, 0);
+  }
+
+  getRightIndex(key){
+    const keys = this.keys;
+    return Math.min(bisectLeft(keys, key + 1), this.size - 1);
+  }
+
   getLeftKey(key){  // the greatest index less than or equal to key
     const keys = this.keys;
     return keys[Math.max(bisectRight(keys, key) - 1, 0)];
@@ -39,30 +49,29 @@ export default class SortedMap extends Map{
   splice(index, removeLength = 0, insertLength = 0){
     //remove
     let keys = this.keys;
-    
+
     if (removeLength > 0){
       const index2 = index + removeLength;
       const key2 = bisectLeft(keys, index + removeLength);
-      const lastStyle = this.get(key2);
+      let lastElem = this.get(key2);
 
       for (let key of keys)
         if (key >= index){
           if (key >= index2)
-            this._styleMap.set(key - (index2 - index1), this._styleMap.get(key));
-
+            this.set(key - (index2 - index), this.get(key));
           if (key <= index2)
-            lastStyle = this.get(key)
+            lastElem = this.get(key);
 
-          this._styleMap.delete(key);
+          this.delete(key);
         }
       
-        lastStyle && this.set(index, lastStyle);
+        lastElem && this.set(index, lastElem);
     }
 
     keys = this.keys;
 
     //insert
-    for (let len = keys.length, i = len - 1; keys[i] >= index; key --){
+    for (let len = keys.length, i = len - 1; keys[i] > index; i --){
       let key = keys[i];
 
       this.set(i + insertLength, this.get(i));

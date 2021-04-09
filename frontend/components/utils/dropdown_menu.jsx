@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 export default function DropdownMenu({className, children, requireClick=true}) {
   const [visible, setVisible] = useState(false);
   const _timeout = useRef();
+  const hasChild = !!children[1];
   
   const handleMouseOver = (e) => {
     clearTimeout(_timeout.current);
@@ -25,9 +26,10 @@ export default function DropdownMenu({className, children, requireClick=true}) {
     e.preventDefault();
     setVisible(false);
   }
+
   return (
     <section
-      className={`dropdown-menu ${visible ? '' : 'hidden'} ${className}`}
+      className={`dropdown-menu ${visible && hasChild ? '' : 'hidden'} ${className}`}
       onBlur={e => handleBlur(e)}
       onMouseLeave={requireClick ? undefined : e => handleBlur(e)}
       tabIndex="0"

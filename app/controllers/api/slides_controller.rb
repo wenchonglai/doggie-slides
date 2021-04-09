@@ -17,7 +17,7 @@ class Api::SlidesController < ApplicationController
   end
 
   def update
-    @slide = Slide.find_by(id: params[:id])
+    @slide = @slides.find_by(id: params[:id])
 
     if @slide
       if (@slide.doc_id != params[:slide][:doc_id].to_i)
@@ -46,8 +46,6 @@ class Api::SlidesController < ApplicationController
   end
 
   def destroy
-    
-    
     if @slides.count == 1
       render json: ['Cannot delete the last slide'], status: 403
     else 
@@ -69,7 +67,6 @@ class Api::SlidesController < ApplicationController
   end
 
   def move
-
     count = @slides.count
     startPage = slide_move_params[:start].to_i
     endPage = slide_move_params[:end].to_i
@@ -97,7 +94,7 @@ class Api::SlidesController < ApplicationController
   end
   
   def show
-    @slide = @doc.slides.find_by(id: params[:id])
+    @slide = @slides.find_by(id: params[:id])
     render :show
   end
 
@@ -154,7 +151,7 @@ class Api::SlidesController < ApplicationController
   end
 
   def slide_params
-    params.require(:slide).permit(:doc_id, :page, :skipped)
+    params.require(:slide).permit(:id, :doc_id, :page, :skipped)
   end
 
   def slide_move_params

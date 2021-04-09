@@ -1,16 +1,3 @@
-// Textbox.create!({
-//   text: 0,
-//   wrapper_attributes: {slide_id: 103,
-//     sequence: 1,
-//     width: 100,
-//     height: 100,
-//     transform_string: ""},
-//   text_styles_attributes: [{
-//     style_string: "a",
-//     offset: 0
-//   }]
-// });
-
 export const asyncFetchPresentation = () => $.ajax({
   method: 'GET',
   url: '/api/users'
@@ -43,4 +30,26 @@ export const asyncMoveSlide = (data) => $.ajax({
   method: 'PATCH',
   url: `/api/slides/move`,
   data: {slide: data}
+});
+
+export const asyncCreateText = (textboxData) => $.ajax({ // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+  method: 'POST',
+  url: `/api/texts/${textboxId}`,
+  data: {
+    textbox: textboxData
+  }
+});
+
+export const asyncUpdateText = (textboxId, textboxData) => $.ajax({ // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+  method: 'PATCH',
+  url: `/api/texts/${textboxId}`,
+  data: {
+    textbox: textboxData
+  }
+});
+
+export const asyncTransformWrapper = (wrapper) => $.ajax({ // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
+  method: 'PATCH',
+  url: `/api/wrappers/${wrapper.id}`,
+  data: { wrapper }
 });

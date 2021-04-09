@@ -1,7 +1,20 @@
 import * as UIActions from '../actions/ui_actions';
 import * as PresentationActions from '../actions/presentation_actions';
+import { combineReducers } from 'redux';
 
-export default function UIReducer(state = {}, action){
+function SlideSettingsReducer(state = {}, action){
+  Object.freeze(state);
+
+  switch (action.type){
+    case UIActions.RECEIVE_CURRENT_SLIDE:
+      return {...state, slideId: action.slideId};
+    case UIActions.CLEAR_UI:
+      return {};
+    default: return state;
+  }
+}
+
+function PagesettingsReducer(state = {}, action){
   Object.freeze(state);
 
   switch (action.type){
@@ -12,8 +25,6 @@ export default function UIReducer(state = {}, action){
         {...state, docId: doc.id, pageWidth: doc.width, pageHeight: doc.height} :
         {};
     }
-    case UIActions.RECEIVE_CURRENT_SLIDE:
-      return {...state, slideId: action.slideId};
     case UIActions.RECEIVE_PAGE_SETTINGS: {
       return {...state, ...action.pageSettings}
     };
@@ -21,4 +32,8 @@ export default function UIReducer(state = {}, action){
       return {};
     default: return state;
   }
-} 
+}
+
+const UIReducer = combineReducers({pageSettings: PagesettingsReducer, slideSettings: SlideSettingsReducer});
+
+export default UIReducer;

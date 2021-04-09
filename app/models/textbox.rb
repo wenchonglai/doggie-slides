@@ -17,7 +17,7 @@ class Textbox < ApplicationRecord
   has_many :textstyles, dependent: :destroy, inverse_of: :textbox
   has_one :slide, through: :wrapper
 
-  accepts_nested_attributes_for :textstyles
+  accepts_nested_attributes_for :textstyles, allow_destroy: true
 
   private 
   def set_default_values

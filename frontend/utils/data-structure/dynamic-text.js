@@ -7,12 +7,54 @@ import React from 'react';
 
 const CTX = document.createElement('canvas').getContext('2d');
 const COMMON_CHAR_SIZE_MAP = {};
-const DEFAULT_LINE_HEIGHT = 60;
+const DEFAULT_FONT_SIZE = 14;
 
-CTX.font = '60px Helvetica';
+CTX.font = `14px Times`;
+
+function parseStyleString(styleString){
+  const stringObj = Object.fromEntries(
+    styleString
+      .split(/\ *\;\ */)
+      .map(x => x.split(/\ *\:\ /)
+    )
+  );
+  
+  let fontStyles = stringObj.font;
+
+  if (fontStyles){
+    Object.assign(stringObj, parseFontString(fontStyles));
+    // delete stringObj.font;
+  }
+
+  return stringObj;
+}
+
+function parseFontString(fontString){
+// 0: " 400 16px/1.33 lkj kjlasdf sjldkf "
+// 1: undefined
+// 2: "400"
+// 3: undefined
+// 4: "16px"
+// 5: "/1.33"
+// 6: "lkj kjlasdf sjldkf "
+  if (!fontString) return {};
+
+  const fontStyles = {};
+  const [firstString, fontSize, lineHeight, fontFamily] = fontString.split(/(\d+px)(?:\/([\d\.]+(?:px)?))?/);
+  const fontWeight = firstString.match(/\d+|bold/);
+  const fontStyle = firstString.match(/italic/);
+
+  if (fontSize) fontStyles.fontSize = fontSize;
+  if (lineHeight) fontStyles.lineHeight = lineHeight;
+  if (fontFamily) fontStyles.fontFamily = fontFamily;
+  if (fontWeight) fontStyles.fontWeight = fontWeight[0];
+  if (fontStyle) fontStyles.fontStyle = fontStyle[0];
+
+  return fontStyles;
+}
 
 export default class DynamicText{
-  constructor(text = '', style){
+  constructor(text = '', styleStrings){
     this._text = '';
     this._bufferSize = 256;
     this._indices = {
@@ -20,11 +62,19 @@ export default class DynamicText{
       tabs: new SortedArray(),
       returns: new SortedArray()
     };
-    this._styleMap = new SortedMap();
+    this._styleMap = new SortedMap(
+      styleStrings
+        .map(styleString => 
+          [styleString.offset, parseStyleString(styleString.styleString)]
+        )
+    );
     this._offsetMap = new SortedMap();
-    this._defaultFont = CTX.font || style.defaultFont;
 
-    this.insert(text + '\0');
+    this._defaultFont = CTX.font || style.defaultFont;
+    
+    if (text[text.length - 1] !== '\0') text = text + '\0';
+    
+    this.insert(text);
   }
 
   get length(){ return this._text.length; }
@@ -100,10 +150,19 @@ export default class DynamicText{
   }
   
   getSegmentStartIndex(index){
+    return this._offsetMap.getLeftIndex(index - 1);
+  }
+
+  getSegmentEndIndex(index){
+    const keys = this._offsetMap.keys;
+    return this._offsetMap.getRightIndex(index + 1) - 1;
+  }
+
+  getSegmentStartOffset(index){ // left arrow
     return this._offsetMap.getLeftKey(index - 1);
   }
 
-  getSegmentEndIndex(index){ // right arrow
+  getSegmentEndOffset(index){ // right arrow
     const keys = this._offsetMap.keys;
     return this._offsetMap.getRightKey(index + 1) - 1;
   }
@@ -127,14 +186,19 @@ export default class DynamicText{
 
   measureSubstringSize(substring, style = {}){
     let oldFont = CTX.font, size;
+    let height = style.lineHeight;
 
     if (style !== undefined){
-      CTX.font = [style.fontWeight || '', style.fontSize || '', style.fontFamily || ''].join(' ');
+      CTX.font = style.font || CTX.font;
       size = CTX.measureText(substring);
       CTX.font = oldFont;
     } else { size = CTX.measureText(substring); }
+    
+    if (!height){
+      height = (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * 1.5
+    }
 
-    return {width: size.width, height: style.lineHeight || DEFAULT_LINE_HEIGHT};
+    return {width: size.width, height: height};
   }
 
   toReactComponents(maxWidth = 800, {tabValue = 72} = {}){
@@ -157,10 +221,11 @@ export default class DynamicText{
 
       for (let i = 0, len = tempQueue.length; i < len; i++){
         let el = tempQueue[i];
-        let reactComponent = this.toReactComponent(el.substring, el.l, el.offsetX, offsetY);
+        let reactComponent = this.toReactComponent({...el, offsetY});
         
         results.push(reactComponent);
-        this._offsetMap.set(el.l, [el.offsetX, offsetY]);
+
+        this._offsetMap.set(el.l, [el.offsetX, offsetY, el.height]);
       }
 
       tempQueue.length = 0;
@@ -170,8 +235,8 @@ export default class DynamicText{
       const substring = this._text.substring(l, r);
       const lastChar = substring.at(-1);
       const style = this._styleMap.getLeftValue(l);
+
       const {width, height} = this.measureSubstringSize(substring, style);
-      console.log(substring, height, offsetY);
 
       if (![' ', '\n', '\t'].includes(substring)){               // if the last character is not a break character
         if (tempQueue.length > 0 && offsetX + width > maxWidth){  // if a line has more than one segment and the last segment exceeds the right boundary
@@ -183,11 +248,12 @@ export default class DynamicText{
       }
 
       if (lastChar === '\n'){
+        tempQueue.push({substring, style, l, r, height, offsetX})
         _changeLine.call(this);
       } else {
         if (height > maxLineHeight) maxLineHeight = height; 
 
-        tempQueue.push({substring, l, r, offsetX})
+        tempQueue.push({substring, style, l, r, height, offsetX})
         offsetX += width;
 
         if (lastChar === '\t'){
@@ -195,7 +261,6 @@ export default class DynamicText{
         } else {
           // last char is ' '
         }
-
       }
     }
 
@@ -204,7 +269,7 @@ export default class DynamicText{
 
     while (positions.some( (pos, i) => pos < arrs[i].length )){
       let typeIndex = 0;
-      let minPosition = arrs[typeIndex][positions[typeIndex]] || Infinity;
+      let minPosition = arrs[typeIndex][positions[typeIndex]] || this.length;
       
       for (let j = 1; j < 4; j++){
         let arrMin = arrs[j][positions[j]];
@@ -226,27 +291,36 @@ export default class DynamicText{
     // process the remaining characters on the right of the last break character or style index
     _processSubstring.call(this, l, this.length);
 
-    this._offsetMap.set(this.length, [offsetX, offsetY]);
+    this._offsetMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
 
     _changeLine.call(this);
 
     return results;
   }
 
-  getOffsetByIndex(index){
+  getPositionByOffset(index){
     let style = this._styleMap.getLeftValue(index);
-    let [leftIndex, [leftX, y]] = this._offsetMap.getLeftEntry(index);
+    let [leftIndex, [leftX, y, lineHeight]] = this._offsetMap.getLeftEntry(index);
     let size = this.measureSubstringSize(this._text.substring(leftIndex, index), style);
     
-    return [leftX + size.width, y];
+    return [leftX + size.width, y, lineHeight];
   }
 
-  toReactComponent(substring, l, offsetX, offsetY){
-    return (<text key={[substring, l, offsetX, offsetY].join('-')} x={offsetX} y={offsetY}>{substring}</text>)
+  toReactComponent({substring, style, l, offsetX, offsetY}){
+    let {font, ...otherstyles} = style;
+    let fontStyles = parseFontString(font);
+
+    return (<text 
+      key={[substring, l, offsetX, offsetY].join('-')}
+      {...otherstyles}
+      {...fontStyles}
+      x={offsetX}
+      y={offsetY}
+    >{substring}</text>)
   }
   
-  toReduxState(){
-    return {text: this._text, styles: Array.from(this._styleMap)};
+  toReduxState(textstylesAttributes){
+    return {text: this._text.substring(0, this._text.length - 1), textstylesAttributes/*: Array.from(this._styleMap)*/};
   }
 }
 

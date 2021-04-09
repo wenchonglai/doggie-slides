@@ -7,10 +7,12 @@
 #  slide_id          :integer          not null
 #  slide_object_type :string
 #  slide_object_id   :bigint
-#  sequence          :integer          not null
-#  width             :integer          default(150), not null
-#  height            :integer          default(100), not null
-#  transform_string  :string
+#  zIndex            :integer          not null
+#  width             :float            default(300.0), not null
+#  height            :float            default(200.0), not null
+#  translateX        :float            default(0.0), not null
+#  translateY        :float            default(0.0), not null
+#  rotate            :float            default(0.0), not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #

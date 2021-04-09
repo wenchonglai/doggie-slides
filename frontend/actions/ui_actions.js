@@ -7,10 +7,10 @@ export const receiveCurrentSlide = (slideId) => ({
   slideId
 });
 
-const receivePageSettings = (pageSettings) => ({
-  type: RECEIVE_PAGE_SETTINGS,
-  pageSettings
-});
+// const receivePageSettings = (pageSettings) => ({
+//   type: RECEIVE_PAGE_SETTINGS,
+//   pageSettings
+// });
 
 export const clearUI = () => ({
   type: CLEAR_UI
@@ -27,12 +27,9 @@ export const updateCurrentSlide = slideId => (dispatch, getState) => {
     
     newURL = `/#/presentation/${slide.docId}/slides/${slideId}`;
   } else {
-    newURL = `/#/presentation/${ui.docId}/slides/${slideId}`;
+    newURL = `/#/presentation/${ui.pageSettings.docId}/slides/${slideId}`;
   }
  
   dispatch(receiveCurrentSlide(slideId));
   window.location.replace(newURL);
 }
-
-export const updatePageSettings = slideId => dispatch =>
-  dispatch(receivePageSettings(slideId));

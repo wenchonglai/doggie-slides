@@ -2977,7 +2977,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "newSlide": () => (/* binding */ newSlide),
 /* harmony export */   "deleteSlide": () => (/* binding */ deleteSlide),
-/* harmony export */   "skipSlide": () => (/* binding */ skipSlide)
+/* harmony export */   "skipSlide": () => (/* binding */ skipSlide),
+/* harmony export */   "textbox": () => (/* binding */ textbox)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3010,8 +3011,8 @@ var newSlide = function newSlide() {
         entities = _getState.entities;
 
     var reqSlide = {
-      docId: ui.docId,
-      page: entities.slides[ui.slideId].page + 1,
+      docId: ui.pageSettings.docId,
+      page: entities.slides[ui.slideSettings.slideId].page + 1,
       skipped: false
     };
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncAddSlide(reqSlide).then(function (resSlides) {
@@ -3029,11 +3030,14 @@ var deleteSlide = function deleteSlide() {
         ui = _getState2.ui,
         entities = _getState2.entities;
 
-    var slideId = ui.slideId;
+    var slideId = ui.slideSettings.slideId;
     var page = entities.slides[slideId].page;
+    var maxPage = Math.max.apply(Math, _toConsumableArray(Object.values(entities.slides).map(function (slide) {
+      return slide.page;
+    })));
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncDeleteSlide(slideId).then(function (resSlides) {
       var newSlideId = Object.values(resSlides).filter(function (slide) {
-        return slide.page == page;
+        return slide.page == page - (page == maxPage ? 1 : 0);
       })[0].id;
       dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlides(resSlides));
       dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.receiveCurrentSlide(newSlideId));
@@ -3048,10 +3052,25 @@ var skipSlide = function skipSlide() {
         ui = _getState3.ui,
         entities = _getState3.entities;
 
-    var reqSlide = _objectSpread({}, entities.slides[ui.slideId]);
+    var reqSlide = _objectSpread({}, entities.slides[ui.slideSettings.slideId]);
 
     reqSlide.skipped = !reqSlide.skipped;
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateSlide(reqSlide).then(function (resSlide) {
+      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resSlide));
+    }, function (err) {
+      console.log(err);
+    });
+  };
+};
+var textbox = function textbox() {
+  return function (dispatch, getState) {
+    var _getState4 = getState(),
+        ui = _getState4.ui;
+
+    return new Promise(function (res) {
+      res(dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.changeUIAction('createText')));
+    });
+    _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateSlide(reqSlide).then(function (resSlide) {
       dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resSlide));
     }, function (err) {
       console.log(err);
@@ -3084,6 +3103,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "RECEIVE_WRAPPER": () => (/* binding */ RECEIVE_WRAPPER),
 /* harmony export */   "receiveWrappers": () => (/* binding */ receiveWrappers),
 /* harmony export */   "receiveWrapper": () => (/* binding */ receiveWrapper),
+/* harmony export */   "RECEIVE_TEXT": () => (/* binding */ RECEIVE_TEXT),
+/* harmony export */   "receiveText": () => (/* binding */ receiveText),
 /* harmony export */   "RECEIVE_TEXTBOXES": () => (/* binding */ RECEIVE_TEXTBOXES),
 /* harmony export */   "RECEIVE_TEXTBOX": () => (/* binding */ RECEIVE_TEXTBOX),
 /* harmony export */   "receiveTextboxes": () => (/* binding */ receiveTextboxes),
@@ -3095,7 +3116,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "fetchPresentation": () => (/* binding */ fetchPresentation),
 /* harmony export */   "updateDoc": () => (/* binding */ updateDoc),
 /* harmony export */   "moveSlide": () => (/* binding */ moveSlide),
-/* harmony export */   "addSlide": () => (/* binding */ addSlide)
+/* harmony export */   "addSlide": () => (/* binding */ addSlide),
+/* harmony export */   "createText": () => (/* binding */ createText),
+/* harmony export */   "updateText": () => (/* binding */ updateText),
+/* harmony export */   "updateWrapper": () => (/* binding */ updateWrapper)
 /* harmony export */ });
 /* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
 /* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3166,6 +3190,13 @@ var receiveWrapper = function receiveWrapper(wrapper) {
   return {
     type: RECEIVE_WRAPPER,
     wrapper: wrapper
+  };
+};
+var RECEIVE_TEXT = "RECEIVE_TEXT";
+var receiveText = function receiveText(data) {
+  return {
+    type: RECEIVE_TEXT,
+    data: data
   };
 };
 var RECEIVE_TEXTBOXES = "RECEIVE_TEXTBOXES";
@@ -3241,6 +3272,30 @@ var addSlide = function addSlide(formSlide) {
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncAddSlide(formSlide).then(function (slide) {
       dispatch(receiveSlide(slide));
       return slide;
+    });
+  };
+};
+var createText = function createText(textboxData) {
+  return function (dispatch) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateText(textboxData).then(function (resData) {
+      dispatch(receiveText(resData));
+      return resData;
+    });
+  };
+};
+var updateText = function updateText(textboxId, textboxData) {
+  return function (dispatch) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateText(textboxId, textboxData).then(function (resData) {
+      dispatch(receiveText(resData));
+      return resData;
+    });
+  };
+};
+var updateWrapper = function updateWrapper(formWrapper) {
+  return function (dispatch) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateText(formWrapper).then(function (resData) {
+      dispatch(receiveWrapper(resData));
+      return resData;
     });
   };
 };
@@ -3377,8 +3432,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "CLEAR_UI": () => (/* binding */ CLEAR_UI),
 /* harmony export */   "receiveCurrentSlide": () => (/* binding */ receiveCurrentSlide),
 /* harmony export */   "clearUI": () => (/* binding */ clearUI),
-/* harmony export */   "updateCurrentSlide": () => (/* binding */ updateCurrentSlide),
-/* harmony export */   "updatePageSettings": () => (/* binding */ updatePageSettings)
+/* harmony export */   "updateCurrentSlide": () => (/* binding */ updateCurrentSlide)
 /* harmony export */ });
 var RECEIVE_PAGE_SETTINGS = 'RECEIVE_PAGE_SETTINGS';
 var RECEIVE_CURRENT_SLIDE = 'RECEIVE_CURRENT_SLIDE';
@@ -3388,14 +3442,10 @@ var receiveCurrentSlide = function receiveCurrentSlide(slideId) {
     type: RECEIVE_CURRENT_SLIDE,
     slideId: slideId
   };
-};
-
-var receivePageSettings = function receivePageSettings(pageSettings) {
-  return {
-    type: RECEIVE_PAGE_SETTINGS,
-    pageSettings: pageSettings
-  };
-};
+}; // const receivePageSettings = (pageSettings) => ({
+//   type: RECEIVE_PAGE_SETTINGS,
+//   pageSettings
+// });
 
 var clearUI = function clearUI() {
   return {
@@ -3417,16 +3467,11 @@ var updateCurrentSlide = function updateCurrentSlide(slideId) {
       slideId = slide.id;
       newURL = "/#/presentation/".concat(slide.docId, "/slides/").concat(slideId);
     } else {
-      newURL = "/#/presentation/".concat(ui.docId, "/slides/").concat(slideId);
+      newURL = "/#/presentation/".concat(ui.pageSettings.docId, "/slides/").concat(slideId);
     }
 
     dispatch(receiveCurrentSlide(slideId));
     window.location.replace(newURL);
-  };
-};
-var updatePageSettings = function updatePageSettings(slideId) {
-  return function (dispatch) {
-    return dispatch(receivePageSettings(slideId));
   };
 };
 
@@ -3745,9 +3790,9 @@ var mapSTP = function mapSTP(_ref) {
       ui = _ref.ui;
   return {
     slides: entities.slides,
-    pageWidth: ui.pageWidth,
-    pageHeight: ui.pageHeight,
-    currentSlideId: ui.slideId
+    pageWidth: ui.pageSettings.pageWidth,
+    pageHeight: ui.pageSettings.pageHeight,
+    currentSlideId: ui.slideSettings.slideId
   };
 };
 
@@ -3894,7 +3939,7 @@ var TEXTBOX = {
   name: "Text Box",
   icon: [7, 3],
   shortCut: undefined,
-  actionName: undefined
+  actionName: 'textbox'
 };
 var SHAPE = {
   name: "Shape",
@@ -4294,7 +4339,7 @@ var PresentationPageContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.conn
   return {
     state: state,
     ownProps: ownProps,
-    currentSlideId: state.ui.slideId,
+    currentSlideId: state.ui.slideSettings.slideId,
     doc: Object.values(state.entities.docs)[0],
     slides: Object.values(state.entities.slides).sort(function (a, b) {
       return a.page - b.page;
@@ -4336,7 +4381,6 @@ function Workspace(_ref) {
   var slideId = _ref.slideId,
       ui = _ref.ui;
   // console.log(ui, slideId, entities)
-  console.log(ui, slideId);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "workspace"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlideContainer, {
@@ -4367,7 +4411,7 @@ __webpack_require__.r(__webpack_exports__);
   return {
     entities: entities,
     ui: ui,
-    slideId: ui.slideId
+    slideId: ui.slideSettings.slideId
   };
 }, null)(_workspace__WEBPACK_IMPORTED_MODULE_1__.default));
 
@@ -5036,7 +5080,7 @@ function UserInfo(_ref) {
     className: "user-profile"
   }, profile), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "user-name"
-  }, "".concat(user.firstname, " ").concat(user.lastname, ", wow")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, "".concat(user.firstname, " ").concat(user.lastname, ", wow~")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "user-email"
   }, user.email)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "bottom-bar"
@@ -5235,9 +5279,539 @@ function SplashPage(props) {
 
 /***/ }),
 
-/***/ "./frontend/components/svg/svg-textarea.jsx":
+/***/ "./frontend/components/svg/svg_draggable.jsx":
+/*!***************************************************!*\
+  !*** ./frontend/components/svg/svg_draggable.jsx ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+
+
+var SVGDraggable = function SVGDraggable(_ref) {
+  var className = _ref.className,
+      children = _ref.children,
+      svgDOM = _ref.svgDOM,
+      onDragStart = _ref.onDragStart,
+      onDrag = _ref.onDrag,
+      onDragEnd = _ref.onDragEnd,
+      props = _objectWithoutProperties(_ref, ["className", "children", "svgDOM", "onDragStart", "onDrag", "onDragEnd"]);
+
+  var dragging = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(false);
+  var startPos = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)({});
+  var pos = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)({});
+
+  function handleDragStart(e) {
+    e.preventDefault();
+
+    if (!dragging.current) {
+      dragging.current = true;
+      startPos.current = {
+        x: e.nativeEvent.clientX,
+        y: e.nativeEvent.clientY
+      };
+      pos.current = {
+        x: e.nativeEvent.clientX,
+        y: e.nativeEvent.clientY
+      };
+      svgDOM.addEventListener('mousemove', handleDrag);
+      svgDOM.addEventListener('mouseup', handleDragEnd);
+      svgDOM.addEventListener('mouseleave', handleDragEnd);
+      onDragStart && onDragStart({
+        clientX: e.nativeEvent.clientX,
+        clientY: e.nativeEvent.clientY,
+        startX: startPos.current.x,
+        startY: startPos.current.y,
+        dx: 0,
+        dy: 0
+      });
+      onDragEnd && onDragEnd(Object.assign(e.nativeEvent, {
+        startX: startPos.current.x,
+        startY: startPos.current.y,
+        dx: 0,
+        dy: 0
+      }));
+    }
+  }
+
+  function handleDrag(e) {
+    e.preventDefault();
+
+    if (dragging.current) {
+      pos.current = {
+        x: e.clientX,
+        y: e.clientY
+      };
+      onDragEnd && onDragEnd(Object.assign(e, {
+        startX: startPos.current.x,
+        startY: startPos.current.y,
+        dx: pos.current.x - startPos.current.x,
+        dy: pos.current.y - startPos.current.y
+      }));
+    } else {
+      console.error('memory leak!');
+    }
+  }
+
+  function handleDragEnd(e) {
+    e.preventDefault();
+
+    if (dragging.current) {
+      dragging.current = false;
+      onDragEnd && onDragEnd(Object.assign(e, {
+        startX: startPos.current.x,
+        startY: startPos.current.y,
+        dx: pos.current.x - startPos.current.x,
+        dy: pos.current.y - startPos.current.y
+      }));
+      startPos.current = {};
+      pos.current = {};
+      svgDOM.removeEventListener('mousemove', handleDrag);
+      svgDOM.removeEventListener('mouseup', handleDragEnd);
+      svgDOM.removeEventListener('mouseleave', handleDragEnd);
+    } else {
+      console.error('memory leak!');
+    }
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", _extends({
+    className: "draggable ".concat(className),
+    pointerEvents: "all",
+    onMouseDown: function onMouseDown(e) {
+      return handleDragStart(e);
+    }
+  }, props), children);
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SVGDraggable);
+
+/***/ }),
+
+/***/ "./frontend/components/svg/svg_edit_frame.jsx":
+/*!****************************************************!*\
+  !*** ./frontend/components/svg/svg_edit_frame.jsx ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _svg_draggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_draggable */ "./frontend/components/svg/svg_draggable.jsx");
+
+
+
+var SVGControlPoint = function SVGControlPoint(_ref) {
+  var svgDOM = _ref.svgDOM,
+      type = _ref.type,
+      x = _ref.x,
+      y = _ref.y,
+      transform = _ref.transform,
+      onDrag = _ref.onDrag;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_draggable__WEBPACK_IMPORTED_MODULE_1__.default, {
+    svgDOM: svgDOM,
+    className: "control-point ".concat(type),
+    transform: transform,
+    onDrag: onDrag,
+    onDragEnd: onDrag
+  }, type === 'rotation' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("circle", {
+    cx: "0",
+    cy: "0",
+    r: "4"
+  }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    x: -4,
+    y: -4,
+    width: 8,
+    height: 8
+  }));
+};
+
+var SVGMoveControl = function SVGMoveControl(_ref2) {
+  var svgDOM = _ref2.svgDOM,
+      width = _ref2.width,
+      height = _ref2.height,
+      onDrag = _ref2.onDrag;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_draggable__WEBPACK_IMPORTED_MODULE_1__.default, {
+    svgDOM: svgDOM,
+    className: "control-box move-control",
+    onDrag: onDrag,
+    onDragEnd: onDrag
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    width: width,
+    height: height,
+    stroke: "2px"
+  }));
+};
+
+var SVGEditFrame = function SVGEditFrame(_ref3) {
+  var width = _ref3.width,
+      height = _ref3.height,
+      handleMove = _ref3.handleMove,
+      handleRotate = _ref3.handleRotate,
+      svgDOM = _ref3.svgDOM,
+      children = _ref3.children;
+  var halfWidth = width / 2;
+  var halfHeight = height / 2;
+  var controlPoints = [/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 0,
+    type: "nwse-resize",
+    transform: "translate(0 0)"
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 1,
+    type: "ns-resize",
+    transform: "translate(".concat(halfWidth, " 0)")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 2,
+    type: "nesw-resize",
+    transform: "translate(".concat(width, " 0)")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 3,
+    type: "ew-resize",
+    transform: "translate(0 ".concat(halfHeight, ")")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 4,
+    type: "rotate",
+    transform: "translate(".concat(halfWidth, " -30)"),
+    onDrag: function onDrag(e) {
+      return handleRotate(e);
+    }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 5,
+    type: "ew-resize",
+    transform: "translate(".concat(width, " ").concat(halfHeight, ")")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 6,
+    type: "nesw-resize",
+    transform: "translate(0 ".concat(height, ")")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 7,
+    type: "ns-resize",
+    transform: "translate(".concat(halfWidth, " ").concat(height, ")")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 8,
+    type: "nwse-resize",
+    transform: "translate(".concat(width, " ").concat(height, ")")
+  })];
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: "svg-edit-frame"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGMoveControl, {
+    svgDOM: svgDOM,
+    width: width,
+    height: height,
+    onDrag: function onDrag(e) {
+      return handleMove(e);
+    }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
+    d: "M".concat(halfWidth, " 0 l 0 -30")
+  }), controlPoints), children);
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SVGEditFrame);
+
+/***/ }),
+
+/***/ "./frontend/components/svg/svg_slide.jsx":
+/*!***********************************************!*\
+  !*** ./frontend/components/svg/svg_slide.jsx ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ SVGSlide)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _svg_textarea_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_textarea_container */ "./frontend/components/svg/svg_textarea_container.js");
+/* harmony import */ var _svg_edit_frame__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./svg_edit_frame */ "./frontend/components/svg/svg_edit_frame.jsx");
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+
+
+
+
+
+var SVGWrapper = function SVGWrapper(_ref) {
+  var wrapper = _ref.wrapper,
+      editable = _ref.editable,
+      svgDOM = _ref.svgDOM,
+      pageWidth = _ref.pageWidth,
+      pageHeight = _ref.pageHeight,
+      props = _objectWithoutProperties(_ref, ["wrapper", "editable", "svgDOM", "pageWidth", "pageHeight"]);
+
+  var slideObjectId = wrapper.slideObjectId,
+      slideObjectType = wrapper.slideObjectType,
+      _wrapper$translateX = wrapper.translateX,
+      translateX = _wrapper$translateX === void 0 ? 0 : _wrapper$translateX,
+      _wrapper$translateY = wrapper.translateY,
+      translateY = _wrapper$translateY === void 0 ? 0 : _wrapper$translateY,
+      _wrapper$rotate = wrapper.rotate,
+      rotate = _wrapper$rotate === void 0 ? 0 : _wrapper$rotate,
+      _wrapper$width = wrapper.width,
+      width = _wrapper$width === void 0 ? 300 : _wrapper$width,
+      _wrapper$height = wrapper.height,
+      height = _wrapper$height === void 0 ? 200 : _wrapper$height;
+
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    width: width,
+    height: height
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      _size = _useState2[0],
+      _setSize = _useState2[1];
+
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    x: translateX,
+    y: translateY
+  }),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _translate = _useState4[0],
+      _setTranslate = _useState4[1];
+
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(rotate),
+      _useState6 = _slicedToArray(_useState5, 2),
+      _rotate = _useState6[0],
+      _setRotate = _useState6[1];
+
+  function handleMove(e) {
+    e.stopPropagation();
+    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    var scale = pageWidth / clientRect.width;
+    var dx = e.dx,
+        dy = e.dy;
+    var angle = _rotate * Math.PI / 180;
+    var COS = Math.cos(angle) * scale;
+    var SIN = Math.sin(angle) * scale;
+
+    _setTranslate({
+      x: _translate.x + dx * scale,
+      y: _translate.y + dy * scale
+    });
+  }
+
+  function handleRotate(e) {
+    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    var scale = pageWidth / clientRect.width;
+    var centerX = (_size.width / 2 + _translate.x) / scale + clientRect.x;
+    var centerY = (_size.height / 2 + _translate.y) / scale + clientRect.y;
+    var dx = e.clientX - centerX;
+    var dy = e.clientY - centerY;
+    var tan = dx / dy;
+    if (Math.abs(tan) < 0.125) dx = 0;else if (Math.abs(tan) > 8) dy = 0;
+    if (Math.abs(tan) > 0.8 && Math.abs(tan) < 1.25) dx = dy * tan / Math.abs(tan);
+
+    _setRotate(Math.atan2(dx, -dy) * 180 / Math.PI | 0);
+  }
+
+  function getComponent() {
+    switch (slideObjectType) {
+      case 'Textbox':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea_container__WEBPACK_IMPORTED_MODULE_2__.default, {
+          editable: editable,
+          textboxId: slideObjectId,
+          width: _size.width,
+          height: _size.height
+        });
+      // case 'image': return <SVGImage id={id} editable={editable}/>;
+      // case 'diagram': return <SVGShape id={id} editable={editable}/>;
+    }
+  }
+
+  var component = getComponent();
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: "SVGWrapper",
+    transform: "rotate(".concat(_rotate, ") translate(").concat(_translate.x, ", ").concat(_translate.y, ")"),
+    "transform-origin": "".concat(_translate.x + _size.width / 2, " ").concat(_translate.y + _size.height / 2)
+  }, editable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_edit_frame__WEBPACK_IMPORTED_MODULE_3__.default, {
+    svgDOM: svgDOM,
+    handleMove: handleMove,
+    handleRotate: handleRotate,
+    width: _size.width,
+    height: _size.height
+  }, component) : component);
+};
+
+var mapSTPCreator = function mapSTPCreator(editable) {
+  return function (_ref2, _ref3) {
+    var entities = _ref2.entities,
+        ui = _ref2.ui;
+    var wrapperId = _ref3.wrapperId,
+        svgDOM = _ref3.svgDOM;
+    return {
+      editable: editable,
+      svgDOM: editable ? svgDOM : undefined,
+      pageWidth: ui.pageSettings.pageWidth,
+      paggHeight: ui.pageSettings.pageHeight,
+      wrapper: entities.wrappers[wrapperId]
+    };
+  };
+};
+
+var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(mapSTPCreator(true), null)(SVGWrapper);
+var SVGNoWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(mapSTPCreator(false), null)(SVGWrapper);
+var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(function (_ref4, ref) {
+  var children = _ref4.children,
+      isPreview = _ref4.isPreview,
+      containerWidth = _ref4.containerWidth,
+      width = _ref4.width,
+      height = _ref4.height,
+      slide = _ref4.slide,
+      props = _objectWithoutProperties(_ref4, ["children", "isPreview", "containerWidth", "width", "height", "slide"]);
+
+  var widthAttr = {};
+
+  if (containerWidth) {
+    widthAttr = {
+      width: containerWidth
+    };
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", _extends({
+    version: "1.1",
+    className: "react-svg svg-slide",
+    xmlns: "http://www.w3.org/2000/svg",
+    xmlnsXlink: "http://www.w3.org/1999/xlink",
+    width: "100%",
+    height: "100%",
+    viewBox: "1000 1000 ".concat(width, " ").concat(height),
+    xmlSpace: "preserve",
+    ref: ref
+  }, widthAttr), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    transform: "translate(1000 1000)"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    width: width,
+    height: height,
+    fill: "#FFFFFF"
+  })), slide.wrapperIds.map(function (wrapperId) {
+    return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGNoWrapperContainer, {
+      key: wrapperId,
+      wrapperId: wrapperId
+    }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGWrapperContainer, {
+      key: wrapperId,
+      wrapperId: wrapperId,
+      svgDOM: ref.current
+    });
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("def", null));
+});
+
+var useSVG = function useSVG(svgRef) {
+  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(undefined),
+      _useState8 = _slicedToArray(_useState7, 2),
+      svg = _useState8[0],
+      setSVG = _useState8[1];
+
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    setSVG(svgRef.current);
+  }, []);
+  return [svg];
+};
+
+function SVGSlide(props) {
+  var svgRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var svg = useSVG(svgRef);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(ReactSVG, _extends({
+    ref: svgRef
+  }, props));
+}
+
+/***/ }),
+
+/***/ "./frontend/components/svg/svg_slide_containers.jsx":
+/*!**********************************************************!*\
+  !*** ./frontend/components/svg/svg_slide_containers.jsx ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SVGSlideContainer": () => (/* binding */ SVGSlideContainer),
+/* harmony export */   "SVGSlidePreviewContainer": () => (/* binding */ SVGSlidePreviewContainer)
+/* harmony export */ });
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _svg_slide__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_slide */ "./frontend/components/svg/svg_slide.jsx");
+
+
+
+var generateSTP = function generateSTP(isPreview) {
+  return function (_ref, ownProps) {
+    var entities = _ref.entities,
+        ui = _ref.ui;
+    // const slide = entities.slides[ownProps.slideId];
+    // const wrappers = slide.wrapperIds.map(id => {
+    //   const wrapper = entities.wrappers[id];
+    //   let slideObject = undefined;
+    //   switch (wrapper.slideObjectType){
+    //     case 'Textbox': {
+    //       slideObject = entities.textboxes[wrapper.slideObjectId];
+    //       const textStyles = slideObject.textstyleIds
+    //         .map(id => entities.textstyles[id]);
+    //       return {...wrapper, slideObject: {...slideObject, textStyles}};
+    //     };
+    //     default: return wrapper;
+    //   }
+    // });
+    return {
+      isPreview: isPreview,
+      slide: entities.slides[ownProps.slideId],
+      // wrapperIds: entities.slides[ownProps.slideId].wrapperIds,
+      width: ui.pageSettings.pageWidth || 0,
+      height: ui.pageSettings.pageHeight || 0
+    };
+  };
+};
+
+var SVGSlideContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(generateSTP(false), function (dispatch, ownProps) {
+  return {};
+})(_svg_slide__WEBPACK_IMPORTED_MODULE_1__.default);
+var SVGSlidePreviewContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(generateSTP(true), function (dispatch, ownProps) {
+  return {};
+})(_svg_slide__WEBPACK_IMPORTED_MODULE_1__.default);
+
+/***/ }),
+
+/***/ "./frontend/components/svg/svg_textarea.jsx":
 /*!**************************************************!*\
-  !*** ./frontend/components/svg/svg-textarea.jsx ***!
+  !*** ./frontend/components/svg/svg_textarea.jsx ***!
   \**************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -5275,25 +5849,140 @@ var KEYCODE_MAP = {
   13: '\n' //return
 
 };
-function SVGTextArea(_ref) {
+
+function SVGTextAreaSelect(_ref) {
   var className = _ref.className,
-      defaultFont = _ref.defaultFont,
-      value = _ref.value,
-      textStyles = _ref.textStyles,
-      props = _objectWithoutProperties(_ref, ["className", "defaultFont", "value", "textStyles"]);
+      text = _ref.text,
+      start = _ref.start,
+      end = _ref.end;
+  if (start === end) return null;
+  if (start > end) return SVGTextAreaSelect({
+    className: className,
+    text: text,
+    start: end,
+    end: start
+  });
+  var blocks = [];
+  var startOffset = text.getPositionByOffset(start);
+  var endOffset = text.getPositionByOffset(end);
+  var key = start;
+
+  for (var i = start + 1; i <= end; i++) {
+    var offset = text._offsetMap.get(i);
+
+    if (offset) {
+      if (offset[1] == startOffset[1]) {
+        blocks.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+          key: key,
+          x: startOffset[0],
+          y: startOffset[1] - startOffset[2],
+          width: offset[0] - startOffset[0],
+          height: startOffset[2]
+        }));
+      } else {
+        var tempOffset = text.getPositionByOffset(i - 1);
+        blocks.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+          key: key,
+          x: startOffset[0],
+          y: startOffset[1] - startOffset[2],
+          width: tempOffset[0] - startOffset[0],
+          height: startOffset[2]
+        }));
+      }
+
+      startOffset = offset;
+      key = i;
+    }
+  }
+
+  if (endOffset[1] == startOffset[1]) {
+    blocks.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+      key: key,
+      x: startOffset[0],
+      y: startOffset[1] - startOffset[2],
+      width: endOffset[0] - startOffset[0],
+      height: startOffset[2]
+    }));
+  } else {
+    console.log(key);
+    blocks.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+      key: key,
+      x: 0,
+      y: endOffset[1] - startOffset[2],
+      width: endOffset[0],
+      height: startOffset[2]
+    }));
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: className
+  }, blocks);
+}
+
+function SVGTextArea(_ref2) {
+  var _ref2$editable = _ref2.editable,
+      editable = _ref2$editable === void 0 ? true : _ref2$editable,
+      width = _ref2.width,
+      textboxId = _ref2.textboxId,
+      _ref2$className = _ref2.className,
+      className = _ref2$className === void 0 ? '' : _ref2$className,
+      defaultFont = _ref2.defaultFont,
+      text = _ref2.text,
+      styleStrings = _ref2.styleStrings,
+      updateTextHandler = _ref2.updateTextHandler,
+      props = _objectWithoutProperties(_ref2, ["editable", "width", "textboxId", "className", "defaultFont", "text", "styleStrings", "updateTextHandler"]);
+
+  function handleUpdate() {
+    clearTimeout(_timeout.current);
+    _timeout.current = setTimeout(function () {
+      updateTextHandler(textboxId, textRef.current.toReduxState());
+    }, 2000);
+  }
 
   function handleKeyDown(e) {
-    if (e.metaKey) {} else {
-      var altKey = e.altKey;
-      var inputCache = inputCacheRef.current;
+    if (!_active) {
+      return;
+    }
+
+    var altKey = e.altKey;
+    var shiftKey = e.shiftKey;
+    var updatable = false;
+    var inputCache = inputCacheRef.current;
+
+    function _removeText() {
+      var minRemoveLength = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var dLen = Math.max(Math.abs(cursorPositionRef.current - selectPositionRef.current), 1);
+
+      if (inputCache > 0) {
+        inputCacheRef.current = inputCache.slice(0, Math.min(0, inputCache.length - dLen));
+        dLen -= Math.min(dLen, inputCache.length);
+      }
+
+      var _sort = [cursorPositionRef.current, selectPositionRef.current].sort(function (a, b) {
+        return a - b;
+      }),
+          _sort2 = _slicedToArray(_sort, 2),
+          leftOffset = _sort2[0],
+          rightOffset = _sort2[1];
+
+      cursorPositionRef.current = textRef.current.remove(Math.min(altKey ? textRef.current.getSegmentStartOffset(leftOffset) : rightOffset - minRemoveLength, rightOffset - dLen), rightOffset);
+      selectPositionRef.current = cursorPositionRef.current;
+    }
+
+    if (e.metaKey) {
+      if (e.key === 'a') {
+        updatable = true;
+        e.preventDefault();
+        cursorPositionRef.current = 0;
+        selectPositionRef.current = textRef.current.length - 1;
+      }
+    } else {
+      updatable = true;
       e.preventDefault();
 
       if (e.key === 'Backspace') {
-        if (inputCache > 0) {
-          inputCacheRef.current = inputCache.slice(0, inputCache.length - 1);
-        } else {
-          cursorPositionRef.current = textRef.current.remove(altKey ? textRef.current.getSegmentStartIndex(cursorPositionRef.current) : cursorPositionRef.current - 1, cursorPositionRef.current); // if (cursorPositionRef.current > 0) cursorPositionRef.current -= 1;
-        }
+        _removeText(1); // if (cursorPositionRef.current > 0) cursorPositionRef.current -= 1;
+
       } else if (KEYCODE_MAP[e.keyCode]) {
         inputCacheRef.current += KEYCODE_MAP[e.keyCode];
       } else if (e.key.length > 1) {
@@ -5301,7 +5990,9 @@ function SVGTextArea(_ref) {
           case 37:
             {
               //left arrow
-              cursorPositionRef.current = Math.max(altKey ? textRef.current.getSegmentStartIndex(cursorPositionRef.current) : cursorPositionRef.current - 1, 0);
+              updatable = false;
+              cursorPositionRef.current = Math.max(altKey ? textRef.current.getSegmentStartOffset(cursorPositionRef.current) : cursorPositionRef.current - 1, 0);
+              if (!shiftKey) selectPositionRef.current = cursorPositionRef.current;
             }
             ;
             break;
@@ -5309,341 +6000,168 @@ function SVGTextArea(_ref) {
           case 39:
             {
               //right arrow
-              cursorPositionRef.current = Math.min(altKey ? textRef.current.getSegmentEndIndex(cursorPositionRef.current) : cursorPositionRef.current + 1, textRef.current.lastOffset - 1);
+              updatable = false;
+              cursorPositionRef.current = Math.min(altKey ? textRef.current.getSegmentEndOffset(cursorPositionRef.current) : cursorPositionRef.current + 1, textRef.current.lastOffset - 1);
+              if (!shiftKey) selectPositionRef.current = cursorPositionRef.current;
             }
             ;
             break;
 
           default:
-            {
-              console.log(e.keyCode);
+            {// console.log(e.keyCode);
             }
         }
       } else {
+        if (selectPositionRef.current !== cursorPositionRef.current) {
+          _removeText();
+        }
+
         inputCacheRef.current += e.key;
       }
-
-      requestAnimationFrame(function () {
-        textRef.current.insert(inputCacheRef.current, cursorPositionRef.current);
-        cursorPositionRef.current += inputCacheRef.current.length;
-        inputCacheRef.current = '';
-        componentsRef.current = textRef.current.toReactComponents();
-        setCursorPosition(cursorPositionRef.current);
-      });
     }
+
+    updatable && handleUpdate();
+    requestAnimationFrame(function () {
+      textRef.current.insert(inputCacheRef.current, cursorPositionRef.current);
+      cursorPositionRef.current += inputCacheRef.current.length;
+      if (inputCacheRef.current.length) selectPositionRef.current = cursorPositionRef.current;
+      inputCacheRef.current = '';
+      componentsRef.current = textRef.current.toReactComponents(width);
+
+      _setSelectPosition(selectPositionRef.current);
+
+      _setCursorPosition(cursorPositionRef.current);
+    });
   }
 
-  function handleClick(e) {}
+  function clickHandler(e) {
+    e.preventDefault();
+
+    _setActive(editable); // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._offsetMap);
+
+  }
+
+  function blurHandler(e) {
+    e.preventDefault();
+
+    _setActive(false);
+  }
 
   function forceUpdate() {
     _forceUpdate(!_);
   }
 
-  var _React$useState = react__WEBPACK_IMPORTED_MODULE_0__.useState(true),
-      _React$useState2 = _slicedToArray(_React$useState, 2),
-      _ = _React$useState2[0],
-      _forceUpdate = _React$useState2[1];
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true),
+      _useState2 = _slicedToArray(_useState, 2),
+      _ = _useState2[0],
+      _forceUpdate = _useState2[1];
 
-  var textRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-  var inputCacheRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef('');
-  var componentsRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef();
-  var cursorPositionRef = react__WEBPACK_IMPORTED_MODULE_0__.useRef(0);
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _active = _useState4[0],
+      _setActive = _useState4[1];
 
-  var _React$useState3 = react__WEBPACK_IMPORTED_MODULE_0__.useState(0),
-      _React$useState4 = _slicedToArray(_React$useState3, 2),
-      cursorPosition = _React$useState4[0],
-      setCursorPosition = _React$useState4[1];
+  var _timeout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
-  textRef.current || (textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(value));
-  componentsRef.current || (componentsRef.current = textRef.current.toReactComponents());
+  var textRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var inputCacheRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
+  var componentsRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var cursorPositionRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(0);
 
-  var _textRef$current$getO = textRef.current.getOffsetByIndex(cursorPosition),
-      _textRef$current$getO2 = _slicedToArray(_textRef$current$getO, 2),
-      cursorX = _textRef$current$getO2[0],
-      cursorY = _textRef$current$getO2[1];
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0),
+      _useState6 = _slicedToArray(_useState5, 2),
+      _cursorPosition = _useState6[0],
+      _setCursorPosition = _useState6[1];
+
+  var selectPositionRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(0);
+
+  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0),
+      _useState8 = _slicedToArray(_useState7, 2),
+      _selectPosition = _useState8[0],
+      _setSelectPosition = _useState8[1];
+
+  textRef.current || (textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings));
+  componentsRef.current || (componentsRef.current = textRef.current.toReactComponents(width));
+
+  var _textRef$current$getP = textRef.current.getPositionByOffset(_cursorPosition),
+      _textRef$current$getP2 = _slicedToArray(_textRef$current$getP, 3),
+      cursorX = _textRef$current$getP2[0],
+      cursorY = _textRef$current$getP2[1],
+      lineHeight = _textRef$current$getP2[2];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(value);
-    componentsRef.current = textRef.current.toReactComponents();
+    textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings);
+    componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
-  }, [value]);
+  }, [text, styleStrings]);
+  var actualHeight = Math.max(textRef.current._offsetMap.last[1] + 60, 60);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", _extends({}, props, {
-    className: "svg-textarea ".concat(className),
+    className: "svg-textarea ".concat(className, " ").concat(_active ? 'active' : ''),
     onKeyDown: function onKeyDown(e) {
       return handleKeyDown(e);
     },
-    onClick: function onClick(e) {
-      return handleClick(e);
-    }
+    fill: "none"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
     xlinkHref: "#",
     onClick: function onClick(e) {
-      e.preventDefault();
+      return clickHandler(e);
     },
-    width: "100%",
-    height: "100%"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-    height: Math.max(textRef.current._offsetMap.last[1] + 60, 60),
-    width: "800",
-    fill: "#ddd"
+    onBlur: function onBlur(e) {
+      return blurHandler(e);
+    },
+    height: actualHeight,
+    width: width
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGTextAreaSelect, {
+    className: "svg-textarea-select",
+    text: textRef.current,
+    start: cursorPositionRef.current,
+    end: selectPositionRef.current
   }), componentsRef.current), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     className: "cursor",
     width: "2",
-    height: "60",
+    height: lineHeight,
     x: cursorX,
-    y: cursorY - 60,
-    fill: "#777"
+    y: cursorY - lineHeight
   }));
 }
 
 /***/ }),
 
-/***/ "./frontend/components/svg/svg_slide.jsx":
-/*!***********************************************!*\
-  !*** ./frontend/components/svg/svg_slide.jsx ***!
-  \***********************************************/
+/***/ "./frontend/components/svg/svg_textarea_container.js":
+/*!***********************************************************!*\
+  !*** ./frontend/components/svg/svg_textarea_container.js ***!
+  \***********************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ SVGSlide)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
-/* harmony import */ var _svg_textarea__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg-textarea */ "./frontend/components/svg/svg-textarea.jsx");
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
-
-function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-
-
-
-
-var CONTROL_POINT_SETTINGS = {
-  radius: 4
-};
-
-var SVGControlPoint = function SVGControlPoint(_ref) {
-  var x = _ref.x,
-      y = _ref.y;
-
-  function handleDrag(e) {}
-
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
-    onDrag: function onDrag(e) {
-      return handleDrag(e);
-    }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("circle", {
-    cx: 0,
-    cy: 0,
-    radius: CONTROL_POINT_SETTINGS.radius
-  })));
-};
-
-var SVGEditFrame = function SVGEditFrame(_ref2) {
-  var width = _ref2.width,
-      height = _ref2.height,
-      _ref2$rotation = _ref2.rotation,
-      rotation = _ref2$rotation === void 0 ? 0 : _ref2$rotation;
-  var halfWidth = width / 2;
-  var halfHeight = height / 2;
-  var controlPoints = [/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 0,
-    type: "vertex",
-    transform: "translate(".concat(-halfWidth, " ").concat(-halfHeight)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 1,
-    type: "edge",
-    transform: "translate(".concat(0, " ", -halfHeight)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 2,
-    type: "vertex",
-    transform: "translate(".concat(halfWidth, " ").concat(-halfHeight)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 3,
-    type: "edge",
-    transform: "translate(".concat(-halfWidth, " ", 0)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 4,
-    type: "edge",
-    transform: "translate(".concat(0, " ", -halfHeight - 30)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 5,
-    type: "edge",
-    transform: "translate(".concat(halfWidth, " ", 0)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 6,
-    type: "vertex",
-    transform: "translate(".concat(-halfWidth, " ").concat(halfHeight)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 7,
-    type: "edge",
-    transform: "translate(".concat(0, " ", halfHeight)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
-    key: 8,
-    type: "vertex",
-    transform: "translate(".concat(halfWidth, " ").concat(halfHeight)
-  })];
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-    className: "svg-edit-frame"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-    width: width,
-    height: height,
-    trasform: "rotate(".concat(rotation, "deg) translate(").concat(-halfWidth, " ").concat(-halfHeight, ")")
-  }), controlPoints);
-};
-
-var SVGWrapper = function SVGWrapper(_ref3) {
-  var wrapper = _ref3.wrapper,
-      allowEdit = _ref3.allowEdit,
-      props = _objectWithoutProperties(_ref3, ["wrapper", "allowEdit"]);
-
-  var slideObjectType = wrapper.slideObjectType,
-      slideObject = wrapper.slideObject,
-      transformString = wrapper.transformString;
-
-  function getComponent() {
-    switch (slideObjectType) {
-      case 'Textbox':
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea__WEBPACK_IMPORTED_MODULE_2__.default, {
-          value: slideObject.text,
-          textStyles: slideObject.textStyles
-        });
-      // case 'image': return <SVGImage id={id} allowEdit={allowEdit}/>;
-      // case 'diagram': return <SVGShape id={id} allowEdit={allowEdit}/>;
-    }
-  }
-
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-    className: "SVGNoWrapper",
-    transform: transformString
-  }, allowEdit ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGEditFrame, null) : null, getComponent());
-};
-
-var mapSTPCreator = function mapSTPCreator(allowEdit) {
-  return function (_ref4, ownProps) {
-    var entities = _ref4.entities;
-    return {
-      allowEdit: allowEdit
-    };
-  };
-};
-
-var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(mapSTPCreator(true), null)(SVGWrapper);
-var SVGNoWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(mapSTPCreator(false), null)(SVGWrapper);
-function SVGSlide(_ref5) {
-  var isPreview = _ref5.isPreview,
-      containerWidth = _ref5.containerWidth,
-      width = _ref5.width,
-      height = _ref5.height,
-      _ref5$slide = _ref5.slide,
-      slide = _ref5$slide === void 0 ? {} : _ref5$slide,
-      wrappers = _ref5.wrappers;
-  var widthAttr = {};
-
-  if (containerWidth) {
-    widthAttr = {
-      width: containerWidth
-    };
-  }
-
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", _extends({
-    version: "1.1",
-    className: "svg-slide",
-    xmlns: "http://www.w3.org/2000/svg",
-    xmlnsXlink: "http://www.w3.org/1999/xlink",
-    width: "100%",
-    height: "100%",
-    viewBox: "0 0 ".concat(width, " ").concat(height),
-    xmlSpace: "preserve"
-  }, widthAttr), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-    width: width,
-    height: height,
-    fill: "#FFFFFF"
-  })), wrappers.map(function (wrapper) {
-    return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGNoWrapperContainer, {
-      key: wrapper.id,
-      wrapper: wrapper
-    }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGWrapperContainer, {
-      key: wrapper.id,
-      wrapper: wrapper
-    });
-  }));
-}
-
-/***/ }),
-
-/***/ "./frontend/components/svg/svg_slide_containers.jsx":
-/*!**********************************************************!*\
-  !*** ./frontend/components/svg/svg_slide_containers.jsx ***!
-  \**********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SVGSlideContainer": () => (/* binding */ SVGSlideContainer),
-/* harmony export */   "SVGSlidePreviewContainer": () => (/* binding */ SVGSlidePreviewContainer)
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
-/* harmony import */ var _svg_slide__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_slide */ "./frontend/components/svg/svg_slide.jsx");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+/* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
+/* harmony import */ var _svg_textarea__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_textarea */ "./frontend/components/svg/svg_textarea.jsx");
 
 
 
-
-var generateSTP = function generateSTP(isPreview) {
-  return function (_ref, ownProps) {
-    var entities = _ref.entities,
-        ui = _ref.ui;
-    var slide = entities.slides[ownProps.slideId];
-    var wrappers = slide.wrapperIds.map(function (id) {
-      var wrapper = entities.wrappers[id];
-      var slideObject = undefined;
-
-      switch (wrapper.slideObjectType) {
-        case 'Textbox':
-          {
-            slideObject = entities.textboxes[wrapper.slideObjectId];
-            var textStyles = slideObject.textstyleIds.map(function (id) {
-              return entities.textstyles[id];
-            });
-            return _objectSpread(_objectSpread({}, wrapper), {}, {
-              slideObject: _objectSpread(_objectSpread({}, slideObject), {}, {
-                textStyles: textStyles
-              })
-            });
-          }
-          ;
-
-        default:
-          return wrapper;
-      }
-    });
-    return {
-      isPreview: isPreview,
-      slide: slide,
-      wrappers: wrappers.sort(function (a, b) {
-        return a.sequence - b.sequence;
-      }),
-      width: ui.pageWidth || 0,
-      height: ui.pageHeight || 0
-    };
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, _ref2) {
+  var entities = _ref.entities;
+  var textboxId = _ref2.textboxId,
+      width = _ref2.width;
+  var textbox = entities.textboxes[textboxId];
+  return {
+    text: textbox.text,
+    styleStrings: textbox.textstyleIds.map(function (id) {
+      return entities.textstyles[id];
+    })
   };
-};
-
-var SVGSlideContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(generateSTP(false), function (dispatch, ownProps) {
-  return {};
-})(_svg_slide__WEBPACK_IMPORTED_MODULE_1__.default);
-var SVGSlidePreviewContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(generateSTP(true), function (dispatch, ownProps) {
-  return {};
-})(_svg_slide__WEBPACK_IMPORTED_MODULE_1__.default);
+}, function (dispatch, ownProps) {
+  return {
+    updateTextHandler: function updateTextHandler(id, data) {
+      return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.updateText)(id, data));
+    }
+  };
+})(_svg_textarea__WEBPACK_IMPORTED_MODULE_2__.default));
 
 /***/ }),
 
@@ -5806,6 +6324,8 @@ function DropdownMenu(_ref) {
 
   var _timeout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
+  var hasChild = !!children[1];
+
   var handleMouseOver = function handleMouseOver(e) {
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
@@ -5828,7 +6348,7 @@ function DropdownMenu(_ref) {
   };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
-    className: "dropdown-menu ".concat(visible ? '' : 'hidden', " ").concat(className),
+    className: "dropdown-menu ".concat(visible && hasChild ? '' : 'hidden', " ").concat(className),
     onBlur: function onBlur(e) {
       return handleBlur(e);
     },
@@ -5963,6 +6483,9 @@ var TextStyleReducer = function TextStyleReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
+      return _objectSpread(_objectSpread({}, state), action.data.textstylesAttributes);
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
       return action.entities.textstyles;
 
@@ -5983,6 +6506,9 @@ var TextboxsReducer = function TextboxsReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
+      return _objectSpread(_objectSpread({}, state), action.data);
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
       return action.entities.textboxes;
 
@@ -6001,7 +6527,6 @@ var WrapperReducer = function WrapperReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var action = arguments.length > 1 ? arguments[1] : undefined;
   Object.freeze(state);
-  console.log(action.entities);
 
   switch (action.type) {
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
@@ -6205,10 +6730,11 @@ var sessionErrorsReducer = function sessionErrorsReducer() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ UIReducer)
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
+/* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -6217,7 +6743,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-function UIReducer() {
+
+
+function SlideSettingsReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+  Object.freeze(state);
+
+  switch (action.type) {
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_CURRENT_SLIDE:
+      return _objectSpread(_objectSpread({}, state), {}, {
+        slideId: action.slideId
+      });
+
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.CLEAR_UI:
+      return {};
+
+    default:
+      return state;
+  }
+}
+
+function PagesettingsReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var action = arguments.length > 1 ? arguments[1] : undefined;
   Object.freeze(state);
@@ -6233,11 +6780,6 @@ function UIReducer() {
         }) : {};
       }
 
-    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_CURRENT_SLIDE:
-      return _objectSpread(_objectSpread({}, state), {}, {
-        slideId: action.slideId
-      });
-
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_PAGE_SETTINGS:
       {
         return _objectSpread(_objectSpread({}, state), action.pageSettings);
@@ -6251,6 +6793,12 @@ function UIReducer() {
       return state;
   }
 }
+
+var UIReducer = (0,redux__WEBPACK_IMPORTED_MODULE_2__.combineReducers)({
+  pageSettings: PagesettingsReducer,
+  slideSettings: SlideSettingsReducer
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (UIReducer);
 
 /***/ }),
 
@@ -6365,13 +6913,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _sorted_array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./sorted-array */ "./frontend/utils/data-structure/sorted-array.js");
 /* harmony import */ var _sorted_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./sorted-map */ "./frontend/utils/data-structure/sorted-map.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
-function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -6379,19 +6931,27 @@ function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableTo
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
@@ -6401,13 +6961,54 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var CTX = document.createElement('canvas').getContext('2d');
 var COMMON_CHAR_SIZE_MAP = {};
-var DEFAULT_LINE_HEIGHT = 60;
-CTX.font = '60px Helvetica';
+var DEFAULT_FONT_SIZE = 14;
+CTX.font = "14px Times";
+
+function parseStyleString(styleString) {
+  var stringObj = Object.fromEntries(styleString.split(/\ *\;\ */).map(function (x) {
+    return x.split(/\ *\:\ /);
+  }));
+  var fontStyles = stringObj.font;
+
+  if (fontStyles) {
+    Object.assign(stringObj, parseFontString(fontStyles)); // delete stringObj.font;
+  }
+
+  return stringObj;
+}
+
+function parseFontString(fontString) {
+  // 0: " 400 16px/1.33 lkj kjlasdf sjldkf "
+  // 1: undefined
+  // 2: "400"
+  // 3: undefined
+  // 4: "16px"
+  // 5: "/1.33"
+  // 6: "lkj kjlasdf sjldkf "
+  if (!fontString) return {};
+  var fontStyles = {};
+
+  var _fontString$split = fontString.split(/(\d+px)(?:\/([\d\.]+(?:px)?))?/),
+      _fontString$split2 = _slicedToArray(_fontString$split, 4),
+      firstString = _fontString$split2[0],
+      fontSize = _fontString$split2[1],
+      lineHeight = _fontString$split2[2],
+      fontFamily = _fontString$split2[3];
+
+  var fontWeight = firstString.match(/\d+|bold/);
+  var fontStyle = firstString.match(/italic/);
+  if (fontSize) fontStyles.fontSize = fontSize;
+  if (lineHeight) fontStyles.lineHeight = lineHeight;
+  if (fontFamily) fontStyles.fontFamily = fontFamily;
+  if (fontWeight) fontStyles.fontWeight = fontWeight[0];
+  if (fontStyle) fontStyles.fontStyle = fontStyle[0];
+  return fontStyles;
+}
 
 var DynamicText = /*#__PURE__*/function () {
   function DynamicText() {
     var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    var style = arguments.length > 1 ? arguments[1] : undefined;
+    var styleStrings = arguments.length > 1 ? arguments[1] : undefined;
 
     _classCallCheck(this, DynamicText);
 
@@ -6418,10 +7019,13 @@ var DynamicText = /*#__PURE__*/function () {
       tabs: new _sorted_array__WEBPACK_IMPORTED_MODULE_3__.default(),
       returns: new _sorted_array__WEBPACK_IMPORTED_MODULE_3__.default()
     };
-    this._styleMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_4__.default();
+    this._styleMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_4__.default(styleStrings.map(function (styleString) {
+      return [styleString.offset, parseStyleString(styleString.styleString)];
+    }));
     this._offsetMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_4__.default();
     this._defaultFont = CTX.font || style.defaultFont;
-    this.insert(text + '\0');
+    if (text[text.length - 1] !== '\0') text = text + '\0';
+    this.insert(text);
   }
 
   _createClass(DynamicText, [{
@@ -6477,9 +7081,9 @@ var DynamicText = /*#__PURE__*/function () {
 
         var thisIndices = this._indices[key];
 
-        for (var _i = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_2__.bisectLeft)(thisIndices, index), l = thisIndices.length; _i < l; _i++) {
+        for (var _i2 = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_2__.bisectLeft)(thisIndices, index), l = thisIndices.length; _i2 < l; _i2++) {
           // offset existing indices right of index by length
-          thisIndices[_i] += length;
+          thisIndices[_i2] += length;
         } // add temporary arrays to the indices
 
 
@@ -6523,11 +7127,23 @@ var DynamicText = /*#__PURE__*/function () {
   }, {
     key: "getSegmentStartIndex",
     value: function getSegmentStartIndex(index) {
-      return this._offsetMap.getLeftKey(index - 1);
+      return this._offsetMap.getLeftIndex(index - 1);
     }
   }, {
     key: "getSegmentEndIndex",
     value: function getSegmentEndIndex(index) {
+      var keys = this._offsetMap.keys;
+      return this._offsetMap.getRightIndex(index + 1) - 1;
+    }
+  }, {
+    key: "getSegmentStartOffset",
+    value: function getSegmentStartOffset(index) {
+      // left arrow
+      return this._offsetMap.getLeftKey(index - 1);
+    }
+  }, {
+    key: "getSegmentEndOffset",
+    value: function getSegmentEndOffset(index) {
       // right arrow
       var keys = this._offsetMap.keys;
       return this._offsetMap.getRightKey(index + 1) - 1;
@@ -6571,18 +7187,23 @@ var DynamicText = /*#__PURE__*/function () {
       var style = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var oldFont = CTX.font,
           size;
+      var height = style.lineHeight;
 
       if (style !== undefined) {
-        CTX.font = [style.fontWeight || '', style.fontSize || '', style.fontFamily || ''].join(' ');
+        CTX.font = style.font || CTX.font;
         size = CTX.measureText(substring);
         CTX.font = oldFont;
       } else {
         size = CTX.measureText(substring);
       }
 
+      if (!height) {
+        height = (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * 1.5;
+      }
+
       return {
         width: size.width,
-        height: style.lineHeight || DEFAULT_LINE_HEIGHT
+        height: height
       };
     }
   }, {
@@ -6614,10 +7235,12 @@ var DynamicText = /*#__PURE__*/function () {
 
         for (var i = 0, len = tempQueue.length; i < len; i++) {
           var el = tempQueue[i];
-          var reactComponent = this.toReactComponent(el.substring, el.l, el.offsetX, offsetY);
+          var reactComponent = this.toReactComponent(_objectSpread(_objectSpread({}, el), {}, {
+            offsetY: offsetY
+          }));
           results.push(reactComponent);
 
-          this._offsetMap.set(el.l, [el.offsetX, offsetY]);
+          this._offsetMap.set(el.l, [el.offsetX, offsetY, el.height]);
         }
 
         tempQueue.length = 0;
@@ -6634,8 +7257,6 @@ var DynamicText = /*#__PURE__*/function () {
             width = _this$measureSubstrin.width,
             height = _this$measureSubstrin.height;
 
-        console.log(substring, height, offsetY);
-
         if (![' ', '\n', '\t'].includes(substring)) {
           // if the last character is not a break character
           if (tempQueue.length > 0 && offsetX + width > maxWidth) {
@@ -6647,13 +7268,24 @@ var DynamicText = /*#__PURE__*/function () {
         }
 
         if (lastChar === '\n') {
+          tempQueue.push({
+            substring: substring,
+            style: style,
+            l: l,
+            r: r,
+            height: height,
+            offsetX: offsetX
+          });
+
           _changeLine.call(this);
         } else {
           if (height > maxLineHeight) maxLineHeight = height;
           tempQueue.push({
             substring: substring,
+            style: style,
             l: l,
             r: r,
+            height: height,
             offsetX: offsetX
           });
           offsetX += width;
@@ -6673,7 +7305,7 @@ var DynamicText = /*#__PURE__*/function () {
         return pos < arrs[i].length;
       })) {
         var typeIndex = 0;
-        var minPosition = arrs[typeIndex][positions[typeIndex]] || Infinity;
+        var minPosition = arrs[typeIndex][positions[typeIndex]] || this.length;
 
         for (var j = 1; j < 4; j++) {
           var arrMin = arrs[j][positions[j]];
@@ -6695,42 +7327,56 @@ var DynamicText = /*#__PURE__*/function () {
 
       _processSubstring.call(this, l, this.length);
 
-      this._offsetMap.set(this.length, [offsetX, offsetY]);
+      this._offsetMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
 
       _changeLine.call(this);
 
       return results;
     }
   }, {
-    key: "getOffsetByIndex",
-    value: function getOffsetByIndex(index) {
+    key: "getPositionByOffset",
+    value: function getPositionByOffset(index) {
       var style = this._styleMap.getLeftValue(index);
 
       var _this$_offsetMap$getL = this._offsetMap.getLeftEntry(index),
           _this$_offsetMap$getL2 = _slicedToArray(_this$_offsetMap$getL, 2),
           leftIndex = _this$_offsetMap$getL2[0],
-          _this$_offsetMap$getL3 = _slicedToArray(_this$_offsetMap$getL2[1], 2),
+          _this$_offsetMap$getL3 = _slicedToArray(_this$_offsetMap$getL2[1], 3),
           leftX = _this$_offsetMap$getL3[0],
-          y = _this$_offsetMap$getL3[1];
+          y = _this$_offsetMap$getL3[1],
+          lineHeight = _this$_offsetMap$getL3[2];
 
       var size = this.measureSubstringSize(this._text.substring(leftIndex, index), style);
-      return [leftX + size.width, y];
+      return [leftX + size.width, y, lineHeight];
     }
   }, {
     key: "toReactComponent",
-    value: function toReactComponent(substring, l, offsetX, offsetY) {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5__.createElement("text", {
-        key: [substring, l, offsetX, offsetY].join('-'),
+    value: function toReactComponent(_ref2) {
+      var substring = _ref2.substring,
+          style = _ref2.style,
+          l = _ref2.l,
+          offsetX = _ref2.offsetX,
+          offsetY = _ref2.offsetY;
+
+      var font = style.font,
+          otherstyles = _objectWithoutProperties(style, ["font"]);
+
+      var fontStyles = parseFontString(font);
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5__.createElement("text", _extends({
+        key: [substring, l, offsetX, offsetY].join('-')
+      }, otherstyles, fontStyles, {
         x: offsetX,
         y: offsetY
-      }, substring);
+      }), substring);
     }
   }, {
     key: "toReduxState",
-    value: function toReduxState() {
+    value: function toReduxState(textstylesAttributes) {
       return {
-        text: this._text,
-        styles: Array.from(this._styleMap)
+        text: this._text.substring(0, this._text.length - 1),
+        textstylesAttributes: textstylesAttributes
+        /*: Array.from(this._styleMap)*/
+
       };
     }
   }]);
@@ -6880,8 +7526,6 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function _readOnlyError(name) { throw new TypeError("\"" + name + "\" is read-only"); }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -6926,6 +7570,18 @@ var SortedMap = /*#__PURE__*/function (_Map) {
   }
 
   _createClass(SortedMap, [{
+    key: "getLeftIndex",
+    value: function getLeftIndex(key) {
+      var keys = this.keys;
+      return Math.max((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectRight)(keys, key) - 1, 0);
+    }
+  }, {
+    key: "getRightIndex",
+    value: function getRightIndex(key) {
+      var keys = this.keys;
+      return Math.min((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectLeft)(keys, key + 1), this.size - 1);
+    }
+  }, {
     key: "getLeftKey",
     value: function getLeftKey(key) {
       // the greatest index less than or equal to key
@@ -6977,20 +7633,19 @@ var SortedMap = /*#__PURE__*/function (_Map) {
       if (removeLength > 0) {
         var index2 = index + removeLength;
         var key2 = (0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectLeft)(keys, index + removeLength);
-        var lastStyle = this.get(key2);
+        var lastElem = this.get(key2);
 
         var _iterator = _createForOfIteratorHelper(keys),
             _step;
 
         try {
           for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var _key2 = _step.value;
+            var key = _step.value;
 
-            if (_key2 >= index) {
-              if (_key2 >= index2) this._styleMap.set(_key2 - (index2 - index1), this._styleMap.get(_key2));
-              if (_key2 <= index2) lastStyle = (_readOnlyError("lastStyle"), this.get(_key2));
-
-              this._styleMap["delete"](_key2);
+            if (key >= index) {
+              if (key >= index2) this.set(key - (index2 - index), this.get(key));
+              if (key <= index2) lastElem = this.get(key);
+              this["delete"](key);
             }
           }
         } catch (err) {
@@ -6999,13 +7654,13 @@ var SortedMap = /*#__PURE__*/function (_Map) {
           _iterator.f();
         }
 
-        lastStyle && this.set(index, lastStyle);
+        lastElem && this.set(index, lastElem);
       }
 
       keys = this.keys; //insert
 
-      for (var len = keys.length, i = len - 1; keys[i] >= index; key--) {
-        var _key3 = keys[i];
+      for (var len = keys.length, i = len - 1; keys[i] > index; i--) {
+        var _key2 = keys[i];
         this.set(i + insertLength, this.get(i));
         this["delete"](i);
       }
@@ -7136,20 +7791,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "asyncAddSlide": () => (/* binding */ asyncAddSlide),
 /* harmony export */   "asyncDeleteSlide": () => (/* binding */ asyncDeleteSlide),
 /* harmony export */   "asyncUpdateSlide": () => (/* binding */ asyncUpdateSlide),
-/* harmony export */   "asyncMoveSlide": () => (/* binding */ asyncMoveSlide)
+/* harmony export */   "asyncMoveSlide": () => (/* binding */ asyncMoveSlide),
+/* harmony export */   "asyncCreateText": () => (/* binding */ asyncCreateText),
+/* harmony export */   "asyncUpdateText": () => (/* binding */ asyncUpdateText),
+/* harmony export */   "asyncTransformWrapper": () => (/* binding */ asyncTransformWrapper)
 /* harmony export */ });
-// Textbox.create!({
-//   text: 0,
-//   wrapper_attributes: {slide_id: 103,
-//     sequence: 1,
-//     width: 100,
-//     height: 100,
-//     transform_string: ""},
-//   text_styles_attributes: [{
-//     style_string: "a",
-//     offset: 0
-//   }]
-// });
 var asyncFetchPresentation = function asyncFetchPresentation() {
   return $.ajax({
     method: 'GET',
@@ -7195,6 +7841,36 @@ var asyncMoveSlide = function asyncMoveSlide(data) {
     url: "/api/slides/move",
     data: {
       slide: data
+    }
+  });
+};
+var asyncCreateText = function asyncCreateText(textboxData) {
+  return $.ajax({
+    // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+    method: 'POST',
+    url: "/api/texts/".concat(textboxId),
+    data: {
+      textbox: textboxData
+    }
+  });
+};
+var asyncUpdateText = function asyncUpdateText(textboxId, textboxData) {
+  return $.ajax({
+    // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+    method: 'PATCH',
+    url: "/api/texts/".concat(textboxId),
+    data: {
+      textbox: textboxData
+    }
+  });
+};
+var asyncTransformWrapper = function asyncTransformWrapper(wrapper) {
+  return $.ajax({
+    // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
+    method: 'PATCH',
+    url: "/api/wrappers/".concat(wrapper.id),
+    data: {
+      wrapper: wrapper
     }
   });
 };
@@ -43782,6 +44458,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 window.bisectLeft = _utils_data_structure_bisect__WEBPACK_IMPORTED_MODULE_4__.bisectLeft;
 window.bisectRight = _utils_data_structure_bisect__WEBPACK_IMPORTED_MODULE_4__.bisectRight;
+window.SortedMap = _utils_data_structure_sorted_map__WEBPACK_IMPORTED_MODULE_5__.default;
 document.addEventListener('DOMContentLoaded', function () {
   var store;
 

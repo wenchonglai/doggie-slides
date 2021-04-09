@@ -7,29 +7,33 @@
 #  slide_id          :integer          not null
 #  slide_object_type :string
 #  slide_object_id   :bigint
-#  sequence          :integer          not null
-#  width             :integer          default(150), not null
-#  height            :integer          default(100), not null
-#  transform_string  :string
+#  z_index           :integer          not null
+#  width             :float            default(300.0), not null
+#  height            :float            default(200.0), not null
+#  translate_x        :float            default(0.0), not null
+#  translate_y        :float            default(0.0), not null
+#  rotate            :float            default(0.0), not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #
 class Wrapper < ApplicationRecord
   before_validation :set_default_values
 
-  validates :slide_id, :sequence, :width, :height, presence: true
+  validates :slide_id, :z_index, :width, :height, :translate_x, :translate_y, :rotate, presence: true
 
-  delegate :user, to: :slide
+  delegate :user, :doc, to: :slide
 
   belongs_to :slide, touch: true
 
-  belongs_to :slide_object, polymorphic: true, inverse_of: :wrapper
+  belongs_to :slide_object, polymorphic: true, inverse_of: :wrapper, dependent: :destroy
 
   validates_presence_of :slide_object
 
   private def set_default_values
-    self.width ||= 150
-    self.height ||= 100
-    self.transform_string ||= ""
+    self.width ||= 300
+    self.height ||= 200
+    self.translate_x ||= 0
+    self.translate_y ||= 0
+    self.rotate ||= 0
   end
 end

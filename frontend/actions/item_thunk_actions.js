@@ -5,8 +5,8 @@ import * as PresentationUtils from '../utils/presentation_utils';
 export const newSlide = () => (dispatch, getState) => {
   const {ui, entities} = getState();
   const reqSlide = {
-    docId: ui.docId,
-    page: entities.slides[ui.slideId].page + 1,
+    docId: ui.pageSettings.docId,
+    page: entities.slides[ui.slideSettings.slideId].page + 1,
     skipped: false
   }
 
@@ -21,12 +21,15 @@ export const newSlide = () => (dispatch, getState) => {
 
 export const deleteSlide = () => (dispatch, getState) => {
   const {ui, entities} = getState();
-  const slideId = ui.slideId;
+  const slideId = ui.slideSettings.slideId;
   const page = entities.slides[slideId].page;
+  const maxPage = Math.max(...Object.values(entities.slides).map(slide => slide.page));
 
   return PresentationUtils.asyncDeleteSlide(slideId)
     .then(resSlides => {
-      const newSlideId = Object.values(resSlides).filter(slide => slide.page == page)[0].id;
+      const newSlideId = Object.values(resSlides)
+        .filter(slide => slide.page == page - (page == maxPage ? 1 : 0) )[0]
+        .id;
 
       dispatch(PresentationActions.receiveSlides(resSlides));
       dispatch(UIActions.receiveCurrentSlide(newSlideId));
@@ -35,10 +38,23 @@ export const deleteSlide = () => (dispatch, getState) => {
 
 export const skipSlide = () => (dispatch, getState) => {
   const {ui, entities} = getState();
-  const reqSlide = {...entities.slides[ui.slideId]};
+  const reqSlide = {...entities.slides[ui.slideSettings.slideId]};
   reqSlide.skipped = !reqSlide.skipped
 
   return PresentationUtils.asyncUpdateSlide(reqSlide)
+    .then(resSlide => {
+      dispatch(PresentationActions.receiveSlide(resSlide));
+    }, (err) => {console.log(err)});
+}
+
+export const textbox = () => (dispatch, getState) => {
+  const {ui} = getState();
+
+  return new Promise(res => {
+    res(dispatch(UIActions.changeUIAction('createText')));
+  });
+  
+  PresentationUtils.asyncUpdateSlide(reqSlide)
     .then(resSlide => {
       dispatch(PresentationActions.receiveSlide(resSlide));
     }, (err) => {console.log(err)});

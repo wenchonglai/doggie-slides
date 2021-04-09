@@ -1,8 +1,13 @@
+svg {
+  fill: none;
+  overflow: visible;
+}
+
 svg g.svg-textarea, svg g.svg-textarea > a{
   user-select: none;
   cursor: text;
   background-color: red;
-  font: 60px Helvetica;
+  font: 14px Times; /*SVG default to avoid parent element font styles from grandfathering*/
 }
 
 @keyframes cursor-blink{
@@ -13,8 +18,45 @@ svg g.svg-textarea, svg g.svg-textarea > a{
   100% {opacity: 1} 
 }
 
-svg g.svg-textarea rect.cursor{
-  animation-name: cursor-blink;
-  animation-duration: 1s;
-  animation-iteration-count: infinite;
+svg g.svg-textarea{
+  cursor: text;
+
+  g.svg-textarea-select{
+    fill: #0000001f;
+  }
+
+  &.active { 
+    rect.cursor{
+      fill: #777;
+      animation-name: cursor-blink;
+      animation-duration: 1s;
+      animation-iteration-count: infinite;
+    }
+
+    g.svg-textarea-select{
+      fill: #76a7fa7f;
+    }
+  }
+}
+
+svg {
+  g.svg-edit-frame {
+    stroke: #1a73e8;
+    stroke-width: 1;
+    .control-box {
+      pointer-events: all;
+      cursor: move;
+    }
+    .control-point {
+      transform-origin: center;
+      fill: #1a73e8;
+      stroke: #fff;
+      cursor: crosshair;
+
+      &.nwse-resize { cursor: nwse-resize; }
+      &.nesw-resize { cursor: nesw-resize; }
+      &.ns-resize { cursor: ns-resize; }
+      &.ew-resize { cursor: ew-resize; }
+    }
+  }
 }

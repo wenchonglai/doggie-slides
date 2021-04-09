@@ -7,7 +7,7 @@ const PresentationPageContainer = connect(
   (state, ownProps) => ({
     state: state,
     ownProps: ownProps,
-    currentSlideId: state.ui.slideId,
+    currentSlideId: state.ui.slideSettings.slideId,
     doc: Object.values(state.entities.docs)[0],
     slides: Object.values(state.entities.slides).sort((a, b) => a.page - b.page)
   }),

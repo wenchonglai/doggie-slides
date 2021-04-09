@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 2021_04_08_005310) do
     t.integer "owner_id", null: false
     t.integer "share_id"
     t.string "filename", default: "Untitled presentation", null: false
-    t.integer "width", default: 1600, null: false
-    t.integer "height", default: 1000, null: false
+    t.integer "width", default: 800, null: false
+    t.integer "height", default: 500, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_id"], name: "index_docs_on_owner_id"
@@ -40,16 +40,6 @@ ActiveRecord::Schema.define(version: 2021_04_08_005310) do
     t.text "text", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "textstyle", force: :cascade do |t|
-    t.integer "textbox_id", null: false
-    t.text "style_string", default: "", null: false
-    t.integer "offset", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["textbox_id", "offset"], name: "index_textstyle_on_textbox_id_and_offset", unique: true
-    t.index ["textbox_id"], name: "index_textstyle_on_textbox_id"
   end
 
   create_table "textstyles", force: :cascade do |t|
@@ -79,10 +69,12 @@ ActiveRecord::Schema.define(version: 2021_04_08_005310) do
     t.integer "slide_id", null: false
     t.string "slide_object_type"
     t.bigint "slide_object_id"
-    t.integer "sequence", null: false
-    t.integer "width", default: 150, null: false
-    t.integer "height", default: 100, null: false
-    t.string "transform_string"
+    t.integer "z_index", null: false
+    t.float "width", default: 300.0, null: false
+    t.float "height", default: 200.0, null: false
+    t.float "translate_x", default: 0.0, null: false
+    t.float "translate_y", default: 0.0, null: false
+    t.float "rotate", default: 0.0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["group_id"], name: "index_wrappers_on_group_id"

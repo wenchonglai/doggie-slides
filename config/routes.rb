@@ -17,8 +17,12 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   namespace :api, defaults: {format: :json} do
     resources :wrappers, only: [:create, :destroy, :update]
-    resources :textbox_styles, only: [:create, :destroy, :update]
-    resources :textboxes, only: [:create, :destroy, :update, :show]
+    resources :texts, only: [:create, :destroy, :update, :show, :index]
+    resources :textstyles, only: []
+    resources :textboxes, only: [ :show]
+
+    patch '/wrappers/move', to: 'wrappers#move'
+    resources :wrappers, only: [:create, :destroy, :update, :show, :index]
 
     patch '/slides/move', to: 'slides#move'
     resources :slides, only: [:create, :destroy, :update, :show, :index]

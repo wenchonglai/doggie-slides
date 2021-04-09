@@ -8,6 +8,7 @@ import SortedMap from './utils/data-structure/sorted-map';
 
 window.bisectLeft = bisectLeft;
 window.bisectRight = bisectRight;
+window.SortedMap = SortedMap;
 
 document.addEventListener('DOMContentLoaded', () => {
   let store;

@@ -6,9 +6,9 @@ import FilmStrip from "./filmstrip";
 
 const mapSTP = ({entities, ui}) => ({
   slides: entities.slides,
-  pageWidth: ui.pageWidth,
-  pageHeight: ui.pageHeight,
-  currentSlideId: ui.slideId
+  pageWidth: ui.pageSettings.pageWidth,
+  pageHeight: ui.pageSettings.pageHeight,
+  currentSlideId: ui.slideSettings.slideId
 });
 
 const mapDTP = (dispatch) => ({

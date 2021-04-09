@@ -6,8 +6,8 @@
 #  owner_id   :integer          not null
 #  share_id   :integer
 #  filename   :string           default("Untitled presentation"), not null
-#  width      :integer          default(1600), not null
-#  height     :integer          default(1000), not null
+#  width      :integer          default(800), not null
+#  height     :integer          default(500), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
@@ -22,8 +22,8 @@ class Doc < ApplicationRecord
   private 
   def set_default_values
     self.filename ||= "Untitled presentation"
-    self.width ||= 1600
-    self.height ||= 1000
+    self.width ||= 800
+    self.height ||= 500
   end
 
   def ensure_slide!

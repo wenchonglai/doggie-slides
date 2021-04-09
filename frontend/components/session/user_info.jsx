@@ -17,7 +17,7 @@ export default function UserInfo({user, logoutHandler, history}){
       <section>
         <section>
           <div className="user-profile">{profile}</div>
-          <div className="user-name">{`${user.firstname} ${user.lastname}, wow`}</div>
+          <div className="user-name">{`${user.firstname} ${user.lastname}, wow~`}</div>
           <div className="user-email">{user.email}</div>
         </section>
         <section className='bottom-bar'>
