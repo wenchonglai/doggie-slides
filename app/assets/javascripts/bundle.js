@@ -3438,7 +3438,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "clearUI": () => (/* binding */ clearUI),
 /* harmony export */   "updateCurrentSlide": () => (/* binding */ updateCurrentSlide),
 /* harmony export */   "updateWrapperSelection": () => (/* binding */ updateWrapperSelection),
-/* harmony export */   "clearWrapperSelection": () => (/* binding */ clearWrapperSelection)
+/* harmony export */   "deleteWrapperSelection": () => (/* binding */ deleteWrapperSelection)
 /* harmony export */ });
 var RECEIVE_PAGE_SETTINGS = 'RECEIVE_PAGE_SETTINGS';
 var RECEIVE_CURRENT_SLIDE = 'RECEIVE_CURRENT_SLIDE';
@@ -3451,10 +3451,13 @@ var receiveCurrentSlide = function receiveCurrentSlide(slideId) {
     slideId: slideId
   };
 };
-var receiveSelectedWrappers = function receiveSelectedWrappers(wrapperIds) {
+var receiveSelectedWrappers = function receiveSelectedWrappers(_ref) {
+  var wrapperIds = _ref.wrapperIds,
+      sharedAttributes = _ref.sharedAttributes;
   return {
     type: RECEIVE_SELECTED_WRAPPERS,
-    wrapperIds: wrapperIds
+    wrapperIds: wrapperIds,
+    sharedAttributes: sharedAttributes
   };
 };
 var removeSelectedWrappers = function removeSelectedWrappers() {
@@ -3493,14 +3496,51 @@ var updateCurrentSlide = function updateCurrentSlide(slideId) {
     window.location.replace(newURL);
   };
 };
+
+function getCommonAttributes(obj1, obj2) {
+  var returnVal = {};
+
+  for (var _len = arguments.length, keys = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    keys[_key - 2] = arguments[_key];
+  }
+
+  (keys || Object.keys(obj1)).forEach(function (key) {
+    if (obj1[key] === obj2[key]) returnVal[key] = obj1[key];
+  });
+  return returnVal;
+}
+
+function getWrapperSelectionInfo(wrapperIds, entities) {
+  var wrappers = wrapperIds.map(function (id) {
+    return entities.wrappers[id];
+  });
+  var sharedAttributes = wrapperIds.length ? wrappers.reduce(function (obj, curr) {
+    return getCommonAttributes(obj, curr, 'stroke', 'fill', 'strokeWidth', 'strokeDasharray', 'slideObjectType');
+  }, wrappers[0]) : {};
+  return {
+    wrapperIds: wrapperIds,
+    sharedAttributes: sharedAttributes
+  };
+}
+
 var updateWrapperSelection = function updateWrapperSelection(wrapperIds) {
-  return function (dispatch) {
-    dispatch(receiveSelectedWrappers(wrapperIds));
+  return function (dispatch, getState) {
+    var _getState2 = getState(),
+        entities = _getState2.entities;
+
+    dispatch(receiveSelectedWrappers(getWrapperSelectionInfo(wrapperIds, entities)));
   };
 };
-var clearWrapperSelection = function clearWrapperSelection() {
-  return function (dispatch) {
-    dispatch(removeSelectedWrappers());
+var deleteWrapperSelection = function deleteWrapperSelection(arg) {
+  return function (dispatch, getState) {
+    var _getState3 = getState(),
+        entities = _getState3.entities,
+        ui = _getState3.ui;
+
+    var wrapperIds = ui.selections.wrapperIds.filter(function (id) {
+      return !arg.includes(id);
+    });
+    dispatch(receiveSelectedWrappers(getWrapperSelectionInfo(wrapperIds, entities)));
   };
 };
 
@@ -3552,7 +3592,8 @@ function App(_ref) {
       }
     });
     return function () {
-      unListenRef.current.unlisten();
+      console.log(unListen);
+      unListenRef.current && unListenRef.current.unlisten();
     };
   }, []);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Switch, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Route, {
@@ -4167,53 +4208,188 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ Menu)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _utils_dropdown_menu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/dropdown_menu */ "./frontend/components/utils/dropdown_menu.jsx");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _menu_item_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./menu_item_container */ "./frontend/components/presentation/menu_item_container.jsx");
+/* harmony import */ var _menu_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./menu_container */ "./frontend/components/presentation/menu_container.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-function Menu(_ref) {
-  var _ref$className = _ref.className,
-      className = _ref$className === void 0 ? "" : _ref$className,
-      items = _ref.items,
+
+
+
+function DropdownMenu(_ref) {
+  var className = _ref.className,
+      item = _ref.item,
+      _ref$active = _ref.active,
+      active = _ref$active === void 0 ? false : _ref$active,
+      _ref$requireClick = _ref.requireClick,
+      requireClick = _ref$requireClick === void 0 ? true : _ref$requireClick,
       _ref$tier = _ref.tier,
       tier = _ref$tier === void 0 ? 0 : _ref$tier,
-      _ref$requireClick = _ref.requireClick,
-      requireClick = _ref$requireClick === void 0 ? true : _ref$requireClick;
+      parentHandleBlur = _ref.parentHandleBlur,
+      children = _ref.children;
 
-  function getChildComponent(item) {
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(active),
+      _useState2 = _slicedToArray(_useState, 2),
+      _active = _useState2[0],
+      _setActive = _useState2[1];
+
+  var _timeout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+
+  var handleMouseOver = function handleMouseOver(e) {
+    clearTimeout(_timeout.current);
+    _timeout.current = setTimeout(function () {
+      _setActive(true);
+    }, 100);
+  };
+
+  var toggleVisibility = function toggleVisibility(e) {
+    _setActive(!_active); // parentHandleBlur && parentHandleBlur(e, true);
+
+  };
+
+  var handleBlur = function handleBlur(e) {
+    console.log(item.name, parentHandleBlur, e, e.target, e.relatedTarget);
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!e.target.contains(e.relatedTarget)) {
+      clearTimeout(_timeout.current);
+
+      _setActive(false);
+
+      parentHandleBlur && parentHandleBlur(e);
+    } // parentHandleBlur && parentHandleBlur(e);
+
+  };
+
+  var getChildComponent = function getChildComponent(item) {
     var childComponent = null;
     var children = item.children;
+    var ChilcContainerClass;
 
     if (children === undefined || children === null) {} else if (Array.isArray(children)) {
-      childComponent = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Menu, {
+      childComponent = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_3__.default, {
         tier: tier + 1,
         items: children,
-        requireClick: false
+        requireClick: false,
+        parentHandleBlur: handleBlur
       });
     } else {
-      var ChildClass = children;
-      childComponent = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(ChildClass, null);
+      var ChildContainerClass = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(null, function (dispatch) {
+        return {
+          dispatch: dispatch
+        };
+      })(children);
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(ChildContainerClass, {
+        item: item,
+        tier: tier + 1,
+        requireClick: false,
+        parentHandleBlur: handleBlur
+      });
     }
 
     return childComponent;
-  }
+  };
+
+  var childComponent = getChildComponent(item);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
+    className: "dropdown-menu ".concat(_active ? '' : 'hidden', " ").concat(className) // onMouseDown={e => {console.log('down', item);  e.stopPropagation();}}
+    ,
+    onBlur: function onBlur(e) {
+      return requireClick ? handleBlur(e) : undefined;
+    },
+    onMouseLeave: requireClick ? undefined : function (e) {
+      return handleBlur(e);
+    },
+    tabIndex: "0"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_item_container__WEBPACK_IMPORTED_MODULE_2__.default, {
+    className: "button dropdown-button",
+    item: item,
+    onClick: requireClick ? function (e) {
+      toggleVisibility(e);
+    } : null,
+    onMouseOver: requireClick ? null : function () {
+      return handleMouseOver();
+    }
+  }), childComponent ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "dropdown-body"
+  }, getChildComponent(item)) : null);
+}
+
+function Menu(_ref2) {
+  var _ref2$className = _ref2.className,
+      className = _ref2$className === void 0 ? "" : _ref2$className,
+      items = _ref2.items,
+      _ref2$tier = _ref2.tier,
+      tier = _ref2$tier === void 0 ? 0 : _ref2$tier,
+      _ref2$requireClick = _ref2.requireClick,
+      requireClick = _ref2$requireClick === void 0 ? true : _ref2$requireClick,
+      nextMenuAction = _ref2.nextMenuAction,
+      parentHandleBlur = _ref2.parentHandleBlur;
+
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _ = _useState4[0],
+      _forceUpdate = _useState4[1];
+
+  var forceUpdate = function forceUpdate() {
+    _forceUpdate(!_);
+  };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
     className: "menu tier-".concat(tier, " ").concat(className)
   }, items.map(function (item, i) {
     return item ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", {
       key: item.name
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_dropdown_menu__WEBPACK_IMPORTED_MODULE_1__.default, {
-      className: items.className || ""
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_item_container__WEBPACK_IMPORTED_MODULE_2__.default, {
-      item: item
-    }), getChildComponent(item))) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("hr", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(DropdownMenu, {
+      item: item,
+      className: items.className || "",
+      active: nextMenuAction === item.name,
+      parentHandleBlur: parentHandleBlur
+    })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("hr", {
       className: "separator",
       key: i
     });
   }));
 }
+
+/***/ }),
+
+/***/ "./frontend/components/presentation/menu_container.js":
+/*!************************************************************!*\
+  !*** ./frontend/components/presentation/menu_container.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _menu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./menu */ "./frontend/components/presentation/menu.jsx");
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref) {
+  var entities = _ref.entities,
+      ui = _ref.ui;
+  return {
+    lastAction: ui.selections.lastAction,
+    nextMenuAction: ui.selections.nextMenuAction
+  };
+}, null)(_menu__WEBPACK_IMPORTED_MODULE_1__.default));
 
 /***/ }),
 
@@ -4231,26 +4407,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/item_thunk_actions */ "./frontend/actions/item_thunk_actions.js");
 /* harmony import */ var _utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/menu_icon */ "./frontend/components/utils/menu_icon.jsx");
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
 
 
 
 function MenuItem(_ref) {
-  var item = _ref.item,
-      dispatch = _ref.dispatch;
-  var clickAttribute = {};
+  var _ref$className = _ref.className,
+      className = _ref$className === void 0 ? "" : _ref$className,
+      item = _ref.item,
+      dispatch = _ref.dispatch,
+      onClick = _ref.onClick,
+      onMouseMove = _ref.onMouseMove;
 
-  if (typeof item.actionName == 'string') {
-    clickAttribute.onClick = function (e) {
-      console.log(item.actionName);
+  function handleClick(e) {
+    if (typeof item.actionName == 'string') {
       dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName]());
-    };
+    }
+
+    onClick(e);
   }
 
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", _extends({
-    className: "menu-item ".concat(item.actionName ? '' : 'no-action')
-  }, clickAttribute), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__.default, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "menu-item ".concat(className, " ").concat(item.actionName ? '' : 'no-action'),
+    onMouseMove: onMouseMove,
+    onClick: handleClick
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__.default, {
     className: "menu-item-icon",
     icon: item.icon
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -4304,7 +4484,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _session_user_info_container__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../session/user_info_container */ "./frontend/components/session/user_info_container.jsx");
 /* harmony import */ var _utils_product_icon__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/product_icon */ "./frontend/components/utils/product_icon.jsx");
-/* harmony import */ var _menu__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./menu */ "./frontend/components/presentation/menu.jsx");
+/* harmony import */ var _menu_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./menu_container */ "./frontend/components/presentation/menu_container.js");
 /* harmony import */ var _menu_items__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./menu-items */ "./frontend/components/presentation/menu-items.js");
 /* harmony import */ var _utils_autosave_input_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/autosave_input_container */ "./frontend/components/utils/autosave_input_container.jsx");
 /* harmony import */ var _utils_last_update__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/last_update */ "./frontend/components/utils/last_update.jsx");
@@ -4393,7 +4573,7 @@ function PresentationPage(_ref) {
     className: "doc-title-input",
     _docHook: _docHook,
     saveHandler: saveDocHandler
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu__WEBPACK_IMPORTED_MODULE_3__.default, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_3__.default, {
     className: "docs-menu",
     items: _menu_items__WEBPACK_IMPORTED_MODULE_4__.MENU_ITEMS,
     respondToMouseOut: false
@@ -4405,7 +4585,7 @@ function PresentationPage(_ref) {
     className: "body"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "toolbar"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu__WEBPACK_IMPORTED_MODULE_3__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_3__.default, {
     className: "toolbar-menu",
     items: _menu_items__WEBPACK_IMPORTED_MODULE_4__.TEXTBOX_TOOLBAR_ITEMS,
     respondToMouseOut: false
@@ -5162,7 +5342,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ UserInfo)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _utils_dropdown_menu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/dropdown_menu */ "./frontend/components/utils/dropdown_menu.jsx");
+/* harmony import */ var _utils_dropdown__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/dropdown */ "./frontend/components/utils/dropdown.jsx");
 
 
 function UserInfo(_ref) {
@@ -5180,7 +5360,7 @@ function UserInfo(_ref) {
   var profile = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "profile-image"
   }, (user.firstname || '?')[0]);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_dropdown_menu__WEBPACK_IMPORTED_MODULE_1__.default, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_dropdown__WEBPACK_IMPORTED_MODULE_1__.default, {
     className: "user-info"
   }, profile, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "user-profile"
@@ -5484,8 +5664,8 @@ function SVGWrapper(_ref) {
       pageHeight = _ref.pageHeight,
       updateWrapperHandler = _ref.updateWrapperHandler,
       updateWrapperSelection = _ref.updateWrapperSelection,
-      clearWrapperSelection = _ref.clearWrapperSelection,
-      props = _objectWithoutProperties(_ref, ["wrapper", "editable", "svgDOM", "pageWidth", "pageHeight", "updateWrapperHandler", "updateWrapperSelection", "clearWrapperSelection"]);
+      deleteWrapperSelection = _ref.deleteWrapperSelection,
+      props = _objectWithoutProperties(_ref, ["wrapper", "editable", "svgDOM", "pageWidth", "pageHeight", "updateWrapperHandler", "updateWrapperSelection", "deleteWrapperSelection"]);
 
   var slideObjectId = wrapper.slideObjectId,
       slideObjectType = wrapper.slideObjectType,
@@ -5547,7 +5727,7 @@ function SVGWrapper(_ref) {
   }
 
   editable && (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    _active ? updateWrapperSelection([wrapper.id]) : clearWrapperSelection();
+    _active ? updateWrapperSelection([wrapper.id]) : deleteWrapperSelection([wrapper.id]);
   }, [_active]);
 
   function handleMove(e) {
@@ -6086,7 +6266,7 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     width: width,
     height: height,
     fill: "#FFFFFF"
-  })), slide.wrapperIds.map(function (wrapperId) {
+  })), (slide ? slide.wrapperIds : []).map(function (wrapperId) {
     return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_1__.SVGNoWrapperContainer, {
       key: wrapperId,
       wrapperId: wrapperId
@@ -6571,17 +6751,16 @@ var mapSTPCreator = function mapSTPCreator(editable) {
   };
 };
 
-var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTPCreator(true), function (dispatch, _ref3) {
-  var wrapperId = _ref3.wrapperId;
+var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTPCreator(true), function (dispatch) {
   return {
     updateWrapperHandler: function updateWrapperHandler(formData) {
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.updateWrapper)(formData));
     },
-    updateWrapperSelection: function updateWrapperSelection(wrapperId) {
-      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateWrapperSelection)(wrapperId));
+    updateWrapperSelection: function updateWrapperSelection(wrapperIds) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateWrapperSelection)(wrapperIds));
     },
-    clearWrapperSelection: function clearWrapperSelection() {
-      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.clearWrapperSelection)());
+    deleteWrapperSelection: function deleteWrapperSelection(wrapperIds) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.deleteWrapperSelection)(wrapperIds));
     }
   };
 })(_svg_wrapper__WEBPACK_IMPORTED_MODULE_3__.default);
@@ -6693,6 +6872,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _utils_menu_icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/menu_icon */ "./frontend/components/utils/menu_icon.jsx");
+/* harmony import */ var _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../actions/item_thunk_actions */ "./frontend/actions/item_thunk_actions.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -6705,7 +6885,6 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 
 
@@ -6714,9 +6893,11 @@ var COLORS = [["#000000", "light black 2"], ["#1f1f1f", "dark grey 4"], ["#3f3f3
 function ColorPicker(_ref) {
   var color = _ref.color,
       tooltip = _ref.tooltip,
-      border = _ref.border;
+      border = _ref.border,
+      onClick = _ref.onClick;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-    className: "color-picker"
+    className: "color-picker",
+    onClick: onClick
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     title: tooltip,
     style: {
@@ -6727,12 +6908,25 @@ function ColorPicker(_ref) {
 }
 
 function ColorPalette(_ref2) {
-  var props = _extends({}, _ref2);
+  var _ref2$color = _ref2.color,
+      color = _ref2$color === void 0 ? '' : _ref2$color,
+      item = _ref2.item,
+      dispatch = _ref2.dispatch,
+      parentHandleBlur = _ref2.parentHandleBlur;
+
+  // this code is identical to menu_item.jsx; DRY it up when necessary
+  function handleClick(e, color) {
+    console.log(item);
+    console.log(parentHandleBlur); //dispatch(ItemThunkActions[item.actionName](color));
+
+    parentHandleBlur(e);
+  }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "color-palette"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-    className: "transparent"
+    className: "transparent",
+    onClick: handleClick
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_1__.default, {
     className: "item-icon",
     icon: [0, 12]
@@ -6748,7 +6942,10 @@ function ColorPalette(_ref2) {
       key: color,
       color: color,
       tooltip: tooltip,
-      border: border
+      border: border,
+      onClick: function onClick(e) {
+        return handleClick(e, color);
+      }
     });
   }));
 }
@@ -6785,16 +6982,16 @@ function DoggieLogo(_ref) {
 
 /***/ }),
 
-/***/ "./frontend/components/utils/dropdown_menu.jsx":
-/*!*****************************************************!*\
-  !*** ./frontend/components/utils/dropdown_menu.jsx ***!
-  \*****************************************************/
+/***/ "./frontend/components/utils/dropdown.jsx":
+/*!************************************************!*\
+  !*** ./frontend/components/utils/dropdown.jsx ***!
+  \************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ DropdownMenu)
+/* harmony export */   "default": () => (/* binding */ Dropdown)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -6810,16 +7007,20 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
-function DropdownMenu(_ref) {
+function Dropdown(_ref) {
   var className = _ref.className,
       children = _ref.children,
+      _ref$active = _ref.active,
+      active = _ref$active === void 0 ? false : _ref$active,
       _ref$requireClick = _ref.requireClick,
-      requireClick = _ref$requireClick === void 0 ? true : _ref$requireClick;
+      requireClick = _ref$requireClick === void 0 ? true : _ref$requireClick,
+      nextMenuAction = _ref.nextMenuAction,
+      name = _ref.name;
 
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(active),
       _useState2 = _slicedToArray(_useState, 2),
-      visible = _useState2[0],
-      setVisible = _useState2[1];
+      _active = _useState2[0],
+      _setActive = _useState2[1];
 
   var _timeout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
@@ -6828,7 +7029,7 @@ function DropdownMenu(_ref) {
   var handleMouseOver = function handleMouseOver(e) {
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
-      setVisible(true);
+      _setActive(true);
     }, 100);
   };
 
@@ -6837,17 +7038,19 @@ function DropdownMenu(_ref) {
   };
 
   var toggleVisibility = function toggleVisibility() {
-    setVisible(!visible);
+    _setActive(!_active);
   };
 
   var handleBlur = function handleBlur(e) {
     clearTimeout(_timeout.current);
     e.preventDefault();
-    setVisible(false);
+
+    _setActive(false);
   };
 
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {}, [active]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
-    className: "dropdown-menu ".concat(visible && hasChild ? '' : 'hidden', " ").concat(className),
+    className: "dropdown ".concat(_active && hasChild ? '' : 'hidden', " ").concat(className),
     onBlur: function onBlur(e) {
       return handleBlur(e);
     },
@@ -6866,7 +7069,7 @@ function DropdownMenu(_ref) {
   }, children[0]), children[1] &&
   /*#__PURE__*/
 
-  /*&& visible ?*/
+  /*&& active ?*/
   react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "dropdown-body",
     onMouseDown: function onMouseDown(e) {
@@ -7262,12 +7465,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -7280,26 +7477,47 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
+
+
+function NextActionReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'select';
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    default:
+      return 'select';
+  }
+}
+
+var nullState = Object.freeze({
+  wrapperIds: [],
+  nextMenuAction: 'Select'
+});
 
 function SelectionReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : nullState;
   var action = arguments.length > 1 ? arguments[1] : undefined;
   Object.freeze(state);
 
   switch (action.type) {
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_SELECTED_WRAPPERS:
-      return {
+      return _objectSpread(_objectSpread({}, state), {}, {
         wrapperIds: _toConsumableArray(action.wrapperIds)
-      };
+      }, action.sharedAttributes);
 
-    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.REMOVE_SELECTED_WRAPPERS:
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_CURRENT_SLIDE:
       ;
 
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.CLEAR_UI:
-      return {};
+      return nullState;
 
     default:
       return state;

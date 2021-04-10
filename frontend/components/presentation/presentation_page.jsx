@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import UserInfoContainer from '../session/user_info_container';
 import ProductIcon from '../utils/product_icon';
-import Menu from './menu';
+import MenuContainer from './menu_container'
 import {MENU_ITEMS, BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS} from './menu-items';
 import AutosaveInputContainer from '../utils/autosave_input_container';
 import LastUpdate from '../utils/last_update';
@@ -50,7 +50,7 @@ export default function PresentationPage({state, ownProps, currentSlideId, doc, 
             />
             
             <div>
-              <Menu
+              <MenuContainer
                 className="docs-menu"
                 items={MENU_ITEMS}
                 respondToMouseOut={false}
@@ -68,7 +68,7 @@ export default function PresentationPage({state, ownProps, currentSlideId, doc, 
       <section className='body'>
         <section>
           <section className='toolbar'>
-            <Menu
+            <MenuContainer
               className="toolbar-menu"
               items={TEXTBOX_TOOLBAR_ITEMS}
               respondToMouseOut={false}

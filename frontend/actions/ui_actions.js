@@ -9,9 +9,10 @@ export const receiveCurrentSlide = (slideId) => ({
   slideId
 });
 
-export const receiveSelectedWrappers = (wrapperIds) => ({
+export const receiveSelectedWrappers = ({wrapperIds, sharedAttributes}) => ({
   type: RECEIVE_SELECTED_WRAPPERS,
-  wrapperIds
+  wrapperIds,
+  sharedAttributes
 });
 
 export const removeSelectedWrappers = () => ({
@@ -45,11 +46,43 @@ export const updateCurrentSlide = slideId => (dispatch, getState) => {
   window.location.replace(newURL);
 }
 
+function getCommonAttributes(obj1, obj2, ...keys){
+  const returnVal = {};
 
-export const updateWrapperSelection = wrapperIds => (dispatch) => {
-  dispatch(receiveSelectedWrappers(wrapperIds));
+  (keys || Object.keys(obj1)).forEach(key => {
+    if (obj1[key] === obj2[key]) returnVal[key] = obj1[key];
+  })
+
+  return returnVal;
 }
 
-export const clearWrapperSelection = () => (dispatch) => {
-  dispatch(removeSelectedWrappers());
+function getWrapperSelectionInfo(wrapperIds, entities){
+  const wrappers = wrapperIds.map(id => entities.wrappers[id]);
+
+  const sharedAttributes = wrapperIds.length ? wrappers
+    .reduce((obj, curr) => 
+      getCommonAttributes(obj, curr,
+        'stroke', 'fill', 'strokeWidth', 'strokeDasharray', 'slideObjectType'
+      ), wrappers[0]
+    ) : {};
+
+  return {wrapperIds, sharedAttributes};
+}
+
+
+export const updateWrapperSelection = wrapperIds => (dispatch, getState) => {
+  const {entities} = getState();
+
+  dispatch(receiveSelectedWrappers(
+    getWrapperSelectionInfo(wrapperIds, entities))
+  );
+}
+
+export const deleteWrapperSelection = (arg) => (dispatch, getState) => {
+  const {entities, ui} = getState();
+  const wrapperIds = ui.selections.wrapperIds.filter(id => !arg.includes(id));
+  
+  dispatch(receiveSelectedWrappers(
+    getWrapperSelectionInfo(wrapperIds, entities))
+  );
 }

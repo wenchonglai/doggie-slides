@@ -26,7 +26,7 @@ const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, 
         <g className={'svg-background'}>
           <rect width={width} height={height} fill="#FFFFFF"></rect>
         </g>
-        { (slide.wrapperIds).map(wrapperId => (
+        { (slide ? slide.wrapperIds : []).map(wrapperId => (
             isPreview ?
               <SVGNoWrapperContainer key={wrapperId} wrapperId = {wrapperId}/> :
               <SVGWrapperContainer key={wrapperId} wrapperId = {wrapperId} svgDOM={ref.current}/>

@@ -19,7 +19,7 @@ function throttle(e, timeoutRef, func, ...args){
 
 export default function SVGWrapper({
   wrapper, editable, svgDOM, pageWidth, pageHeight,
-  updateWrapperHandler, updateWrapperSelection, clearWrapperSelection,
+  updateWrapperHandler, updateWrapperSelection, deleteWrapperSelection,
   ...props
 }){
   const {slideObjectId, slideObjectType, translateX=0, translateY=0, rotate=0, width = 300, height = 200} = wrapper;
@@ -52,8 +52,7 @@ export default function SVGWrapper({
   editable && useEffect(() => {
     _active ?
       updateWrapperSelection([wrapper.id]) :
-      clearWrapperSelection()
-
+      deleteWrapperSelection([wrapper.id])
   }, [_active])
 
   function handleMove(e){

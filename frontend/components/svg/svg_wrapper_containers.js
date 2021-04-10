@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import { updateWrapper } from '../../actions/presentation_actions';
-import { updateWrapperSelection, clearWrapperSelection } from '../../actions/ui_actions';
+import { updateWrapperSelection, deleteWrapperSelection } from '../../actions/ui_actions';
 
 import SVGWrapper from './svg-wrapper';
 
@@ -14,10 +14,10 @@ const mapSTPCreator = editable => ({entities, ui}, {wrapperId, svgDOM}) => ({
 
 export const SVGWrapperContainer = connect(
   mapSTPCreator(true),
-  (dispatch, {wrapperId}) => ({
+  (dispatch) => ({
     updateWrapperHandler: (formData) => dispatch(updateWrapper(formData)),
-    updateWrapperSelection: (wrapperId) => dispatch(updateWrapperSelection(wrapperId)),
-    clearWrapperSelection: () => dispatch(clearWrapperSelection())
+    updateWrapperSelection: (wrapperIds) => dispatch(updateWrapperSelection(wrapperIds)),
+    deleteWrapperSelection: (wrapperIds) => dispatch(deleteWrapperSelection(wrapperIds))
   })
 )(SVGWrapper);
 

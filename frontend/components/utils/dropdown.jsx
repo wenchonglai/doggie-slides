@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-export default function DropdownMenu({className, children, requireClick=true}) {
-  const [visible, setVisible] = useState(false);
+export default function Dropdown({className, children, active=false, requireClick=true, nextMenuAction, name}) {
+  const [_active, _setActive] = useState(active);
   const _timeout = useRef();
   const hasChild = !!children[1];
   
@@ -9,7 +9,7 @@ export default function DropdownMenu({className, children, requireClick=true}) {
     clearTimeout(_timeout.current);
 
     _timeout.current = setTimeout(() => {
-      setVisible(true);
+      _setActive(true);
     }, 100);
   }
 
@@ -18,18 +18,22 @@ export default function DropdownMenu({className, children, requireClick=true}) {
   }
 
   const toggleVisibility = () => {
-    setVisible(!visible);
+    _setActive(!_active);
   }
 
   const handleBlur = (e) => {
     clearTimeout(_timeout.current);
     e.preventDefault();
-    setVisible(false);
+    _setActive(false);
   }
+
+  useEffect(() => {
+
+  }, [active])
 
   return (
     <section
-      className={`dropdown-menu ${visible && hasChild ? '' : 'hidden'} ${className}`}
+      className={`dropdown ${_active && hasChild ? '' : 'hidden'} ${className}`}
       onBlur={e => handleBlur(e)}
       onMouseLeave={requireClick ? undefined : e => handleBlur(e)}
       tabIndex="0"
@@ -41,7 +45,7 @@ export default function DropdownMenu({className, children, requireClick=true}) {
       >
         {children[0]}
       </div>
-      { children[1] && /*&& visible ?*/ (
+      { children[1] && /*&& active ?*/ (
           <div
             className='dropdown-body'
             onMouseDown={e => handleMouseDown(e)}

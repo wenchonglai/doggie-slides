@@ -2,15 +2,27 @@ import * as UIActions from '../actions/ui_actions';
 import * as PresentationActions from '../actions/presentation_actions';
 import { combineReducers } from 'redux';
 
-function SelectionReducer(state = {}, action){
+function NextActionReducer(state = 'select', action){
+  switch (action.type){
+    default: return 'select';
+  }
+}
+
+const nullState = Object.freeze({wrapperIds: [], nextMenuAction: 'Select'});
+
+function SelectionReducer(state = nullState, action){
   Object.freeze(state);
 
   switch (action.type){
     case UIActions.RECEIVE_SELECTED_WRAPPERS:
-      return {wrapperIds: [...action.wrapperIds]}
-    case UIActions.REMOVE_SELECTED_WRAPPERS:;
+      return {
+        ...state,
+        wrapperIds: [...action.wrapperIds],
+        ...action.sharedAttributes
+      }
+    case UIActions.RECEIVE_CURRENT_SLIDE:;
     case UIActions.CLEAR_UI:
-      return {};
+      return nullState;
     default: return state;
   }
 }

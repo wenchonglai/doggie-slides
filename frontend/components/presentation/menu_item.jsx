@@ -2,20 +2,23 @@ import React from 'react';
 import * as ItemThunkActions from '../../actions/item_thunk_actions';
 import MenuIcon from '../utils/menu_icon';
 
-export default function MenuItem({item, dispatch}){
-  const clickAttribute = {}
+export default function MenuItem({className="", item, dispatch, onClick, onMouseMove}){
 
-  if (typeof item.actionName == 'string'){
-    clickAttribute.onClick = (e) => {
-      console.log(item.actionName);
-      dispatch(ItemThunkActions[item.actionName]())
-    };
+  function handleClick(e){
+
+    if (typeof item.actionName == 'string'){
+      dispatch(ItemThunkActions[item.actionName]());
+    }
+
+    onClick(e);
   }
+ 
 
   return (
     <div 
-      className={`menu-item ${item.actionName ? '' : 'no-action'}`}
-      {...clickAttribute}
+      className={`menu-item ${className} ${item.actionName ? '' : 'no-action'}`}
+      onMouseMove={onMouseMove}
+      onClick={handleClick}
     >
       <MenuIcon className='menu-item-icon' icon={item.icon}/>
       <div className='menu-item-name'>{item.name}</div>
