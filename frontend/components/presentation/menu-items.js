@@ -1,4 +1,5 @@
 import {addSlide} from '../../actions/presentation_actions';
+import ColorPalette from '../utils/color_palette';
 
 const NEW_SLIDE = {
   name: "New Slide", icon: [6, 11], shortCut: undefined, actionName: 'newSlide'
@@ -31,16 +32,25 @@ const DELETE_SLIDE = { name: "Delete Slide", icon: undefined, shortCut: undefine
 const SKIP_SLIDE = { name: "Skip Slide", icon: undefined, shortCut: undefined, actionName: "skipSlide"};
 const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, actionName: undefined};
 
-const FILL_COLOR = { name: "Fill color", icon: [0, 9], shortCut: undefined, actionName: undefined};
-const BORDER_COLOR = { name: "Border color", icon: [1, 9], shortCut: undefined, actionName: undefined};
-const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined, actionName: undefined};
+const FILL_COLOR = { name: "Fill color", icon: [0, 9], shortCut: undefined, children: ColorPalette};
+const BORDER_COLOR = { name: "Border color", icon: [1, 9], shortCut: undefined, children: ColorPalette};
+const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined, children: [
+  { name: "none", shortCut: undefined, actionName: undefined},
+  undefined,
+  { name: "1px", shortCut: undefined, actionName: undefined},
+  { name: "2px", shortCut: undefined, actionName: undefined},
+  { name: "3px", shortCut: undefined, actionName: undefined},
+  { name: "4px", shortCut: undefined, actionName: undefined},
+  { name: "6px", shortCut: undefined, actionName: undefined},
+  { name: "8px", shortCut: undefined, actionName: undefined},
+]};
 const BORDER_DASH = { name: "Border dash", icon: [3, 9], shortCut: undefined, actionName: undefined};
 
 const BOLD = { name: "Bold", icon: [4, 9], shortCut: undefined, actionName: undefined};
 const ITALIC = { name: "Italic", icon: [5, 9], shortCut: undefined, actionName: undefined};
 const UNDERLINE = { name: "Underline", icon: [6, 9], shortCut: undefined, actionName: undefined};
-const TEXT_COLOR = { name: "Text color", icon: [7, 9], shortCut: undefined, actionName: undefined};
-const HIGHLIGHT_COLOR = { name: "Highlight color", icon: [8, 9], shortCut: undefined, actionName: undefined};
+const TEXT_COLOR = { name: "Text color", icon: [7, 9], shortCut: undefined, children: ColorPalette};
+const HIGHLIGHT_COLOR = { name: "Highlight color", icon: [8, 9], shortCut: undefined, children: ColorPalette};
 
 const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, actionName: undefined, children: [
   { name: "Left", icon: [0, 6], shortCut: undefined, actionName: undefined},

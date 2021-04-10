@@ -19,7 +19,7 @@ nyan_doc = nyan.docs[0]
   Textbox.create!(
     text: (["Nyan"] * i).join(' '),
     wrapper_attributes: {slide_id: slide.id, z_index: 1, width: 800, height: 100},
-    textstyles_attributes: [{style_string: "font: 60px Helvetica", offset: 0}]
+    textstyles_attributes: [{style_string: "font: 60px Helvetica; fill: black", offset: 0}]
   )
 end
   

@@ -7,6 +7,7 @@ import AutosaveInputContainer from '../utils/autosave_input_container';
 import LastUpdate from '../utils/last_update';
 import FilmStripContainer from './filmstrip_container';
 import WorkspaceContainer from './workspace_container';
+import { ColorPalette } from '../utils/color_palette';
 
 export default function PresentationPage({state, ownProps, currentSlideId, doc, slides, fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler}){
   const _docHook = useState({});
@@ -69,7 +70,7 @@ export default function PresentationPage({state, ownProps, currentSlideId, doc, 
           <section className='toolbar'>
             <Menu
               className="toolbar-menu"
-              items={BASE_TOOLBAR_ITEMS}
+              items={TEXTBOX_TOOLBAR_ITEMS}
               respondToMouseOut={false}
             />
             

@@ -1,16 +1,16 @@
+.menu-icon{
+  width: 18px;
+  height: 18px;
+  background: image-url('sprite.svg');
+  background-size: 288px 288px;
+  margin-right: 8px;
+  opacity: .7;
+}
+
 section.dropdown-menu {
   font-family: "Roboto",Helvetica,Arial,sans-serif;
   font-size: 14px;
   line-height: 18px;
-  
-  .menu-icon{
-    width: 18px;
-    height: 18px;
-    background: image-url('sprite.svg');
-    background-size: 288px 288px;
-    margin-right: 8px;
-    opacity: .7;
-  }
 
   hr {
     width: 100%;
@@ -21,6 +21,7 @@ section.dropdown-menu {
   > div.dropdown-button {
     border: 1px solid transparent;
     background-color: #f1f3f4;
+    &:active { background-color: #e8eaed;}
   }
 
   &.hidden{
@@ -47,6 +48,7 @@ ul.docs-menu, ul.toolbar-menu{
       padding: 8px 16px;
     }
     > div.dropdown-body {
+      border-radius: 0 4px 4px 4px;
       padding: 8px 0;
       border: 1px solid transparent;
       top: 0px;
@@ -56,13 +58,56 @@ ul.docs-menu, ul.toolbar-menu{
   }
 }
 
+div.color-palette{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  position: relative;
+  user-select: none;
+  padding: 4px 0;
+
+  .transparent {
+    width: 100%;
+    margin: 0 8px 4px 8px;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: row;
+
+    &:hover { background-color: #f1f3f4;}
+    &:active { background-color: #e8eaed;}
+  }
+
+  .color-picker {
+    display: flex;
+    
+    > div {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      margin: 2px;
+      border: 1px solid;
+      position: relative;
+      display: flex;  
+      
+      &:hover {
+        box-shadow: 0 0 2px 2px #0000001f;
+        transform-origin: 50% 50%;
+        transform: scale(1.05);
+        &:active { box-shadow: 0 0 2px 2px #0000002f;}
+
+        > span {
+          display: block;
+        }
+      }
+    }
+    
+  }
+}
+
 ul.docs-menu {
   display: flex;
   flex-direction: row;
-
-  div.menu-item-name {
-    flex: 1 0 auto;
-  }
 
   .submenu-indicator {
     width: 12px;
@@ -137,6 +182,8 @@ ul.toolbar-menu {
         padding: 3px 3px;
         border-radius: 4px;
         background-color: #f1f3f4;
+        &:active { background-color: #e8eaed;}
+
         .menu-icon { margin-right: 0px; }
         .submenu-indicator {
           width: 12px;

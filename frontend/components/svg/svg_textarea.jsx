@@ -51,7 +51,7 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
 
     _timeout.current = setTimeout(() => {
       updateTextHandler(textboxId, textRef.current.toReduxState());
-    }, 2000);
+    }, 1000);
   }
   
   function handleKeyDown(e){
@@ -165,6 +165,12 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
 
   function blurHandler(e){
     e.preventDefault();
+    clearTimeout(_timeout.current);
+
+    _timeout.current = setTimeout(() => {
+      updateTextHandler(textboxId, textRef.current.toReduxState());
+    }, 100);
+    
     _setActive(false);
   }
 

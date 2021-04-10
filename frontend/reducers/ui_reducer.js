@@ -2,6 +2,20 @@ import * as UIActions from '../actions/ui_actions';
 import * as PresentationActions from '../actions/presentation_actions';
 import { combineReducers } from 'redux';
 
+function SelectionReducer(state = {}, action){
+  Object.freeze(state);
+
+  switch (action.type){
+    case UIActions.RECEIVE_SELECTED_WRAPPERS:
+      return {wrapperIds: [...action.wrapperIds]}
+    case UIActions.REMOVE_SELECTED_WRAPPERS:;
+    case UIActions.CLEAR_UI:
+      return {};
+    default: return state;
+  }
+}
+
+
 function SlideSettingsReducer(state = {}, action){
   Object.freeze(state);
 
@@ -34,6 +48,6 @@ function PagesettingsReducer(state = {}, action){
   }
 }
 
-const UIReducer = combineReducers({pageSettings: PagesettingsReducer, slideSettings: SlideSettingsReducer});
+const UIReducer = combineReducers({pageSettings: PagesettingsReducer, slideSettings: SlideSettingsReducer, selections: SelectionReducer});
 
 export default UIReducer;

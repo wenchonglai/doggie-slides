@@ -118,7 +118,10 @@ class Api::WrappersController < ApplicationController
 
   def wrapper_params
     params.require(:wrapper).permit(
-      :id, :slide_id, :group_id, :z_index, :width, :height, :translate_x, :translate_y, :rotate, :slide_object_id, :slide_object_type
+      :id, :slide_id, :group_id,
+      :z_index, :width, :height, :translate_x, :translate_y,
+      :rotate, :slide_object_id, :slide_object_type,
+      :fill, :stroke, :stroke_width, :stroke_dasharray
     )
   end
 

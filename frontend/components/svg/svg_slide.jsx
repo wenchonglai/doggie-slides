@@ -23,7 +23,7 @@ const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, 
     >
       
 			<g transform="translate(1000 1000)">
-        <g>
+        <g className={'svg-background'}>
           <rect width={width} height={height} fill="#FFFFFF"></rect>
         </g>
         { (slide.wrapperIds).map(wrapperId => (

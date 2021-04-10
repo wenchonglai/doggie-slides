@@ -10,9 +10,13 @@
 #  z_index           :integer          not null
 #  width             :float            default(300.0), not null
 #  height            :float            default(200.0), not null
-#  translate_x        :float            default(0.0), not null
-#  translate_y        :float            default(0.0), not null
+#  translate_x       :float            default(0.0), not null
+#  translate_y       :float            default(0.0), not null
 #  rotate            :float            default(0.0), not null
+#  fill              :string
+#  stroke            :string
+#  stroke_width      :float            default(0.0)
+#  stroke_dasharray  :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #
@@ -24,16 +28,16 @@ class Wrapper < ApplicationRecord
   delegate :user, :doc, to: :slide
 
   belongs_to :slide, touch: true
-
   belongs_to :slide_object, polymorphic: true, inverse_of: :wrapper, dependent: :destroy
 
   validates_presence_of :slide_object
 
   private def set_default_values
-    self.width ||= 300
-    self.height ||= 200
-    self.translate_x ||= 0
-    self.translate_y ||= 0
-    self.rotate ||= 0
+    self.width ||= 300.0
+    self.height ||= 200.0
+    self.translate_x ||= 0.0
+    self.translate_y ||= 0.0
+    self.rotate ||= 0.0
+    self.stroke_width ||= 0.0
   end
 end

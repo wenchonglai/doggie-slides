@@ -1,57 +1,28 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import DropdownMenu from '../utils/dropdown_menu';
-import * as ItemThunkActions from '../../actions/item_thunk_actions'
-
-const MenuIcon = function({className, icon=[-1, -1]}){
-  return (
-    <div 
-      className={`menu-icon ${className}`}
-      style={{
-        backgroundPositionX: -icon[0] * 18,
-        backgroundPositionY: -icon[1] * 18
-      }}
-    > 
-    </div>
-  )
-}
-
-const MenuItem = function({item, dispatch}){
-  const clickAttribute = {}
-
-  if (typeof item.actionName == 'string'){
-    clickAttribute.onClick = (e) => {
-      console.log(e);
-      console.log(item.actionName);
-      dispatch(ItemThunkActions[item.actionName]())
-    };
-  }
-
-  return (
-    <div 
-      className={`menu-item ${item.actionName ? '' : 'no-action'}`}
-      {...clickAttribute}
-    >
-      <MenuIcon className='menu-item-icon' icon={item.icon}/>
-      <div className='menu-item-name'>{item.name}</div>
-      {(item.children ? 
-          <div className='submenu-indicator' />
-          : null
-      )}
-    </div>
-  );
-}
-
-const MenuItemContainer = connect(
-  state => ({
-    state
-  }),
-  dispatch => ({
-    dispatch
-  })
-)(MenuItem)
+import MenuItemContainer from './menu_item_container'
 
 export default function Menu({className = "", items, tier = 0, requireClick=true}){
+  function getChildComponent(item){
+    let childComponent = null;
+    let children = item.children;
+  
+    if (children === undefined || children === null) {
+    } else if (Array.isArray(children)){
+      childComponent = <Menu
+                        tier={tier + 1}
+                        items={children}
+                        requireClick={false}
+                      />;
+    } else {
+      let ChildClass = children;
+      childComponent = <ChildClass />
+
+    }
+
+    return childComponent;
+  }
+
   return (
     <ul className={`menu tier-${tier} ${className}`}>
       { items.map((item, i) => 
@@ -60,13 +31,7 @@ export default function Menu({className = "", items, tier = 0, requireClick=true
                   className={items.className || ""}
                 >
                   <MenuItemContainer item={item}/>
-                  { item.children ?
-                    <Menu
-                      tier={tier + 1}
-                      items={item.children}
-                      requireClick={false}
-                    /> : null
-                  }
+                  {getChildComponent(item)}
                 </DropdownMenu>
               </li>
             ) : <hr className='separator' key={i}/>

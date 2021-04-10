@@ -75,6 +75,10 @@ ActiveRecord::Schema.define(version: 2021_04_08_005310) do
     t.float "translate_x", default: 0.0, null: false
     t.float "translate_y", default: 0.0, null: false
     t.float "rotate", default: 0.0, null: false
+    t.string "fill"
+    t.string "stroke"
+    t.float "stroke_width", default: 0.0
+    t.string "stroke_dasharray"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["group_id"], name: "index_wrappers_on_group_id"

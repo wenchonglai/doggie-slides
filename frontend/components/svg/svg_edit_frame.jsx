@@ -30,40 +30,9 @@ const SVGMoveControl = function({svgDOM, width, height, onDrag, ...props}){
   )
 }
 
-const SVGEditFrame = function({width, height, handleMove, handleRotate, handleResize, svgDOM, children, scale}){
+const SVGEditFrame = function({width, height, handleMove, handleRotate, handleResize, svgDOM, children, active, scale}){
   const halfWidth = width / 2;
   const halfHeight = height / 2;
-  
-  const [_active, _setActive] = useState(false);
-  const timeoutRef = useRef();
-
-  function onFocus(e){
-    e.stopPropagation();
-
-    clearTimeout(timeoutRef.current);
-    svgDOM.addEventListener('mousedown', handleBlur);
-
-    _setActive(true);
-    // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._offsetMap);
-  }
-
-  function handleBlur(e){
-    // e.preventDefault();
-
-    timeoutRef.current = setTimeout(() => {
-      _setActive(false);
-    }, 0)
-
-    svgDOM.removeEventListener('mousedown', handleBlur);
-  }
-
-
-  useEffect(() => {
-    // if (_active){
-    //   svgDOM.addEventListener('mousedown', handleBlur);
-    // }
-    console.log(_active);
-  }, [_active])
 
   const controlPoints = [
     <SVGControlPoint svgDOM={svgDOM} key={0} type="nwse-resize" onDrag={e => handleResize(e, -1, -1)} transform={`translate(0 0)`}/>,
@@ -82,12 +51,12 @@ const SVGEditFrame = function({width, height, handleMove, handleRotate, handleRe
   ];
 
   return (
-    <g className={`edit-frame ${_active ? 'active' : ''}`} onMouseDown={onFocus} >
+    <g className={`edit-frame ${active ? 'active' : ''}`}>
       <SVGMoveControl className='control-background' {...{svgDOM, width, height}}
         onDrag={e => handleMove(e)}
       />
       {children}
-      { _active ? (
+      { active ? (
           <g className='svg-edit-frame'>
             <SVGMoveControl {...{svgDOM, width, height}}
               onDrag={e => handleMove(e)}

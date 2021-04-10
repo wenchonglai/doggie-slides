@@ -17,12 +17,44 @@ function throttle(e, timeoutRef, func, ...args){
   }
 }
 
-export default function SVGWrapper({wrapper, editable, svgDOM, pageWidth, pageHeight, updateWrapperHandler, ...props}){
+export default function SVGWrapper({
+  wrapper, editable, svgDOM, pageWidth, pageHeight,
+  updateWrapperHandler, updateWrapperSelection, clearWrapperSelection,
+  ...props
+}){
   const {slideObjectId, slideObjectType, translateX=0, translateY=0, rotate=0, width = 300, height = 200} = wrapper;
   const [_size, _setSize] = useState({width, height});
   const [_translate, _setTranslate] = useState({x: translateX, y: translateY});
   const [_rotate, _setRotate] = useState(rotate); 
+  const blurTimeoutRef = useRef();
+  const [_active, _setActive] = useState(false);
   const timeoutRef = useRef();
+
+  function onFocus(e){
+    e.stopPropagation();
+
+    clearTimeout(blurTimeoutRef.current);
+    svgDOM.addEventListener('mousedown', handleBlur);
+
+    _setActive(true);
+  }
+
+  function handleBlur(e){
+    // e.preventDefault();
+
+    blurTimeoutRef.current = setTimeout(() => {
+      _setActive(false);
+    }, 0)
+
+    svgDOM.removeEventListener('mousedown', handleBlur);
+  }
+
+  editable && useEffect(() => {
+    _active ?
+      updateWrapperSelection([wrapper.id]) :
+      clearWrapperSelection()
+
+  }, [_active])
 
   function handleMove(e){
     e.stopPropagation();
@@ -132,9 +164,12 @@ export default function SVGWrapper({wrapper, editable, svgDOM, pageWidth, pageHe
     <g className='SVGWrapper'
       transform={`rotate(${_rotate}) translate(${_translate.x}, ${_translate.y})`}
       transform-origin={`${_translate.x + _size.width / 2} ${_translate.y +_size.height / 2}`}
+      onMouseDown={svgDOM && onFocus}
     >
         { editable ?  
             <SVGEditFrame
+              
+              active={_active}
               {...{svgDOM, handleMove, handleRotate, handleResize}}
               width={_size.width} height={_size.height}
               

@@ -10,6 +10,10 @@ class CreateWrappers < ActiveRecord::Migration[5.2]
       t.float :translate_x, null: false, default: 0.0
       t.float :translate_y, null: false, default: 0.0
       t.float :rotate, null: false, default: 0.0
+      t.string :fill
+      t.string :stroke
+      t.float :stroke_width, default: 0.0
+      t.string :stroke_dasharray
       t.timestamps
     end
 
