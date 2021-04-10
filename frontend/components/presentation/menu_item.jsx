@@ -7,7 +7,7 @@ export default function MenuItem({className="", item, dispatch, onClick, onMouse
   function handleClick(e){
 
     if (typeof item.actionName == 'string'){
-      dispatch(ItemThunkActions[item.actionName]());
+      item.children || dispatch(ItemThunkActions[item.actionName](item.value));
     }
 
     onClick(e);

@@ -48,7 +48,7 @@ export const asyncUpdateText = (textboxId, textboxData) => $.ajax({ // params: {
   }
 });
 
-export const asyncTransformWrapper = (wrapper) => $.ajax({ // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
+export const asyncUpdateWrapper = (wrapper) => $.ajax({ // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
   method: 'PATCH',
   url: `/api/wrappers/${wrapper.id}`,
   data: { wrapper }

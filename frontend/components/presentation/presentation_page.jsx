@@ -9,10 +9,17 @@ import FilmStripContainer from './filmstrip_container';
 import WorkspaceContainer from './workspace_container';
 import { ColorPalette } from '../utils/color_palette';
 
-export default function PresentationPage({state, ownProps, currentSlideId, doc, slides, fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler}){
+export default function PresentationPage({currentSlideId, doc, uiSelections, fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler}){
   const _docHook = useState({});
   const [_doc, _setDoc] = _docHook;
   const [_loading, _setLoading] = useState(true);
+
+  const chooseToolbar = function(){
+    switch (uiSelections.slideObjectType){
+      case "Textbox": return TEXTBOX_TOOLBAR_ITEMS;
+      default: return BASE_TOOLBAR_ITEMS;
+    }
+  }
 
   useEffect(() => {
     fetchPresentationHandler();
@@ -70,7 +77,7 @@ export default function PresentationPage({state, ownProps, currentSlideId, doc, 
           <section className='toolbar'>
             <MenuContainer
               className="toolbar-menu"
-              items={TEXTBOX_TOOLBAR_ITEMS}
+              items={chooseToolbar()}
               respondToMouseOut={false}
             />
             

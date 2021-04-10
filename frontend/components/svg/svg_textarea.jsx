@@ -164,12 +164,13 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
   }
 
   function blurHandler(e){
+    console.log(e, textRef.current);
     e.preventDefault();
     clearTimeout(_timeout.current);
 
     _timeout.current = setTimeout(() => {
       updateTextHandler(textboxId, textRef.current.toReduxState());
-    }, 100);
+    }, 0);
     
     _setActive(false);
   }

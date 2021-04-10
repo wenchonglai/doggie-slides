@@ -32,19 +32,28 @@ const DELETE_SLIDE = { name: "Delete Slide", icon: undefined, shortCut: undefine
 const SKIP_SLIDE = { name: "Skip Slide", icon: undefined, shortCut: undefined, actionName: "skipSlide"};
 const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, actionName: undefined};
 
-const FILL_COLOR = { name: "Fill color", icon: [0, 9], shortCut: undefined, children: ColorPalette};
-const BORDER_COLOR = { name: "Border color", icon: [1, 9], shortCut: undefined, children: ColorPalette};
+const FILL_COLOR = { name: "Fill color", icon: [0, 9], shortCut: undefined, children: ColorPalette, actionName: 'fillColor'};
+const BORDER_COLOR = { name: "Border color", icon: [1, 9], shortCut: undefined, children: ColorPalette, actionName: 'borderColor'};
 const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined, children: [
-  { name: "none", shortCut: undefined, actionName: undefined},
+  { name: "none", shortCut: undefined, actionName: "borderWeight", value: "none"},
   undefined,
-  { name: "1px", shortCut: undefined, actionName: undefined},
-  { name: "2px", shortCut: undefined, actionName: undefined},
-  { name: "3px", shortCut: undefined, actionName: undefined},
-  { name: "4px", shortCut: undefined, actionName: undefined},
-  { name: "6px", shortCut: undefined, actionName: undefined},
-  { name: "8px", shortCut: undefined, actionName: undefined},
+  { name: "1px", shortCut: undefined, actionName: "borderWeight", value: 1},
+  { name: "2px", shortCut: undefined, actionName: "borderWeight", value: 2},
+  { name: "3px", shortCut: undefined, actionName: "borderWeight", value: 3},
+  { name: "4px", shortCut: undefined, actionName: "borderWeight", value: 4},
+  { name: "6px", shortCut: undefined, actionName: "borderWeight", value: 6},
+  { name: "8px", shortCut: undefined, actionName: "borderWeight", value: 8},
 ]};
-const BORDER_DASH = { name: "Border dash", icon: [3, 9], shortCut: undefined, actionName: undefined};
+const BORDER_DASH = { name: "Border dash", icon: [3, 9], shortCut: undefined, children: [
+  { name: "none", shortCut: undefined, actionName: "borderDash", value: ""},
+  undefined,
+  { name: "short dash", shortCut: undefined, actionName: "borderDash", value: "4 4"},
+  { name: "dash", shortCut: undefined, actionName: "borderDash", value: "6 4"},
+  { name: "dotted", shortCut: undefined, actionName: "borderDash", value: "1 1"},
+  { name: "dash dotted", shortCut: undefined, actionName: "borderDash", value: "8 2 1 2"},
+  { name: "dash double dotted", shortCut: undefined, actionName: "borderDash", value: "8 2 1 1 1 2"},
+  { name: "long dash", shortCut: undefined, actionName: "borderDash", value: "12 4"},
+]};
 
 const BOLD = { name: "Bold", icon: [4, 9], shortCut: undefined, actionName: undefined};
 const ITALIC = { name: "Italic", icon: [5, 9], shortCut: undefined, actionName: undefined};

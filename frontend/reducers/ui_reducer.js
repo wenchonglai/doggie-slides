@@ -15,11 +15,11 @@ function SelectionReducer(state = nullState, action){
 
   switch (action.type){
     case UIActions.RECEIVE_SELECTED_WRAPPERS:
-      return {
+      return action.wrapperIds.length ? {
         ...state,
         wrapperIds: [...action.wrapperIds],
         ...action.sharedAttributes
-      }
+      } : nullState
     case UIActions.RECEIVE_CURRENT_SLIDE:;
     case UIActions.CLEAR_UI:
       return nullState;

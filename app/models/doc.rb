@@ -21,7 +21,7 @@ class Doc < ApplicationRecord
 
   private 
   def set_default_values
-    self.filename ||= "Untitled presentation"
+    self.filename ||= "Thicc doc, so untitled. wow~"
     self.width ||= 800
     self.height ||= 500
   end

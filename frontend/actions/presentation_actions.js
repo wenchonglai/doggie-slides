@@ -102,7 +102,7 @@ export const updateText = (textboxId, textboxData) => (dispatch) =>
     });
 
 export const updateWrapper = (formWrapper) => (dispatch) => 
-  PresentationUtils.asyncTransformWrapper(formWrapper)
+  PresentationUtils.asyncUpdateWrapper(formWrapper)
     .then((resData) => {
       dispatch(receiveWrapper(resData));
       return resData;

@@ -2978,7 +2978,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "newSlide": () => (/* binding */ newSlide),
 /* harmony export */   "deleteSlide": () => (/* binding */ deleteSlide),
 /* harmony export */   "skipSlide": () => (/* binding */ skipSlide),
-/* harmony export */   "textbox": () => (/* binding */ textbox)
+/* harmony export */   "textbox": () => (/* binding */ textbox),
+/* harmony export */   "updateWrapperAttribute": () => (/* binding */ updateWrapperAttribute),
+/* harmony export */   "fillColor": () => (/* binding */ fillColor),
+/* harmony export */   "borderColor": () => (/* binding */ borderColor),
+/* harmony export */   "borderWeight": () => (/* binding */ borderWeight),
+/* harmony export */   "borderDash": () => (/* binding */ borderDash)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3055,7 +3060,7 @@ var skipSlide = function skipSlide() {
     var reqSlide = _objectSpread({}, entities.slides[ui.slideSettings.slideId]);
 
     reqSlide.skipped = !reqSlide.skipped;
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateSlide(reqSlide).then(function (resSlide) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateWrapper(reqSlide).then(function (resSlide) {
       dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resSlide));
     }, function (err) {
       console.log(err);
@@ -3077,6 +3082,35 @@ var textbox = function textbox() {
     });
   };
 };
+var updateWrapperAttribute = function updateWrapperAttribute(key) {
+  return function (value) {
+    return function (dispatch, getState) {
+      var _getState5 = getState(),
+          ui = _getState5.ui,
+          entities = _getState5.entities;
+
+      var wrappers = ui.selections.wrapperIds.map(function (id) {
+        return entities.wrappers[id];
+      });
+
+      if (wrappers.length > 1) {
+        console.warn('The feature of updating multiple wrappers is yet to be implemented.');
+      }
+
+      var wrapper = _objectSpread(_objectSpread({}, wrappers[0]), {}, _defineProperty({}, key, value));
+
+      return wrapper && _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateWrapper(wrapper).then(function (resWrapper) {
+        dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveWrapper(resWrapper));
+      }, function (err) {
+        console.log(err);
+      });
+    };
+  };
+};
+var fillColor = updateWrapperAttribute('fill');
+var borderColor = updateWrapperAttribute('stroke');
+var borderWeight = updateWrapperAttribute('strokeWidth');
+var borderDash = updateWrapperAttribute('stroke-dasharray');
 
 /***/ }),
 
@@ -3293,7 +3327,7 @@ var updateText = function updateText(textboxId, textboxData) {
 };
 var updateWrapper = function updateWrapper(formWrapper) {
   return function (dispatch) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncTransformWrapper(formWrapper).then(function (resData) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateWrapper(formWrapper).then(function (resData) {
       dispatch(receiveWrapper(resData));
       return resData;
     });
@@ -4056,13 +4090,15 @@ var FILL_COLOR = {
   name: "Fill color",
   icon: [0, 9],
   shortCut: undefined,
-  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default,
+  actionName: 'fillColor'
 };
 var BORDER_COLOR = {
   name: "Border color",
   icon: [1, 9],
   shortCut: undefined,
-  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default,
+  actionName: 'borderColor'
 };
 var BORDER_WEIGHT = {
   name: "Border weight",
@@ -4071,38 +4107,80 @@ var BORDER_WEIGHT = {
   children: [{
     name: "none",
     shortCut: undefined,
-    actionName: undefined
+    actionName: "borderWeight",
+    value: "none"
   }, undefined, {
     name: "1px",
     shortCut: undefined,
-    actionName: undefined
+    actionName: "borderWeight",
+    value: 1
   }, {
     name: "2px",
     shortCut: undefined,
-    actionName: undefined
+    actionName: "borderWeight",
+    value: 2
   }, {
     name: "3px",
     shortCut: undefined,
-    actionName: undefined
+    actionName: "borderWeight",
+    value: 3
   }, {
     name: "4px",
     shortCut: undefined,
-    actionName: undefined
+    actionName: "borderWeight",
+    value: 4
   }, {
     name: "6px",
     shortCut: undefined,
-    actionName: undefined
+    actionName: "borderWeight",
+    value: 6
   }, {
     name: "8px",
     shortCut: undefined,
-    actionName: undefined
+    actionName: "borderWeight",
+    value: 8
   }]
 };
 var BORDER_DASH = {
   name: "Border dash",
   icon: [3, 9],
   shortCut: undefined,
-  actionName: undefined
+  children: [{
+    name: "none",
+    shortCut: undefined,
+    actionName: "borderDash",
+    value: ""
+  }, undefined, {
+    name: "short dash",
+    shortCut: undefined,
+    actionName: "borderDash",
+    value: "4 4"
+  }, {
+    name: "dash",
+    shortCut: undefined,
+    actionName: "borderDash",
+    value: "6 4"
+  }, {
+    name: "dotted",
+    shortCut: undefined,
+    actionName: "borderDash",
+    value: "1 1"
+  }, {
+    name: "dash dotted",
+    shortCut: undefined,
+    actionName: "borderDash",
+    value: "8 2 1 2"
+  }, {
+    name: "dash double dotted",
+    shortCut: undefined,
+    actionName: "borderDash",
+    value: "8 2 1 1 1 2"
+  }, {
+    name: "long dash",
+    shortCut: undefined,
+    actionName: "borderDash",
+    value: "12 4"
+  }]
 };
 var BOLD = {
   name: "Bold",
@@ -4255,12 +4333,12 @@ function DropdownMenu(_ref) {
   };
 
   var toggleVisibility = function toggleVisibility(e) {
-    _setActive(!_active); // parentHandleBlur && parentHandleBlur(e, true);
+    _setActive(!_active);
 
+    item.children || parentHandleBlur && parentHandleBlur(e);
   };
 
   var handleBlur = function handleBlur(e) {
-    console.log(item.name, parentHandleBlur, e, e.target, e.relatedTarget);
     e.preventDefault();
     e.stopPropagation();
 
@@ -4305,8 +4383,7 @@ function DropdownMenu(_ref) {
 
   var childComponent = getChildComponent(item);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
-    className: "dropdown-menu ".concat(_active ? '' : 'hidden', " ").concat(className) // onMouseDown={e => {console.log('down', item);  e.stopPropagation();}}
-    ,
+    className: "dropdown-menu ".concat(_active ? '' : 'hidden', " ").concat(className),
     onBlur: function onBlur(e) {
       return requireClick ? handleBlur(e) : undefined;
     },
@@ -4338,16 +4415,6 @@ function Menu(_ref2) {
       requireClick = _ref2$requireClick === void 0 ? true : _ref2$requireClick,
       nextMenuAction = _ref2.nextMenuAction,
       parentHandleBlur = _ref2.parentHandleBlur;
-
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
-      _useState4 = _slicedToArray(_useState3, 2),
-      _ = _useState4[0],
-      _forceUpdate = _useState4[1];
-
-  var forceUpdate = function forceUpdate() {
-    _forceUpdate(!_);
-  };
-
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
     className: "menu tier-".concat(tier, " ").concat(className)
   }, items.map(function (item, i) {
@@ -4420,7 +4487,7 @@ function MenuItem(_ref) {
 
   function handleClick(e) {
     if (typeof item.actionName == 'string') {
-      dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName]());
+      item.children || dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName](item.value));
     }
 
     onClick(e);
@@ -4520,11 +4587,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 function PresentationPage(_ref) {
-  var state = _ref.state,
-      ownProps = _ref.ownProps,
-      currentSlideId = _ref.currentSlideId,
+  var currentSlideId = _ref.currentSlideId,
       doc = _ref.doc,
-      slides = _ref.slides,
+      uiSelections = _ref.uiSelections,
       fetchPresentationHandler = _ref.fetchPresentationHandler,
       updateCurrentSlideHandler = _ref.updateCurrentSlideHandler,
       saveDocHandler = _ref.saveDocHandler;
@@ -4539,6 +4604,16 @@ function PresentationPage(_ref) {
       _useState2 = _slicedToArray(_useState, 2),
       _loading = _useState2[0],
       _setLoading = _useState2[1];
+
+  var chooseToolbar = function chooseToolbar() {
+    switch (uiSelections.slideObjectType) {
+      case "Textbox":
+        return _menu_items__WEBPACK_IMPORTED_MODULE_4__.TEXTBOX_TOOLBAR_ITEMS;
+
+      default:
+        return _menu_items__WEBPACK_IMPORTED_MODULE_4__.BASE_TOOLBAR_ITEMS;
+    }
+  };
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     fetchPresentationHandler();
@@ -4587,7 +4662,7 @@ function PresentationPage(_ref) {
     className: "toolbar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_3__.default, {
     className: "toolbar-menu",
-    items: _menu_items__WEBPACK_IMPORTED_MODULE_4__.TEXTBOX_TOOLBAR_ITEMS,
+    items: chooseToolbar(),
     respondToMouseOut: false
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "two-panel-layout"
@@ -4617,17 +4692,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _presentation_page__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./presentation_page */ "./frontend/components/presentation/presentation_page.jsx");
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../actions/ui_actions */ "./frontend/actions/ui_actions.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
 
-var PresentationPageContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (state, ownProps) {
+
+var PresentationPageContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, ownProps) {
+  var ui = _ref.ui,
+      entities = _ref.entities;
   return {
-    state: state,
-    ownProps: ownProps,
-    currentSlideId: state.ui.slideSettings.slideId,
-    doc: Object.values(state.entities.docs)[0],
-    slides: Object.values(state.entities.slides).sort(function (a, b) {
+    currentSlideId: ui.slideSettings.slideId,
+    uiSelections: _objectSpread({}, ui.selections),
+    doc: Object.values(entities.docs)[0],
+    slides: Object.values(entities.slides).sort(function (a, b) {
       return a.page - b.page;
     })
   };
@@ -5536,7 +5618,12 @@ function Headline(_ref3) {
     title: "Clone",
     iconUrl: window.productIconUrl,
     iconIndex: 3
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "One little bug took me the whole night... Is it me or the database is slow??? Good person please extend the deadline T_T"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Thicc DoggIe Slide is made from scratch by ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
+    style: {
+      display: "inline"
+    },
+    href: "https://www.linkedin.com/in/wenchong-lai-4296424b/"
+  }, "one person"), " in two weeks. He wishes he has more time. Blep."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
     className: "splash button-anchor",
     to: "/presentation/"
   }, "Go to DoggIe Slides")) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(HeadLineItem, {
@@ -5678,7 +5765,15 @@ function SVGWrapper(_ref) {
       _wrapper$width = wrapper.width,
       width = _wrapper$width === void 0 ? 300 : _wrapper$width,
       _wrapper$height = wrapper.height,
-      height = _wrapper$height === void 0 ? 200 : _wrapper$height;
+      height = _wrapper$height === void 0 ? 200 : _wrapper$height,
+      _wrapper$fill = wrapper.fill,
+      fill = _wrapper$fill === void 0 ? "none" : _wrapper$fill,
+      _wrapper$stroke = wrapper.stroke,
+      stroke = _wrapper$stroke === void 0 ? "none" : _wrapper$stroke,
+      _wrapper$strokeWidth = wrapper.strokeWidth,
+      strokeWidth = _wrapper$strokeWidth === void 0 ? "0" : _wrapper$strokeWidth,
+      _wrapper$strokeDashar = wrapper.strokeDasharray,
+      strokeDasharray = _wrapper$strokeDashar === void 0 ? "" : _wrapper$strokeDashar;
 
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     width: width,
@@ -5877,12 +5972,24 @@ function SVGWrapper(_ref) {
       height: height
     });
   }, [wrapper]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    return svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+  }, [svgDOM]);
   return wrapper ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     className: "SVGWrapper",
     transform: "rotate(".concat(_rotate, ") translate(").concat(_translate.x, ", ").concat(_translate.y, ")"),
     "transform-origin": "".concat(_translate.x + _size.width / 2, " ").concat(_translate.y + _size.height / 2),
     onMouseDown: svgDOM && onFocus
-  }, editable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_edit_frame__WEBPACK_IMPORTED_MODULE_2__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    width: width,
+    height: height,
+    fill: fill,
+    stroke: stroke,
+    strokeWidth: strokeWidth || stroke && 1,
+    strokeDasharray: strokeDasharray && strokeDasharray.split(" ").map(function (x) {
+      return x * strokeWidth;
+    }).join(" ")
+  }), editable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_edit_frame__WEBPACK_IMPORTED_MODULE_2__.default, {
     active: _active,
     svgDOM: svgDOM,
     handleMove: handleMove,
@@ -6587,11 +6694,12 @@ function SVGTextArea(_ref2) {
   }
 
   function blurHandler(e) {
+    console.log(e, textRef.current);
     e.preventDefault();
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
       updateTextHandler(textboxId, textRef.current.toReduxState());
-    }, 100);
+    }, 0);
 
     _setActive(false);
   }
@@ -6916,17 +7024,17 @@ function ColorPalette(_ref2) {
 
   // this code is identical to menu_item.jsx; DRY it up when necessary
   function handleClick(e, color) {
-    console.log(item);
-    console.log(parentHandleBlur); //dispatch(ItemThunkActions[item.actionName](color));
-
-    parentHandleBlur(e);
+    dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_2__[item.actionName](color));
+    parentHandleBlur && parentHandleBlur(e);
   }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "color-palette"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "transparent",
-    onClick: handleClick
+    onClick: function onClick(e) {
+      return handleClick(e, "");
+    }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_1__.default, {
     className: "item-icon",
     icon: [0, 12]
@@ -7509,9 +7617,9 @@ function SelectionReducer() {
 
   switch (action.type) {
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_SELECTED_WRAPPERS:
-      return _objectSpread(_objectSpread({}, state), {}, {
+      return action.wrapperIds.length ? _objectSpread(_objectSpread({}, state), {}, {
         wrapperIds: _toConsumableArray(action.wrapperIds)
-      }, action.sharedAttributes);
+      }, action.sharedAttributes) : nullState;
 
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_CURRENT_SLIDE:
       ;
@@ -8574,7 +8682,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "asyncMoveSlide": () => (/* binding */ asyncMoveSlide),
 /* harmony export */   "asyncCreateText": () => (/* binding */ asyncCreateText),
 /* harmony export */   "asyncUpdateText": () => (/* binding */ asyncUpdateText),
-/* harmony export */   "asyncTransformWrapper": () => (/* binding */ asyncTransformWrapper)
+/* harmony export */   "asyncUpdateWrapper": () => (/* binding */ asyncUpdateWrapper)
 /* harmony export */ });
 var asyncFetchPresentation = function asyncFetchPresentation() {
   return $.ajax({
@@ -8644,7 +8752,7 @@ var asyncUpdateText = function asyncUpdateText(textboxId, textboxData) {
     }
   });
 };
-var asyncTransformWrapper = function asyncTransformWrapper(wrapper) {
+var asyncUpdateWrapper = function asyncUpdateWrapper(wrapper) {
   return $.ajax({
     // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
     method: 'PATCH',

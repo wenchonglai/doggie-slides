@@ -16,13 +16,13 @@ function DropdownMenu({className, item, active=false, requireClick=true, tier = 
   }
 
   const toggleVisibility = (e) => {
+   
     _setActive(!_active);
 
-    // parentHandleBlur && parentHandleBlur(e, true);
+    item.children || (parentHandleBlur && parentHandleBlur(e));
   }
 
   const handleBlur = (e) => {
-    console.log(item.name, parentHandleBlur, e, e.target, e.relatedTarget)
     e.preventDefault();
     e.stopPropagation();
 
@@ -71,7 +71,6 @@ function DropdownMenu({className, item, active=false, requireClick=true, tier = 
   return (
     <section
       className={`dropdown-menu ${_active ? '' : 'hidden'} ${className}`}
-      // onMouseDown={e => {console.log('down', item);  e.stopPropagation();}}
       onBlur={e => requireClick ? handleBlur(e) : undefined}
       onMouseLeave={requireClick ? undefined : e => handleBlur(e)}
       tabIndex="0"
@@ -79,7 +78,6 @@ function DropdownMenu({className, item, active=false, requireClick=true, tier = 
       <MenuItemContainer
         className='button dropdown-button'
         item={item} 
-        
         onClick={requireClick ? (e) => {toggleVisibility(e)} : null}
         onMouseOver={requireClick ? null : () => handleMouseOver() }
       />
@@ -95,9 +93,6 @@ function DropdownMenu({className, item, active=false, requireClick=true, tier = 
 }
 
 export default function Menu({className = "", items, tier = 0, requireClick=true, nextMenuAction, parentHandleBlur}){
-  const [_, _forceUpdate] = useState(false);
-  const forceUpdate = function(){ _forceUpdate(!_); }
-
   return (
     <ul className={`menu tier-${tier} ${className}`}>
       { items.map((item, i) => 

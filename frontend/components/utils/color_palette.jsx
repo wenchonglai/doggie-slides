@@ -14,7 +14,6 @@ const COLORS = [
 ];
 
 function ColorPicker({color, tooltip, border, onClick}){
-  
   return (
     <div className='color-picker' onClick={onClick}>
       <div title={tooltip} style={{backgroundColor: color, borderColor: border ? '#ddd' : color}}>
@@ -26,15 +25,13 @@ function ColorPicker({color, tooltip, border, onClick}){
 export default function ColorPalette({color = '', item, dispatch, parentHandleBlur}){
   // this code is identical to menu_item.jsx; DRY it up when necessary
   function handleClick(e, color){
-    console.log(item)
-    console.log(parentHandleBlur);
-    //dispatch(ItemThunkActions[item.actionName](color));
-    parentHandleBlur(e);
+    dispatch(ItemThunkActions[item.actionName](color));
+    parentHandleBlur && parentHandleBlur(e);
   }
 
   return (
     <div className='color-palette'>
-      <div className='transparent' onClick={handleClick}>
+      <div className='transparent' onClick={e => handleClick(e, "")}>
         <MenuIcon className='item-icon' icon={[0, 12]}/>
         <div className='item-name'>Transparent</div>
       </div>

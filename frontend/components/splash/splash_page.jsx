@@ -73,7 +73,8 @@ function Headline({productName, googleProductBodyText}){
         { productName === 'slides' ?
           ( <HeadLineItem title="Clone" iconUrl={window.productIconUrl} iconIndex={3}>
               <p>
-                One little bug took me the whole night... Is it me or the database is slow??? Good person please extend the deadline T_T
+                Thicc DoggIe Slide is made from scratch by <a style={{display: "inline"}} href="https://www.linkedin.com/in/wenchong-lai-4296424b/">one person</a> in two weeks.
+                He wishes he has more time. Blep.
               </p>
               <Link className='splash button-anchor' to={`/presentation/`} >Go to DoggIe Slides</Link>
             </HeadLineItem>

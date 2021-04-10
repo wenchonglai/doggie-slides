@@ -41,7 +41,7 @@ export const skipSlide = () => (dispatch, getState) => {
   const reqSlide = {...entities.slides[ui.slideSettings.slideId]};
   reqSlide.skipped = !reqSlide.skipped
 
-  return PresentationUtils.asyncUpdateSlide(reqSlide)
+  return PresentationUtils.asyncUpdateWrapper(reqSlide)
     .then(resSlide => {
       dispatch(PresentationActions.receiveSlide(resSlide));
     }, (err) => {console.log(err)});
@@ -59,3 +59,25 @@ export const textbox = () => (dispatch, getState) => {
       dispatch(PresentationActions.receiveSlide(resSlide));
     }, (err) => {console.log(err)});
 }
+
+export const updateWrapperAttribute = (key) => 
+  (value) => (dispatch, getState) => {
+    const {ui, entities} = getState();
+    const wrappers = ui.selections.wrapperIds.map(
+      id => entities.wrappers[id]
+    );
+
+    if (wrappers.length > 1){ console.warn('The feature of updating multiple wrappers is yet to be implemented.'); }
+
+    const wrapper = {...wrappers[0], [key]: value}
+
+    return wrapper && PresentationUtils.asyncUpdateWrapper(wrapper)
+      .then(resWrapper => {
+        dispatch(PresentationActions.receiveWrapper(resWrapper));
+      }, (err) => {console.log(err)});
+  }
+
+export const fillColor = updateWrapperAttribute('fill');
+export const borderColor = updateWrapperAttribute('stroke');
+export const borderWeight = updateWrapperAttribute('strokeWidth');
+export const borderDash = updateWrapperAttribute('stroke-dasharray');
