@@ -29,7 +29,7 @@ const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, 
         { (slide ? slide.wrapperIds : []).map(wrapperId => (
             isPreview ?
               <SVGNoWrapperContainer key={wrapperId} wrapperId = {wrapperId}/> :
-              <SVGWrapperContainer key={wrapperId} wrapperId = {wrapperId} svgDOM={ref.current}/>
+              <SVGWrapperContainer key={wrapperId} slideId={slideId} wrapperId = {wrapperId} svgDOM={ref.current}/>
           ))
         }
         

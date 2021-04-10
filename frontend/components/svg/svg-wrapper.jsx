@@ -33,23 +33,24 @@ export default function SVGWrapper({
   const blurTimeoutRef = useRef();
   const [_active, _setActive] = useState(false);
   const timeoutRef = useRef();
+  const eventListenerRef = useRef(
+    function handleBlur(e){
+      // e.preventDefault();
+      console.log(wrapper.id, 'blur');
+      blurTimeoutRef.current = setTimeout(() => {
+        _setActive(false);
+      }, 0)
+      
+      svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+    }
+  );
+
   function onFocus(e){
     e.stopPropagation();
-    
     clearTimeout(blurTimeoutRef.current);
-    svgDOM.addEventListener('mousedown', handleBlur);
+    svgDOM.addEventListener('mousedown', eventListenerRef.current);
     
     _setActive(true);
-  }
-  
-  function handleBlur(e){
-    // e.preventDefault();
-
-    blurTimeoutRef.current = setTimeout(() => {
-      _setActive(false);
-    }, 0)
-    
-    svgDOM.removeEventListener('mousedown', handleBlur);
   }
   
   function handleMove(e){
@@ -150,10 +151,10 @@ export default function SVGWrapper({
 
     useEffect(() => {
       return () => {
-        svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+        svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
         clearTimeout(timeoutRef.current);
       }
-    });
+    }, []);
     
     useEffect(() => {
       const {translateX=0, translateY=0, rotate=0, width = 300, height = 200} = wrapper;
@@ -171,7 +172,7 @@ export default function SVGWrapper({
     
     useEffect(() => {
       return () => {
-        svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+        svgDOM && svgDOM.removeEventListener('dom destroyed', eventListenerRef.current);
         clearTimeout(timeoutRef.current);
       }
     }, [svgDOM]);

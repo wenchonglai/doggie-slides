@@ -5804,21 +5804,21 @@ function SVGWrapper(_ref) {
       _setActive = _useState8[1];
 
   var timeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(function handleBlur(e) {
+    // e.preventDefault();
+    console.log(wrapper.id, 'blur');
+    blurTimeoutRef.current = setTimeout(function () {
+      _setActive(false);
+    }, 0);
+    svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+  });
 
   function onFocus(e) {
     e.stopPropagation();
     clearTimeout(blurTimeoutRef.current);
-    svgDOM.addEventListener('mousedown', handleBlur);
+    svgDOM.addEventListener('mousedown', eventListenerRef.current);
 
     _setActive(true);
-  }
-
-  function handleBlur(e) {
-    // e.preventDefault();
-    blurTimeoutRef.current = setTimeout(function () {
-      _setActive(false);
-    }, 0);
-    svgDOM.removeEventListener('mousedown', handleBlur);
   }
 
   function handleMove(e) {
@@ -5946,10 +5946,10 @@ function SVGWrapper(_ref) {
   var component = getComponent();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     return function () {
-      svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+      svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
       clearTimeout(timeoutRef.current);
     };
-  });
+  }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     var _wrapper$translateX2 = wrapper.translateX,
         translateX = _wrapper$translateX2 === void 0 ? 0 : _wrapper$translateX2,
@@ -5979,7 +5979,7 @@ function SVGWrapper(_ref) {
   }, [_active]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     return function () {
-      svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+      svgDOM && svgDOM.removeEventListener('dom destroyed', eventListenerRef.current);
       clearTimeout(timeoutRef.current);
     };
   }, [svgDOM]);
@@ -6387,6 +6387,7 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
       wrapperId: wrapperId
     }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_1__.SVGWrapperContainer, {
       key: wrapperId,
+      slideId: slideId,
       wrapperId: wrapperId,
       svgDOM: ref.current
     });
@@ -6702,7 +6703,6 @@ function SVGTextArea(_ref2) {
   }
 
   function blurHandler(e) {
-    console.log(e, textRef.current);
     e.preventDefault();
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
@@ -7721,7 +7721,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var configureStore = function configureStore() {
   var preloadedState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default, (redux_logger__WEBPACK_IMPORTED_MODULE_0___default())));
+  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default));
 };
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (configureStore);
