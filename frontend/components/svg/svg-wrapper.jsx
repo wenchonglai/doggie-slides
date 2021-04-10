@@ -44,19 +44,13 @@ export default function SVGWrapper({
   
   function handleBlur(e){
     // e.preventDefault();
-    
+
     blurTimeoutRef.current = setTimeout(() => {
       _setActive(false);
     }, 0)
     
     svgDOM.removeEventListener('mousedown', handleBlur);
   }
-  
-  editable && useEffect(() => {
-    _active ?
-    updateWrapperSelection([wrapper.id]) :
-    deleteWrapperSelection([wrapper.id])
-  }, [_active])
   
   function handleMove(e){
     e.stopPropagation();
@@ -153,25 +147,40 @@ export default function SVGWrapper({
     }
     
     const component = getComponent();
+
+    useEffect(() => {
+      return () => {
+        svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+        clearTimeout(timeoutRef.current);
+      }
+    });
     
     useEffect(() => {
       const {translateX=0, translateY=0, rotate=0, width = 300, height = 200} = wrapper;
 
-      
       _setTranslate({x: translateX, y: translateY});
       _setRotate(rotate);
       _setSize({width, height});
     }, [wrapper]);
+
+    editable && useEffect(() => {
+      _active ?
+      updateWrapperSelection([wrapper.id]) :
+      deleteWrapperSelection([wrapper.id])
+    }, [_active])
     
     useEffect(() => {
-      return svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+      return () => {
+        svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+        clearTimeout(timeoutRef.current);
+      }
     }, [svgDOM]);
 
     return ( wrapper ?
     <g className='SVGWrapper'
       transform={`rotate(${_rotate}) translate(${_translate.x}, ${_translate.y})`}
       transform-origin={`${_translate.x + _size.width / 2} ${_translate.y +_size.height / 2}`}
-      onMouseDown={svgDOM && onFocus}
+      onMouseDown={editable && svgDOM ? onFocus : null}
     > 
       <rect 
         width={width} height={height}

@@ -5821,10 +5821,6 @@ function SVGWrapper(_ref) {
     svgDOM.removeEventListener('mousedown', handleBlur);
   }
 
-  editable && (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    _active ? updateWrapperSelection([wrapper.id]) : deleteWrapperSelection([wrapper.id]);
-  }, [_active]);
-
   function handleMove(e) {
     e.stopPropagation();
     var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
@@ -5949,6 +5945,12 @@ function SVGWrapper(_ref) {
 
   var component = getComponent();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    return function () {
+      svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+      clearTimeout(timeoutRef.current);
+    };
+  });
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     var _wrapper$translateX2 = wrapper.translateX,
         translateX = _wrapper$translateX2 === void 0 ? 0 : _wrapper$translateX2,
         _wrapper$translateY2 = wrapper.translateY,
@@ -5972,14 +5974,20 @@ function SVGWrapper(_ref) {
       height: height
     });
   }, [wrapper]);
+  editable && (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    _active ? updateWrapperSelection([wrapper.id]) : deleteWrapperSelection([wrapper.id]);
+  }, [_active]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    return svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+    return function () {
+      svgDOM && svgDOM.removeEventListener('mousedown', handleBlur);
+      clearTimeout(timeoutRef.current);
+    };
   }, [svgDOM]);
   return wrapper ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     className: "SVGWrapper",
     transform: "rotate(".concat(_rotate, ") translate(").concat(_translate.x, ", ").concat(_translate.y, ")"),
     "transform-origin": "".concat(_translate.x + _size.width / 2, " ").concat(_translate.y + _size.height / 2),
-    onMouseDown: svgDOM && onFocus
+    onMouseDown: editable && svgDOM ? onFocus : null
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     width: width,
     height: height,
