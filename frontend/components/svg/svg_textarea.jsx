@@ -153,10 +153,12 @@ export default function SVGTextArea({
     updatable && handleUpdate();
 
     animationFrameRef.current = requestAnimationFrame( () => {
+      
       let inputCacheLength = inputCacheRef.current.length;
 
       if (inputCacheLength){
         textRef.current.insert(inputCacheRef.current, cursorOffsetRef.current);
+
         cursorOffsetRef.current += inputCacheLength;
         selectOffsetRef.current = cursorOffsetRef.current;
       }
@@ -173,6 +175,7 @@ export default function SVGTextArea({
 
       _setSelectOffset(selectOffsetRef.current);
       _setCursorOffset(cursorOffsetRef.current);
+
     });
   }
 
@@ -219,9 +222,9 @@ export default function SVGTextArea({
   const [cursorX, cursorY, lineHeight] = (textRef.current.getPositionByOffset(_cursorOffset));
 
   useEffect(() => {
+    // console.log(styleStrings);
     textRef.current = new DynamicText(text, styleStrings);
     componentsRef.current = textRef.current.toReactComponents(width);
-
     forceUpdate();
   }, [text, styleStrings])
 

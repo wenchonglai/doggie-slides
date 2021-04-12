@@ -90,7 +90,7 @@ export default class DynamicText{
       // add temporary arrays to the indices
       this._indices[key].push(...temp_indices[key]);
     }
-  
+
     // modify style indices
     init || this._styleMap.splice(offset, 0, length);
 
@@ -99,6 +99,8 @@ export default class DynamicText{
   }
 
   remove(index1 = this.length - 1, index2 = index1 + 1){
+    if (this.length <= 1) return false;
+
     index1 = Math.min(Math.max(0, index1), this.length);
     index2 = Math.min(Math.max(0, index2), this.length);
 
@@ -114,27 +116,39 @@ export default class DynamicText{
     }
 
     // modify style indices
-    this._styleMap.splice(index1, index2 - index1)
+    // the the rightmost value to the left of index2
+    const endingStyle = this._styleMap.getLeftValue(index2);
 
-    const [leftKey, leftStyle] = this._styleMap.getLeftEntry(Math.max(index1 - 1, 0));
-    const style = this._styleMap.get(leftKey);
+    // delete all styles between index1 and index2
+    this._styleMap.splice(index1, index2 - index1);
 
-    if ( leftKey > 0 && 
-      toStyleString(leftStyle) === toStyleString(style)
-    ) { this._styleMap.delete(index1); }
+    //set style at index to endingStyle 
+    this._styleMap.set(index1, endingStyle)
+
+    // delete endingStyle if it is the same with the previous one
+    const prevStyle = this._styleMap.get(index1 - 1);
+
+    if ( prevStyle && toStyleString(prevStyle) === toStyleString(endingStyle)) {
+      this._styleMap.delete(index1);
+    }
+    console.log(endingStyle, prevStyle, this._styleMap)
+
+    // { let index = Math.max(1, index1);  // avoid deleting style at index 0
+    //   this._styleMap.splice(index, index2 - index);
+    // }
+
+    // const [leftKey, leftStyle] = this._styleMap.getLeftEntry(Math.max(index1, 0));
+    // const style = this._styleMap.get(leftKey);
+
+    // if ( index1 > 0 &&  toStyleString(leftStyle) === toStyleString(style)) {
+    //   console.log(index1);
+    //   this._styleMap.delete(index1);
+    // }
+
     // renew text
     this._text = this._text.splice(index1, index2 - index1);
 
     return index1;
-  }
-  
-  getSegmentStartIndex(index){
-    return this._segmentMap.getLeftIndex(index - 1);
-  }
-
-  getSegmentEndIndex(index){
-    const keys = this._segmentMap.keys;
-    return this._segmentMap.getRightIndex(index + 1) - 1;
   }
 
   getSegmentStartOffset(index){ // left arrow
@@ -144,7 +158,7 @@ export default class DynamicText{
     let offsetMap = this._text
       .match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g)
       .map(str => str.length);
-console.log(this._text, this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g));
+
     let aggr = this.length;
 
     for (let len = offsetMap.length, i = len - 1; i >= 0; i--){
@@ -179,40 +193,49 @@ console.log(this._text, this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g));
     return this._segmentMap.lastKey;
   }
 
-  setStyle(offset1, offset2, style){
+  setStyle(offset1 = 0, offset2 = this.length, style){
+    if (offset1 >= offset2) return this;
+  // .o...a....b..c...... - currStyle
+  // ....^^^^^^^^........ - style
+  // .o..OA....B.bc......
     offset1 = Math.min(Math.max(0, offset1), this.length);
     offset2 = Math.min(Math.max(0, offset2), this.length);
 
-    if (offset2 <= offset1) return false;
-
     const styleMap = this._styleMap;
-    const sortedKeys = Array.from(styleMap).sort((a, b) => a - b);
-    let prevStyle = styleMap.getLeftValue(Math.max(0, offset1 - 1));
-    let newStyle = prevStyle;
-    let lastStyle = prevStyle;
-    
-    styleMap.set(offset1, {...prevStyle});
 
-    for (let i = offset1; i < offset2; i++){ // to be optimized
+    let leftCurrStyle = styleMap.getLeftValue(offset1);
+    let newStyle = {...leftCurrStyle, ...style};
+    let leftNewStyle = newStyle;
+    
+    if (toStyleString(newStyle) !== toStyleString(leftCurrStyle))
+      styleMap.set(offset1, newStyle);
+
+    for (let i = offset1 + 1, len = Math.min(this.length - 1, offset2); i < len; i++){ // to be optimized
       let currStyle = styleMap.get(i);
 
       if (currStyle){
         newStyle = {...currStyle, ...style};
-        if (toStyleString(prevStyle) === toStyleString(newStyle) && i > 0){
+        
+        if (toStyleString(leftNewStyle) === toStyleString(newStyle)){
           styleMap.delete(i);
         } else {
           styleMap.set(i, newStyle);
         }
-        
-        lastStyle = currStyle;
-        prevStyle = newStyle;
+        leftNewStyle = newStyle;
       }
     }
 
-    if (toStyleString(newStyle) == toStyleString(lastStyle)){
+    let [rightOffset, rightCurrStyle] = styleMap.getRightEntry(offset2);  
+
+    if (rightOffset > offset2){
+      if (offset2 < this.length - 1)
+        styleMap.set(offset2, rightCurrStyle);
+
+      styleMap.delete(rightOffset);
+    }
+
+    if (toStyleString(leftNewStyle) == toStyleString(rightCurrStyle)){
       styleMap.delete(offset2);
-    } else {
-      styleMap.set(offset2, lastStyle);
     }
 
     // this._styleMap.set(index1, style);
@@ -221,6 +244,7 @@ console.log(this._text, this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g));
     // for (let i of sortedKeys)
     //   if (i >= index1 && i < index2)
     //     this._styleMap.delete(i);
+    return this;
   }
 
   measureSubstringSize(substring, style = {}){
@@ -272,13 +296,19 @@ console.log(this._text, this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g));
 
     function _processSubstring(l, r){
       const substring = this._text.substring(l, r);
+
+      if (l == r || substring === '\0') return;
+
       const lastChar = substring.at(-1);
       const style = this._styleMap.getLeftValue(l);
 
       const {width, height} = this.measureSubstringSize(substring, style);
 
       if (![' ', '\n', '\t'].includes(substring)){               // if the last character is not a break character
-        if (tempQueue.length > 0 && offsetX + width > maxWidth){  // if a line has more than one segment and the last segment exceeds the right boundary
+        if (
+          tempQueue.some(x => x.substring.match(/[\ \n\t]/)) > 0 && 
+          offsetX + width > maxWidth
+        ){  // if a line has more than one segment and the last segment exceeds the right boundary
           _changeLine.call(this);
         } else {
           if (height > maxLineHeight) maxLineHeight = height; 

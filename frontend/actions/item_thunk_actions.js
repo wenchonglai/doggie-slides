@@ -111,20 +111,15 @@ export const updateTextstyleAttribute = (key) =>
     const {entities, ui} = state;
     const {selectOffset, cursorOffset} = ui.selections;
     const textbox = getSelectedTextbox(state);
-    const dynamicText = DynamicText.fromTexbox(state, textbox);
- 
-    dynamicText.setStyle(
-      ...[cursorOffset, selectOffset].sort((a, b) => a - b),
-      {[key]: value}
-    );
+    const dynamicText = DynamicText
+      .fromTexbox(state, textbox)
+      .setStyle(
+        ...[cursorOffset, selectOffset].sort((a, b) => a - b),
+        {[key]: value}
+      );
+    const dynamicTextReduxState = dynamicText.toReduxState();
 
-    dispatch(PresentationActions.updateText(textbox.id, dynamicText.toReduxState()));
-    // if (wrappers.length > 1){ console.warn('The feature of updating multiple wrappers is yet to be implemented.'); }
-
-    // return wrapper && PresentationUtils.asyncUpdateWrapper(wrapper)
-    //   .then(resWrapper => {
-    //     dispatch(PresentationActions.receiveWrapper(resWrapper));
-    //   }, (err) => {console.log(err)});
+    dispatch(PresentationActions.updateText(textbox.id, dynamicTextReduxState));
   }
 
 export const textColor = updateTextstyleAttribute('fill');

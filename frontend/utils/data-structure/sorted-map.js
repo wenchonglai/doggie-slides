@@ -10,7 +10,7 @@ export default class SortedMap extends Map{
 
   getRightIndex(key){
     const keys = this.keys;
-    return Math.min(bisectLeft(keys, key + 1), this.size - 1);
+    return Math.min(bisectLeft(keys, key), this.size - 1);
   }
 
   getLeftKey(key){  // the greatest index less than or equal to key
@@ -20,7 +20,7 @@ export default class SortedMap extends Map{
 
   getRightKey(key){ // the smallest index greater than or equal to key
     const keys = this.keys;
-    return keys[Math.min(bisectLeft(keys, key + 1), this.size - 1)];
+    return keys[Math.min(bisectLeft(keys, key), this.size - 1)];
   }
 
   getLeftValue(key){
@@ -52,8 +52,6 @@ export default class SortedMap extends Map{
   }
 
   splice(offsetLeft, removeLength = 0, insertLength = 0){
-    console.log(offsetLeft, removeLength, insertLength)
-    console.log(this.keys)
     //remove
     let offsets = this.keys.sort((a, b) => a - b);
 
@@ -78,14 +76,13 @@ export default class SortedMap extends Map{
 
     if (insertLength > 0)
       for (let len = offsets.length, i = len - 1; offsets[i] > offsetLeft; i --){
-        console.log(i);
+
         let key = offsets[i];
 
         this.set(key + insertLength, this.get(key));
         this.delete(key);
-        console.log(...this.entries)
+
       }
-    console.log(this.keys)
   }
   get keys(){ return Array.from(Map.prototype.keys.call(this)).sort((a, b) => a - b); }
   get values(){ return this.keys.map(key => this.get(key)); }

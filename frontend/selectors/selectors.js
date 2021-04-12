@@ -1,15 +1,13 @@
-export const getTextstylesByTextbox = ( {entities}, textbox) => 
-  textbox.textstyleIds.map(id => entities.textstyles[id]);
+export const getTextstylesByTextbox = ( {entities}, textbox) => {
+  return textbox.textstyleIds.map(id => entities.textstyles[id]);
+}
 
 export const getTextstylesByTextboxId = (state, textboxId) => {
   const textbox = getTextboxById(state, textboxId);
   return getTextstylesByTextbox(state, textbox);
 }
 
-export const getTextboxByWrapper = ( {entities}, wrapper) => 
-  textbox.textstyleIds.map(wrapper => entities.textboxes[wrapper.slideObjectId]);
-
-const getWrapperById = ({entities}, id) => 
+export const getWrapperById = ({entities}, id) => 
   entities.wrappers[id]
 
 export const getTextboxById = ({entities}, id) => 

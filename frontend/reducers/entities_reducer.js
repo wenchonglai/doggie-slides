@@ -24,7 +24,7 @@ const TextStyleReducer = (state = {}, action) => {
   }
 }
 
-const TextboxsReducer = (state = {}, action) => {
+const TextboxReducer = (state = {}, action) => {
   switch (action.type){
     case UIActions.RECEIVE_SELECTED_TEXT:
       return {...state, ...action.textboxData};
@@ -112,6 +112,6 @@ export default combineReducers({
   docs: DocsReducer,
   slides: SlidesReducer,
   wrappers: WrapperReducer,
-  textboxes: TextboxsReducer,
+  textboxes: TextboxReducer,
   textstyles: TextStyleReducer
 });

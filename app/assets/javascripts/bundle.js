@@ -3149,6 +3149,8 @@ var deleteWrappers = function deleteWrappers() {
 var updateTextstyleAttribute = function updateTextstyleAttribute(key) {
   return function (value) {
     return function (dispatch, getState) {
+      var _DynamicText$fromTexb;
+
       var state = getState();
       var entities = state.entities,
           ui = state.ui;
@@ -3156,15 +3158,13 @@ var updateTextstyleAttribute = function updateTextstyleAttribute(key) {
           selectOffset = _ui$selections.selectOffset,
           cursorOffset = _ui$selections.cursorOffset;
       var textbox = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_2__.getSelectedTextbox)(state);
-      var dynamicText = _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_3__.default.fromTexbox(state, textbox);
-      dynamicText.setStyle.apply(dynamicText, _toConsumableArray([cursorOffset, selectOffset].sort(function (a, b) {
+
+      var dynamicText = (_DynamicText$fromTexb = _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_3__.default.fromTexbox(state, textbox)).setStyle.apply(_DynamicText$fromTexb, _toConsumableArray([cursorOffset, selectOffset].sort(function (a, b) {
         return a - b;
       })).concat([_defineProperty({}, key, value)]));
-      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateText(textbox.id, dynamicText.toReduxState())); // if (wrappers.length > 1){ console.warn('The feature of updating multiple wrappers is yet to be implemented.'); }
-      // return wrapper && PresentationUtils.asyncUpdateWrapper(wrapper)
-      //   .then(resWrapper => {
-      //     dispatch(PresentationActions.receiveWrapper(resWrapper));
-      //   }, (err) => {console.log(err)});
+
+      var dynamicTextReduxState = dynamicText.toReduxState();
+      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateText(textbox.id, dynamicTextReduxState));
     };
   };
 };
@@ -3365,6 +3365,7 @@ var updateText = function updateText(textboxId, textData) {
     var textstylesAttributeIndexedOnOffset = new Map(textstylesAttributes.map(function (attribute) {
       return [attribute.offset, attribute];
     }));
+    console.log(entities.textboxes[textboxId]);
     textstyles.forEach(function (textstyle) {
       var attribute = textstylesAttributeIndexedOnOffset.get(textstyle.offset);
 
@@ -3668,14 +3669,15 @@ var updateUITextSelection = function updateUITextSelection(_ref2) {
     var prevTextstyleAttributes = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_0__.getTextstylesByTextbox)(state, textBox); //array
 
     var text = uiTextData.text,
-        textstylesAttributes = uiTextData.textstylesAttributes;
-    var textstyleIds = [];
+        textstylesAttributes = uiTextData.textstylesAttributes; // console.warn(uiTextData);
 
-    for (var i = 0, len = prevTextstyleAttributes.length; i < len; i++) {
+    var textstyleIds = []; // console.warn(...prevTextstyleAttributes, ...textstylesAttributes);
+
+    for (var i = 0, len = prevTextstyleAttributes.length, textLen = text.length; i < len; i++) {
       var prevAttribute = prevTextstyleAttributes[i];
       var newAttribute = textstylesAttributes[i];
 
-      if (newAttribute) {
+      if (newAttribute && (!textLen || newAttribute.offset < textLen)) {
         textstylesAttributes[i] = _objectSpread(_objectSpread({}, prevAttribute), newAttribute);
         textstyleIds.push(prevAttribute.id);
       } else {
@@ -3690,7 +3692,7 @@ var updateUITextSelection = function updateUITextSelection(_ref2) {
       cursorOffset: cursorOffset,
       selectOffset: selectOffset,
       textboxData: _defineProperty({}, textboxId, {
-        textboxId: textboxId,
+        id: textboxId,
         text: text,
         textstyleIds: textstyleIds
       }),
@@ -7028,6 +7030,7 @@ function SVGTextArea(_ref2) {
       lineHeight = _textRef$current$getP2[2];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    // console.log(styleStrings);
     textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings);
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
@@ -7653,7 +7656,7 @@ var TextStyleReducer = function TextStyleReducer() {
   }
 };
 
-var TextboxsReducer = function TextboxsReducer() {
+var TextboxReducer = function TextboxReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var action = arguments.length > 1 ? arguments[1] : undefined;
 
@@ -7775,7 +7778,7 @@ var DocsReducer = function DocsReducer() {
   docs: DocsReducer,
   slides: SlidesReducer,
   wrappers: WrapperReducer,
-  textboxes: TextboxsReducer,
+  textboxes: TextboxReducer,
   textstyles: TextStyleReducer
 }));
 
@@ -8075,7 +8078,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "getTextstylesByTextbox": () => (/* binding */ getTextstylesByTextbox),
 /* harmony export */   "getTextstylesByTextboxId": () => (/* binding */ getTextstylesByTextboxId),
-/* harmony export */   "getTextboxByWrapper": () => (/* binding */ getTextboxByWrapper),
+/* harmony export */   "getWrapperById": () => (/* binding */ getWrapperById),
 /* harmony export */   "getTextboxById": () => (/* binding */ getTextboxById),
 /* harmony export */   "getSelectedTextbox": () => (/* binding */ getSelectedTextbox),
 /* harmony export */   "getSelectedText": () => (/* binding */ getSelectedText)
@@ -8090,26 +8093,18 @@ var getTextstylesByTextboxId = function getTextstylesByTextboxId(state, textboxI
   var textbox = getTextboxById(state, textboxId);
   return getTextstylesByTextbox(state, textbox);
 };
-var getTextboxByWrapper = function getTextboxByWrapper(_ref2, wrapper) {
+var getWrapperById = function getWrapperById(_ref2, id) {
   var entities = _ref2.entities;
-  return textbox.textstyleIds.map(function (wrapper) {
-    return entities.textboxes[wrapper.slideObjectId];
-  });
-};
-
-var getWrapperById = function getWrapperById(_ref3, id) {
-  var entities = _ref3.entities;
   return entities.wrappers[id];
 };
-
-var getTextboxById = function getTextboxById(_ref4, id) {
-  var entities = _ref4.entities;
+var getTextboxById = function getTextboxById(_ref3, id) {
+  var entities = _ref3.entities;
   return entities.textboxes[id];
 };
 
-var getSelectedWrapper = function getSelectedWrapper(_ref5) {
-  var ui = _ref5.ui,
-      entities = _ref5.entities;
+var getSelectedWrapper = function getSelectedWrapper(_ref4) {
+  var ui = _ref4.ui,
+      entities = _ref4.entities;
   return entities.wrappers[ui.selections.wrapperIds[0] || -1];
 };
 
@@ -8244,12 +8239,6 @@ function _objectWithoutProperties(source, excluded) { if (source == null) return
 
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -8257,6 +8246,12 @@ function _nonIterableRest() { throw new TypeError("Invalid attempt to destructur
 function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
@@ -8385,6 +8380,7 @@ var DynamicText = /*#__PURE__*/function () {
     value: function remove() {
       var index1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.length - 1;
       var index2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : index1 + 1;
+      if (this.length <= 1) return false;
       index1 = Math.min(Math.max(0, index1), this.length);
       index2 = Math.min(Math.max(0, index2), this.length);
 
@@ -8400,35 +8396,37 @@ var DynamicText = /*#__PURE__*/function () {
 
         indices.splice(key1, key2 - key1);
       } // modify style indices
+      // the the rightmost value to the left of index2
 
 
-      this._styleMap.splice(index1, index2 - index1);
+      var endingStyle = this._styleMap.getLeftValue(index2); // delete all styles between index1 and index2
 
-      var _this$_styleMap$getLe = this._styleMap.getLeftEntry(Math.max(index1 - 1, 0)),
-          _this$_styleMap$getLe2 = _slicedToArray(_this$_styleMap$getLe, 2),
-          leftKey = _this$_styleMap$getLe2[0],
-          leftStyle = _this$_styleMap$getLe2[1];
 
-      var style = this._styleMap.get(leftKey);
+      this._styleMap.splice(index1, index2 - index1); //set style at index to endingStyle 
 
-      if (leftKey > 0 && (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(style)) {
+
+      this._styleMap.set(index1, endingStyle); // delete endingStyle if it is the same with the previous one
+
+
+      var prevStyle = this._styleMap.get(index1 - 1);
+
+      if (prevStyle && (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(prevStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(endingStyle)) {
         this._styleMap["delete"](index1);
-      } // renew text
+      }
 
+      console.log(endingStyle, prevStyle, this._styleMap); // { let index = Math.max(1, index1);  // avoid deleting style at index 0
+      //   this._styleMap.splice(index, index2 - index);
+      // }
+      // const [leftKey, leftStyle] = this._styleMap.getLeftEntry(Math.max(index1, 0));
+      // const style = this._styleMap.get(leftKey);
+      // if ( index1 > 0 &&  toStyleString(leftStyle) === toStyleString(style)) {
+      //   console.log(index1);
+      //   this._styleMap.delete(index1);
+      // }
+      // renew text
 
       this._text = this._text.splice(index1, index2 - index1);
       return index1;
-    }
-  }, {
-    key: "getSegmentStartIndex",
-    value: function getSegmentStartIndex(index) {
-      return this._segmentMap.getLeftIndex(index - 1);
-    }
-  }, {
-    key: "getSegmentEndIndex",
-    value: function getSegmentEndIndex(index) {
-      var keys = this._segmentMap.keys;
-      return this._segmentMap.getRightIndex(index + 1) - 1;
     }
   }, {
     key: "getSegmentStartOffset",
@@ -8440,7 +8438,6 @@ var DynamicText = /*#__PURE__*/function () {
         return str.length;
       });
 
-      console.log(this._text, this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g));
       var aggr = this.length;
 
       for (var len = offsetMap.length, i = len - 1; i >= 0; i--) {
@@ -8476,47 +8473,61 @@ var DynamicText = /*#__PURE__*/function () {
     }
   }, {
     key: "setStyle",
-    value: function setStyle(offset1, offset2, style) {
+    value: function setStyle() {
+      var offset1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var offset2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.length;
+      var style = arguments.length > 2 ? arguments[2] : undefined;
+      if (offset1 >= offset2) return this; // .o...a....b..c...... - currStyle
+      // ....^^^^^^^^........ - style
+      // .o..OA....B.bc......
+
       offset1 = Math.min(Math.max(0, offset1), this.length);
       offset2 = Math.min(Math.max(0, offset2), this.length);
-      if (offset2 <= offset1) return false;
       var styleMap = this._styleMap;
-      var sortedKeys = Array.from(styleMap).sort(function (a, b) {
-        return a - b;
-      });
-      var prevStyle = styleMap.getLeftValue(Math.max(0, offset1 - 1));
-      var newStyle = prevStyle;
-      var lastStyle = prevStyle;
-      styleMap.set(offset1, _objectSpread({}, prevStyle));
+      var leftCurrStyle = styleMap.getLeftValue(offset1);
 
-      for (var i = offset1; i < offset2; i++) {
+      var newStyle = _objectSpread(_objectSpread({}, leftCurrStyle), style);
+
+      var leftNewStyle = newStyle;
+      if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(newStyle) !== (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftCurrStyle)) styleMap.set(offset1, newStyle);
+
+      for (var i = offset1 + 1, len = Math.min(this.length - 1, offset2); i < len; i++) {
         // to be optimized
         var currStyle = styleMap.get(i);
 
         if (currStyle) {
           newStyle = _objectSpread(_objectSpread({}, currStyle), style);
 
-          if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(prevStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(newStyle) && i > 0) {
+          if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftNewStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(newStyle)) {
             styleMap["delete"](i);
           } else {
             styleMap.set(i, newStyle);
           }
 
-          lastStyle = currStyle;
-          prevStyle = newStyle;
+          leftNewStyle = newStyle;
         }
       }
 
-      if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(newStyle) == (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(lastStyle)) {
+      var _styleMap$getRightEnt = styleMap.getRightEntry(offset2),
+          _styleMap$getRightEnt2 = _slicedToArray(_styleMap$getRightEnt, 2),
+          rightOffset = _styleMap$getRightEnt2[0],
+          rightCurrStyle = _styleMap$getRightEnt2[1];
+
+      if (rightOffset > offset2) {
+        if (offset2 < this.length - 1) styleMap.set(offset2, rightCurrStyle);
+        styleMap["delete"](rightOffset);
+      }
+
+      if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftNewStyle) == (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(rightCurrStyle)) {
         styleMap["delete"](offset2);
-      } else {
-        styleMap.set(offset2, lastStyle);
       } // this._styleMap.set(index1, style);
       // lastStyle && this._styleMap.set(index2, lastStyle);
       // for (let i of sortedKeys)
       //   if (i >= index1 && i < index2)
       //     this._styleMap.delete(i);
 
+
+      return this;
     }
   }, {
     key: "measureSubstringSize",
@@ -8586,6 +8597,7 @@ var DynamicText = /*#__PURE__*/function () {
       function _processSubstring(l, r) {
         var substring = this._text.substring(l, r);
 
+        if (l == r || substring === '\0') return;
         var lastChar = substring.at(-1);
 
         var style = this._styleMap.getLeftValue(l);
@@ -8596,7 +8608,9 @@ var DynamicText = /*#__PURE__*/function () {
 
         if (![' ', '\n', '\t'].includes(substring)) {
           // if the last character is not a break character
-          if (tempQueue.length > 0 && offsetX + width > maxWidth) {
+          if (tempQueue.some(function (x) {
+            return x.substring.match(/[\ \n\t]/);
+          }) > 0 && offsetX + width > maxWidth) {
             // if a line has more than one segment and the last segment exceeds the right boundary
             _changeLine.call(this);
           } else {
@@ -8903,14 +8917,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _bisect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bisect */ "./frontend/utils/data-structure/bisect.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -8970,7 +8976,7 @@ var SortedMap = /*#__PURE__*/function (_Map) {
     key: "getRightIndex",
     value: function getRightIndex(key) {
       var keys = this.keys;
-      return Math.min((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectLeft)(keys, key + 1), this.size - 1);
+      return Math.min((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectLeft)(keys, key), this.size - 1);
     }
   }, {
     key: "getLeftKey",
@@ -8984,7 +8990,7 @@ var SortedMap = /*#__PURE__*/function (_Map) {
     value: function getRightKey(key) {
       // the smallest index greater than or equal to key
       var keys = this.keys;
-      return keys[Math.min((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectLeft)(keys, key + 1), this.size - 1)];
+      return keys[Math.min((0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectLeft)(keys, key), this.size - 1)];
     }
   }, {
     key: "getLeftValue",
@@ -9024,9 +9030,7 @@ var SortedMap = /*#__PURE__*/function (_Map) {
     value: function splice(offsetLeft) {
       var removeLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
       var insertLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      console.log(offsetLeft, removeLength, insertLength);
-      console.log(this.keys); //remove
-
+      //remove
       var offsets = this.keys.sort(function (a, b) {
         return a - b;
       });
@@ -9061,16 +9065,10 @@ var SortedMap = /*#__PURE__*/function (_Map) {
         return a - b;
       });
       if (insertLength > 0) for (var len = offsets.length, i = len - 1; offsets[i] > offsetLeft; i--) {
-        var _console;
-
-        console.log(i);
         var key = offsets[i];
         this.set(key + insertLength, this.get(key));
         this["delete"](key);
-
-        (_console = console).log.apply(_console, _toConsumableArray(this.entries));
       }
-      console.log(this.keys);
     }
   }, {
     key: "keys",

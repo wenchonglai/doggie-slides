@@ -1,6 +1,6 @@
 import { getTextstylesByTextboxId } from '../selectors/selectors';
 import * as PresentationUtils from '../utils/presentation_utils';
-import { receiveCurrentSlide, updatePageSettings } from './ui_actions';
+import { receiveCurrentSlide, updatePageSettings, updateUITextSelection } from './ui_actions';
 
 function actionCreatorCreator({verb='receive', noun, nouns = noun + 's'}){
   const verbNoun = verb.toLowerCase() + noun[0].toUpperCase() + noun.substring(1).toLowerCase();
@@ -105,23 +105,23 @@ export const createText = (textData) => (dispatch) =>
 export const updateText = (textboxId, textData) => (dispatch, getState) => {
   const state = getState();
   const {entities, ui} = state;
-  const textstyles = getTextstylesByTextboxId(state, textboxId);
 
+  const textstyles = getTextstylesByTextboxId(state, textboxId);
   const textstylesAttributes = textData.textstylesAttributes;
   const textstylesAttributeIndexedOnOffset = new Map(
     textstylesAttributes.map(attribute => [attribute.offset, attribute])
   );
+  console.log(entities.textboxes[textboxId]);
   
   textstyles.forEach(textstyle => {
     let attribute = textstylesAttributeIndexedOnOffset.get(textstyle.offset);
-
     if (attribute){
       attribute.id = textstyle.id;
     } else {
       textstylesAttributes.push({id: textstyle.id, _destroy: 1});
     }
   });
-  
+
   return PresentationUtils.asyncUpdateText(textboxId, textData)
     .then((resData) => {
       const wrapperAttributes = resData.wrapperAttributes;
