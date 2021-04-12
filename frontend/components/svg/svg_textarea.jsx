@@ -19,7 +19,7 @@ function SVGTextAreaSelect({className, text, start, end}){
   let key = start;
 
   for (let i = start + 1; i <= end; i++){
-    let offset = text._offsetMap.get(i);
+    let offset = text._segmentMap.get(i);
     if (offset){
       if (offset[1] == startOffset[1]){
         blocks.push(<rect key={key} x={startOffset[0]} y={startOffset[1] - startOffset[2]} width={offset[0] - startOffset[0]} height={startOffset[2]}/>)
@@ -45,17 +45,26 @@ function SVGTextAreaSelect({className, text, start, end}){
   </g>)
 }
 
-export default function SVGTextArea({editable = true, width, textboxId, className='', defaultFont, text, styleStrings, updateTextHandler, ...props}){
+export default function SVGTextArea({
+  active, textboxId,
+  width, height,
+  className='', defaultFont, text, styleStrings, 
+  updateTextHandler, updateUITextSelection, 
+  ...props
+}){
   function handleUpdate(){
     clearTimeout(_timeout.current);
 
     _timeout.current = setTimeout(() => {
+      // console.log('updateTextHandler', entities.textboxes[textboxId], textRef.current);
       updateTextHandler(textboxId, textRef.current.toReduxState());
-    }, 1000);
+    }, 2000);
   }
-  
+
   function handleKeyDown(e){
-    if (!_active){ return; }
+    cancelAnimationFrame(animationFrameRef.current);
+
+    if (!active){ return; }
     const altKey = e.altKey;
     const shiftKey = e.shiftKey;
 
@@ -64,7 +73,7 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
 
     function _removeText(minRemoveLength = 0){
       let dLen =  Math.max(
-        Math.abs(cursorPositionRef.current - selectPositionRef.current), 
+        Math.abs(cursorOffsetRef.current - selectOffsetRef.current), 
       1);
 
       if (inputCache > 0){
@@ -72,10 +81,10 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
         dLen -= Math.min(dLen, inputCache.length);
       } 
 
-      let [leftOffset, rightOffset] = [cursorPositionRef.current, selectPositionRef.current]
+      let [leftOffset, rightOffset] = [cursorOffsetRef.current, selectOffsetRef.current]
         .sort((a, b)=>a - b);
 
-      cursorPositionRef.current = textRef.current.remove(
+      cursorOffsetRef.current = textRef.current.remove(
         Math.min(
           altKey ?
             textRef.current.getSegmentStartOffset(leftOffset) :
@@ -85,15 +94,15 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
         rightOffset
       );
 
-      selectPositionRef.current = cursorPositionRef.current
+      selectOffsetRef.current = cursorOffsetRef.current
     }
 
     if (e.metaKey){
       if (e.key === 'a'){
         updatable = true;
         e.preventDefault();
-        cursorPositionRef.current = 0;
-        selectPositionRef.current = textRef.current.length - 1;
+        cursorOffsetRef.current = 0;
+        selectOffsetRef.current = textRef.current.length - 1;
       }
     } else {
       updatable = true;
@@ -101,32 +110,32 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
       e.preventDefault();
 
       if (e.key === 'Backspace'){
-        _removeText(1);
-          // if (cursorPositionRef.current > 0) cursorPositionRef.current -= 1;
+        _removeText();
+          // if (cursorOffsetRef.current > 0) cursorOffsetRef.current -= 1;
       } else if (KEYCODE_MAP[e.keyCode]) {
         inputCacheRef.current += KEYCODE_MAP[e.keyCode];
+        console.log(e.keyCode);
       } else if (e.key.length > 1){
-
         switch (e.keyCode){
           case 37: { //left arrow
             updatable = false;
-            cursorPositionRef.current = Math.max(
+            cursorOffsetRef.current = Math.max(
               altKey ? 
-                textRef.current.getSegmentStartOffset(cursorPositionRef.current) :
-                cursorPositionRef.current - 1,
+                textRef.current.getSegmentStartOffset(cursorOffsetRef.current) :
+                cursorOffsetRef.current - 1,
             0);
 
-            if (!shiftKey) selectPositionRef.current = cursorPositionRef.current;
+            if (!shiftKey) selectOffsetRef.current = cursorOffsetRef.current;
           }; break; 
           case 39: { //right arrow
             updatable = false;
-            cursorPositionRef.current = Math.min(
+            cursorOffsetRef.current = Math.min(
               altKey ? 
-              textRef.current.getSegmentEndOffset(cursorPositionRef.current) :
-              cursorPositionRef.current + 1,
+              textRef.current.getSegmentEndOffset(cursorOffsetRef.current) :
+              cursorOffsetRef.current + 1,
             textRef.current.lastOffset - 1);
 
-            if (!shiftKey) selectPositionRef.current = cursorPositionRef.current;
+            if (!shiftKey) selectOffsetRef.current = cursorOffsetRef.current;
           }; break; 
           default: {
             // console.log(e.keyCode);
@@ -134,7 +143,7 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
         }
 
       } else {
-        if (selectPositionRef.current !== cursorPositionRef.current){
+        if (selectOffsetRef.current !== cursorOffsetRef.current){
           _removeText();
         }
         inputCacheRef.current += e.key;
@@ -143,59 +152,71 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
 
     updatable && handleUpdate();
 
-    requestAnimationFrame( () => {
-      textRef.current.insert(inputCacheRef.current, cursorPositionRef.current);
-      cursorPositionRef.current += inputCacheRef.current.length;
-      if (inputCacheRef.current.length) 
-        selectPositionRef.current = cursorPositionRef.current;
+    animationFrameRef.current = requestAnimationFrame( () => {
+      let inputCacheLength = inputCacheRef.current.length;
+
+      if (inputCacheLength){
+        textRef.current.insert(inputCacheRef.current, cursorOffsetRef.current);
+        cursorOffsetRef.current += inputCacheLength;
+        selectOffsetRef.current = cursorOffsetRef.current;
+      }
 
       inputCacheRef.current = '';
       componentsRef.current = textRef.current.toReactComponents(width);
 
-      _setSelectPosition(selectPositionRef.current);
-      _setCursorPosition(cursorPositionRef.current);
+      updateUITextSelection({
+        textboxId, 
+        uiTextData: textRef.current.toReduxState(),
+        cursorOffset: cursorOffsetRef.current,
+        selectOffset: selectOffsetRef.current
+      });
+
+      _setSelectOffset(selectOffsetRef.current);
+      _setCursorOffset(cursorOffsetRef.current);
     });
   }
 
-  function clickHandler(e){
-    e.preventDefault();
-    _setActive(editable);
-    // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._offsetMap);
-  }
+  // function clickHandler(e){
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   _setActive(editable);
+  //   // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._segmentMap);
+  // }
 
-  function blurHandler(e){
-    e.preventDefault();
-    clearTimeout(_timeout.current);
+  // function blurHandler(e){
+  //   e.preventDefault();
+  //   clearTimeout(_timeout.current);
 
-    _timeout.current = setTimeout(() => {
-      updateTextHandler(textboxId, textRef.current.toReduxState());
-    }, 0);
-    
-    _setActive(false);
-  }
+  //   _timeout.current = setTimeout(() => {
+  //     updateTextHandler(textboxId, textRef.current.toReduxState());
+  //   }, 0);
+
+  //   _setActive(false);
+  // }
 
   function forceUpdate(){
     _forceUpdate(!_);
   }
 
   const [_, _forceUpdate] = useState(true);
-  const [_active, _setActive] = useState(false);
+  // const [_active, _setActive] = useState(false);
   
   const _timeout = useRef();
   const textRef = useRef();
   const inputCacheRef = useRef('');
   const componentsRef = useRef();
+  const animationFrameRef = useRef();
   
-  const cursorPositionRef = useRef(0);
-  const [_cursorPosition, _setCursorPosition] = useState(0); 
+  const cursorOffsetRef = useRef(0);
+  const [_cursorOffset, _setCursorOffset] = useState(0); 
 
-  const selectPositionRef = useRef(0);
-  const [_selectPosition, _setSelectPosition] = useState(0); 
+  const selectOffsetRef = useRef(0);
+  const [_selectOffset, _setSelectOffset] = useState(0); 
 
   textRef.current ||= new DynamicText(text, styleStrings);
   componentsRef.current ||= textRef.current.toReactComponents(width);
 
-  const [cursorX, cursorY, lineHeight] = (textRef.current.getPositionByOffset(_cursorPosition));
+  const [cursorX, cursorY, lineHeight] = (textRef.current.getPositionByOffset(_cursorOffset));
 
   useEffect(() => {
     textRef.current = new DynamicText(text, styleStrings);
@@ -204,27 +225,27 @@ export default function SVGTextArea({editable = true, width, textboxId, classNam
     forceUpdate();
   }, [text, styleStrings])
 
-  const actualHeight = Math.max(textRef.current._offsetMap.last[1] + 60, 60);
+  const actualHeight = Math.max(textRef.current._segmentMap.last[1] + 60, 60);
 
   return (
     <g 
       {...props}
-      className={`svg-textarea ${className} ${_active ? 'active' : ''}`}
-      onKeyDown={(e) => handleKeyDown(e)}
+      className={`svg-textarea ${className} ${active ? 'active' : ''}`}
+      onKeyDown={active ? (e) => handleKeyDown(e) : null}
       fill="none"
     > 
       <a xlinkHref="#" 
-        onClick={e => clickHandler(e)}
-        onBlur={e => blurHandler(e)}
+        onClick={e => e.preventDefault()}
+        // onBlur={e => blurHandler(e)}
         height={actualHeight}
         width={width}
       >
-        {/* <rect height={actualHeight} width={width} ></rect> */}
+        <rect height={height} width={width} pointerEvents="all"></rect>
         <SVGTextAreaSelect
           className='svg-textarea-select'
           text={textRef.current}
-          start={cursorPositionRef.current}
-          end={selectPositionRef.current}
+          start={cursorOffsetRef.current}
+          end={selectOffsetRef.current}
         />
         { componentsRef.current }
       </a>

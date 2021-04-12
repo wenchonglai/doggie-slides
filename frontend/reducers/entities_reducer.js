@@ -1,13 +1,18 @@
 import { combineReducers } from 'redux';
 import * as SessionActions from '../actions/session_actions';
 import * as PresentationActions from '../actions/presentation_actions';
+import * as UIActions from '../actions/ui_actions'
+import { getTextstylesByTextboxId } from '../selectors/selectors';
 
 const TextStyleReducer = (state = {}, action) => {
   Object.freeze(state);
 
   switch (action.type){
+    case UIActions.RECEIVE_SELECTED_TEXT: { 
+      return {...state, ...action.textstyleData};
+    }
     case PresentationActions.RECEIVE_TEXT: 
-      return {...state, ...action.data.textstylesAttributes}
+      return {...state, ...action.textData.textstylesAttributes}
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.textstyles; 
     case PresentationActions.RECEIVE_TEXTSTYLES: 
@@ -20,11 +25,15 @@ const TextStyleReducer = (state = {}, action) => {
 }
 
 const TextboxsReducer = (state = {}, action) => {
-  Object.freeze(state);
-
   switch (action.type){
-    case PresentationActions.RECEIVE_TEXT: 
-      return {...state, ...action.data}
+    case UIActions.RECEIVE_SELECTED_TEXT:
+      return {...state, ...action.textboxData};
+    case PresentationActions.RECEIVE_TEXT: {
+      const {id, text, textstyleIds} = action.textData;
+      return {...state,
+        [id]: {id, text, textstyleIds}
+      }
+    }
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.textboxes; 
     case PresentationActions.RECEIVE_TEXTBOXES: 
@@ -40,6 +49,9 @@ const WrapperReducer = (state = {}, action) => {
   Object.freeze(state);
 
   switch (action.type){
+    case PresentationActions.RECEIVE_TEXT: {
+      return {...state, [action.wrapperData.id]: action.wrapperData};
+    }
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.wrappers;
     case PresentationActions.RECEIVE_WRAPPERS: 
@@ -55,6 +67,21 @@ const SlidesReducer = (state = {}, action) => {
   Object.freeze(state);
 
   switch (action.type){
+    case PresentationActions.RECEIVE_WRAPPERS: {
+      return {...state}
+    }
+    case PresentationActions.RECEIVE_TEXT: {
+      const wrapperAttributes = action.textData.wrapperAttributes;
+      const wrapperData = Object.values(wrapperAttributes)[0];
+      const wrapperId = action.wrapperData.id;
+      const slideId = wrapperData.slideId;
+      const slideData = state[slideId];
+      const wrapperIds = Array.from(
+        new Set([...slideData.wrapperIds, wrapperId])
+      );
+
+      return {...state, [slideId]: {...slideData, wrapperIds}};
+    } 
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.slides; 
     case PresentationActions.RECEIVE_SLIDES: 
@@ -81,4 +108,10 @@ const DocsReducer = (state = {}, action) => {
   }
 }
 
-export default combineReducers({docs: DocsReducer, slides: SlidesReducer, wrappers: WrapperReducer, textboxes: TextboxsReducer, textstyles: TextStyleReducer});
+export default combineReducers({
+  docs: DocsReducer,
+  slides: SlidesReducer,
+  wrappers: WrapperReducer,
+  textboxes: TextboxsReducer,
+  textstyles: TextStyleReducer
+});

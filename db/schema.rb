@@ -37,7 +37,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_005310) do
   end
 
   create_table "textboxes", force: :cascade do |t|
-    t.text "text", null: false
+    t.text "text", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 2021_04_08_005310) do
     t.integer "offset", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["textbox_id", "offset"], name: "index_textstyles_on_textbox_id_and_offset", unique: true
+    t.index ["textbox_id", "offset"], name: "index_textstyles_on_textbox_id_and_offset"
     t.index ["textbox_id"], name: "index_textstyles_on_textbox_id"
   end
 

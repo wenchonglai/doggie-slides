@@ -1,9 +1,12 @@
+import React from 'react';
 import '../monkey-patches/array';
 import '../monkey-patches/string';
+
 import {bisectLeft, insertLeft} from './bisect.js';
 import SortedArray from './sorted-array';
 import SortedMap from './sorted-map';
-import React from 'react';
+import {parseStyleString, parseFontString, toStyleString} from '../string_parsers'
+import {getSelectedText, getTextstylesByTextbox} from '../../selectors/selectors';
 
 const CTX = document.createElement('canvas').getContext('2d');
 const COMMON_CHAR_SIZE_MAP = {};
@@ -11,49 +14,17 @@ const DEFAULT_FONT_SIZE = 14;
 
 CTX.font = `14px Times`;
 
-function parseStyleString(styleString){
-  const stringObj = Object.fromEntries(
-    styleString
-      .split(/\ *\;\ */)
-      .map(x => x.split(/\ *\:\ /)
-    )
-  );
-  
-  let fontStyles = stringObj.font;
-
-  if (fontStyles){
-    Object.assign(stringObj, parseFontString(fontStyles));
-    // delete stringObj.font;
+export default class DynamicText{
+  static fromCurrentSelection(state){
+    const textData = getSelectedText(state);
+    return new DynamicText(textData[0].text, textData[1].map(({offset, styleString}) => ({offset, styleString})));
   }
 
-  return stringObj;
-}
+  static fromTexbox(state, textbox){
+    const textstyles = getTextstylesByTextbox(state, textbox);
+    return new DynamicText(textbox.text, textstyles.map(({offset, styleString}) => ({offset, styleString})))
+  }
 
-function parseFontString(fontString){
-// 0: " 400 16px/1.33 lkj kjlasdf sjldkf "
-// 1: undefined
-// 2: "400"
-// 3: undefined
-// 4: "16px"
-// 5: "/1.33"
-// 6: "lkj kjlasdf sjldkf "
-  if (!fontString) return {};
-
-  const fontStyles = {};
-  const [firstString, fontSize, lineHeight, fontFamily] = fontString.split(/(\d+px)(?:\/([\d\.]+(?:px)?))?/);
-  const fontWeight = firstString.match(/\d+|bold/);
-  const fontStyle = firstString.match(/italic/);
-
-  if (fontSize) fontStyles.fontSize = fontSize;
-  if (lineHeight) fontStyles.lineHeight = lineHeight;
-  if (fontFamily) fontStyles.fontFamily = fontFamily;
-  if (fontWeight) fontStyles.fontWeight = fontWeight[0];
-  if (fontStyle) fontStyles.fontStyle = fontStyle[0];
-
-  return fontStyles;
-}
-
-export default class DynamicText{
   constructor(text = '', styleStrings){
     this._text = '';
     this._bufferSize = 256;
@@ -62,19 +33,21 @@ export default class DynamicText{
       tabs: new SortedArray(),
       returns: new SortedArray()
     };
+
     this._styleMap = new SortedMap(
       styleStrings
         .map(styleString => 
           [styleString.offset, parseStyleString(styleString.styleString)]
         )
     );
-    this._offsetMap = new SortedMap();
+
+    this._segmentMap = new SortedMap();
 
     this._defaultFont = CTX.font || style.defaultFont;
     
     if (text[text.length - 1] !== '\0') text = text + '\0';
     
-    this.insert(text);
+    this.insert(text, 0, true);
   }
 
   get length(){ return this._text.length; }
@@ -92,37 +65,37 @@ export default class DynamicText{
     }
   }
 
-  insert(text, index = this.length){
+  insert(text, offset = this.length, init = false){
     length = text.length;
 
     if (length === 0){ return; }
 
-    index = Math.max(Math.min(this.length, index), 0);
+    offset = Math.max(Math.min(this.length, offset), 0);
     const temp_indices = { spaces: [], tabs: [], returns: []}
     
     // add special characters in text to temporary arrays 
     for (let i = 0, arr = []; i < length; i++){
       let ch = text[i];
       
-      if (ch === ' ' || ch === '-'){ temp_indices.spaces.push(index + i); }
-      if (ch === '\t'){ temp_indices.tabs.push(index + i); }
-      if (ch === '\n'){ temp_indices.returns.push(index + i); }
+      if (ch === ' ' || ch === '-'){ temp_indices.spaces.push(offset + i); }
+      if (ch === '\t'){ temp_indices.tabs.push(offset + i); }
+      if (ch === '\n'){ temp_indices.returns.push(offset + i); }
     }
 
     for ( let key in this._indices){
       let thisIndices = this._indices[key];
 
-      for (let i = bisectLeft(thisIndices, index), l = thisIndices.length; i < l; i++) // offset existing indices right of index by length
+      for (let i = bisectLeft(thisIndices, offset), l = thisIndices.length; i < l; i++) // offset existing indices right of offset by length
         thisIndices[i] += length;
       // add temporary arrays to the indices
       this._indices[key].push(...temp_indices[key]);
     }
   
     // modify style indices
-    this._styleMap.splice(index, 0, length);
+    init || this._styleMap.splice(offset, 0, length);
 
     // renew text
-    this._text = this._text.splice(index, 0, text);
+    this._text = this._text.splice(offset, 0, text);
   }
 
   remove(index1 = this.length - 1, index2 = index1 + 1){
@@ -141,8 +114,14 @@ export default class DynamicText{
     }
 
     // modify style indices
-    this._styleMap.splice(index1, index2 - index1);
+    this._styleMap.splice(index1, index2 - index1)
 
+    const [leftKey, leftStyle] = this._styleMap.getLeftEntry(Math.max(index1 - 1, 0));
+    const style = this._styleMap.get(leftKey);
+
+    if ( leftKey > 0 && 
+      toStyleString(leftStyle) === toStyleString(style)
+    ) { this._styleMap.delete(index1); }
     // renew text
     this._text = this._text.splice(index1, index2 - index1);
 
@@ -150,38 +129,98 @@ export default class DynamicText{
   }
   
   getSegmentStartIndex(index){
-    return this._offsetMap.getLeftIndex(index - 1);
+    return this._segmentMap.getLeftIndex(index - 1);
   }
 
   getSegmentEndIndex(index){
-    const keys = this._offsetMap.keys;
-    return this._offsetMap.getRightIndex(index + 1) - 1;
+    const keys = this._segmentMap.keys;
+    return this._segmentMap.getRightIndex(index + 1) - 1;
   }
 
   getSegmentStartOffset(index){ // left arrow
-    return this._offsetMap.getLeftKey(index - 1);
+    if (index >= this._text.length - 1) 
+      index = this._text.length - 2;
+
+    let offsetMap = this._text
+      .match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g)
+      .map(str => str.length);
+console.log(this._text, this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g));
+    let aggr = this.length;
+
+    for (let len = offsetMap.length, i = len - 1; i >= 0; i--){
+      aggr -= offsetMap[i];
+      
+      if (aggr < index) return aggr;
+    }
+
+   return 0;
   }
 
   getSegmentEndOffset(index){ // right arrow
-    const keys = this._offsetMap.keys;
-    return this._offsetMap.getRightKey(index + 1) - 1;
+    if (index >= this._text.length - 1) 
+      index = this._text.length - 2;
+
+    let offsetMap = this._text
+      .match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g)
+      .map(str => str.length);
+
+    let aggr = 0;
+
+    for (let i = 0, len = offsetMap.length; i < len; i++){
+      aggr += offsetMap[i];
+      
+      if (aggr > index) return aggr;
+    }
+
+   return this._text.length - 2
   }
 
   get lastOffset(){
-    return this._offsetMap.lastKey;
+    return this._segmentMap.lastKey;
   }
 
-  setStyle(index1, index2, style){
-    const sortedKeys = Array.from(this._styleMap).sort((a, b) => a - b);
-    const i2 = bisectLeft(sortedKeys, index2);
-    const lastStyle = this._styleMap.get(i2);
+  setStyle(offset1, offset2, style){
+    offset1 = Math.min(Math.max(0, offset1), this.length);
+    offset2 = Math.min(Math.max(0, offset2), this.length);
 
-    this._styleMap.set(index1, style);
-    lastStyle && this._styleMap.set(index2, lastStyle);
+    if (offset2 <= offset1) return false;
 
-    for (let i of sortedKeys)
-      if (i >= index1 && i < index2)
-        this._styleMap.delete(i);
+    const styleMap = this._styleMap;
+    const sortedKeys = Array.from(styleMap).sort((a, b) => a - b);
+    let prevStyle = styleMap.getLeftValue(Math.max(0, offset1 - 1));
+    let newStyle = prevStyle;
+    let lastStyle = prevStyle;
+    
+    styleMap.set(offset1, {...prevStyle});
+
+    for (let i = offset1; i < offset2; i++){ // to be optimized
+      let currStyle = styleMap.get(i);
+
+      if (currStyle){
+        newStyle = {...currStyle, ...style};
+        if (toStyleString(prevStyle) === toStyleString(newStyle) && i > 0){
+          styleMap.delete(i);
+        } else {
+          styleMap.set(i, newStyle);
+        }
+        
+        lastStyle = currStyle;
+        prevStyle = newStyle;
+      }
+    }
+
+    if (toStyleString(newStyle) == toStyleString(lastStyle)){
+      styleMap.delete(offset2);
+    } else {
+      styleMap.set(offset2, lastStyle);
+    }
+
+    // this._styleMap.set(index1, style);
+    // lastStyle && this._styleMap.set(index2, lastStyle);
+
+    // for (let i of sortedKeys)
+    //   if (i >= index1 && i < index2)
+    //     this._styleMap.delete(i);
   }
 
   measureSubstringSize(substring, style = {}){
@@ -209,7 +248,7 @@ export default class DynamicText{
     let offsetX = 0, offsetY = 0;
     let maxLineHeight = 0;
 
-    this._offsetMap.clear();
+    this._segmentMap.clear();
 
     const tempQueue = [];
     const results = [];
@@ -225,7 +264,7 @@ export default class DynamicText{
         
         results.push(reactComponent);
 
-        this._offsetMap.set(el.l, [el.offsetX, offsetY, el.height]);
+        this._segmentMap.set(el.l, [el.offsetX, offsetY, el.height]);
       }
 
       tempQueue.length = 0;
@@ -269,8 +308,9 @@ export default class DynamicText{
 
     while (positions.some( (pos, i) => pos < arrs[i].length )){
       let typeIndex = 0;
-      let minPosition = arrs[typeIndex][positions[typeIndex]] || this.length;
-      
+      let pos = arrs[typeIndex][positions[typeIndex]];
+      let minPosition = isNaN(pos) ? this.length : pos;
+
       for (let j = 1; j < 4; j++){
         let arrMin = arrs[j][positions[j]];
 
@@ -279,7 +319,7 @@ export default class DynamicText{
           typeIndex = j;
         }
       }
-      
+
       r = minPosition + (typeIndex > 0 ? 1 : 0);
 
       _processSubstring.call(this, l, r);
@@ -291,7 +331,7 @@ export default class DynamicText{
     // process the remaining characters on the right of the last break character or style index
     _processSubstring.call(this, l, this.length);
 
-    this._offsetMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
+    this._segmentMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
 
     _changeLine.call(this);
 
@@ -300,7 +340,7 @@ export default class DynamicText{
 
   getPositionByOffset(index){
     let style = this._styleMap.getLeftValue(index);
-    let [leftIndex, [leftX, y, lineHeight]] = this._offsetMap.getLeftEntry(index);
+    let [leftIndex, [leftX, y, lineHeight]] = this._segmentMap.getLeftEntry(index);
     let size = this.measureSubstringSize(this._text.substring(leftIndex, index), style);
     
     return [leftX + size.width, y, lineHeight];
@@ -319,8 +359,22 @@ export default class DynamicText{
     >{substring}</text>)
   }
   
-  toReduxState(textstylesAttributes){
-    return {text: this._text.substring(0, this._text.length - 1), textstylesAttributes/*: Array.from(this._styleMap)*/};
+  toReduxState(){
+    const textstylesAttributes = [];
+
+    this._styleMap.entries
+      .filter(([offset, styleObject]) => offset < this.length)
+      .forEach(([offset, styleObject]) => {
+        textstylesAttributes.push({
+          offset,
+          styleString: toStyleString(styleObject)
+        });
+      });
+
+    return {
+      text: this._text.substring(0, this._text.length - 1),
+      textstylesAttributes
+    };
   }
 }
 

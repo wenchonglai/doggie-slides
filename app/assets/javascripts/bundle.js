@@ -2983,11 +2983,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "fillColor": () => (/* binding */ fillColor),
 /* harmony export */   "borderColor": () => (/* binding */ borderColor),
 /* harmony export */   "borderWeight": () => (/* binding */ borderWeight),
-/* harmony export */   "borderDash": () => (/* binding */ borderDash)
+/* harmony export */   "borderDash": () => (/* binding */ borderDash),
+/* harmony export */   "bold": () => (/* binding */ bold),
+/* harmony export */   "deleteWrappers": () => (/* binding */ deleteWrappers),
+/* harmony export */   "updateTextstyleAttribute": () => (/* binding */ updateTextstyleAttribute),
+/* harmony export */   "textColor": () => (/* binding */ textColor)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
-/* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
+/* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../selectors/selectors */ "./frontend/selectors/selectors.js");
+/* harmony import */ var _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/data-structure/dynamic-text */ "./frontend/utils/data-structure/dynamic-text.js");
+/* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -3009,6 +3015,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
+
+
 var newSlide = function newSlide() {
   return function (dispatch, getState) {
     var _getState = getState(),
@@ -3020,7 +3028,7 @@ var newSlide = function newSlide() {
       page: entities.slides[ui.slideSettings.slideId].page + 1,
       skipped: false
     };
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncAddSlide(reqSlide).then(function (resSlides) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_4__.asyncAddSlide(reqSlide).then(function (resSlides) {
       var newSlideId = Math.max.apply(Math, _toConsumableArray(Object.keys(resSlides)));
       dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlides(resSlides));
       dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.receiveCurrentSlide(newSlideId));
@@ -3040,7 +3048,7 @@ var deleteSlide = function deleteSlide() {
     var maxPage = Math.max.apply(Math, _toConsumableArray(Object.values(entities.slides).map(function (slide) {
       return slide.page;
     })));
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncDeleteSlide(slideId).then(function (resSlides) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_4__.asyncDeleteSlide(slideId).then(function (resSlides) {
       var newSlideId = Object.values(resSlides).filter(function (slide) {
         return slide.page == page - (page == maxPage ? 1 : 0);
       })[0].id;
@@ -3060,34 +3068,27 @@ var skipSlide = function skipSlide() {
     var reqSlide = _objectSpread({}, entities.slides[ui.slideSettings.slideId]);
 
     reqSlide.skipped = !reqSlide.skipped;
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateWrapper(reqSlide).then(function (resSlide) {
-      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resSlide));
-    }, function (err) {
-      console.log(err);
-    });
+    return dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resSlide));
   };
 };
 var textbox = function textbox() {
   return function (dispatch, getState) {
-    var _getState4 = getState(),
-        ui = _getState4.ui;
-
     return new Promise(function (res) {
-      res(dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.changeUIAction('createText')));
-    });
-    _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateSlide(reqSlide).then(function (resSlide) {
-      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resSlide));
-    }, function (err) {
-      console.log(err);
-    });
+      res();
+    }).then(function () {
+      dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updateMenuAction('Text Box'));
+    }); // PresentationUtils.asyncUpdateSlide(reqSlide)
+    //   .then(resSlide => {
+    //     dispatch(PresentationActions.receiveSlide(resSlide));
+    //   }, (err) => {console.log(err)});
   };
 };
 var updateWrapperAttribute = function updateWrapperAttribute(key) {
   return function (value) {
     return function (dispatch, getState) {
-      var _getState5 = getState(),
-          ui = _getState5.ui,
-          entities = _getState5.entities;
+      var _getState4 = getState(),
+          ui = _getState4.ui,
+          entities = _getState4.entities;
 
       var wrappers = ui.selections.wrapperIds.map(function (id) {
         return entities.wrappers[id];
@@ -3099,7 +3100,7 @@ var updateWrapperAttribute = function updateWrapperAttribute(key) {
 
       var wrapper = _objectSpread(_objectSpread({}, wrappers[0]), {}, _defineProperty({}, key, value));
 
-      return wrapper && _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_2__.asyncUpdateWrapper(wrapper).then(function (resWrapper) {
+      return wrapper && _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_4__.asyncUpdateWrapper(wrapper).then(function (resWrapper) {
         dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveWrapper(resWrapper));
       }, function (err) {
         console.log(err);
@@ -3111,6 +3112,63 @@ var fillColor = updateWrapperAttribute('fill');
 var borderColor = updateWrapperAttribute('stroke');
 var borderWeight = updateWrapperAttribute('strokeWidth');
 var borderDash = updateWrapperAttribute('stroke-dasharray');
+var bold = function bold() {
+  return function (dispatch, getState) {
+    var _getState5 = getState(),
+        ui = _getState5.ui,
+        entities = _getState5.entities;
+
+    console.log(ui);
+  };
+};
+var deleteWrappers = function deleteWrappers() {
+  return function (dispatch, getState) {
+    var _getState6 = getState(),
+        entities = _getState6.entities,
+        ui = _getState6.ui;
+
+    var slideId = ui.slideSettings.slideId;
+
+    var slideData = _objectSpread(_objectSpread({}, entities.slides[slideId]), {}, {
+      wrappersAttributes: ui.selections.wrapperIds.map(function (id) {
+        return {
+          id: id,
+          _destroy: 1
+        };
+      })
+    });
+
+    delete slideData.wrapperIds; // currently only supports deleting one feature
+
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_4__.asyncDeleteWrappers(slideId, slideData).then(function (resData) {
+      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resData));
+      return resData;
+    });
+  };
+};
+var updateTextstyleAttribute = function updateTextstyleAttribute(key) {
+  return function (value) {
+    return function (dispatch, getState) {
+      var state = getState();
+      var entities = state.entities,
+          ui = state.ui;
+      var _ui$selections = ui.selections,
+          selectOffset = _ui$selections.selectOffset,
+          cursorOffset = _ui$selections.cursorOffset;
+      var textbox = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_2__.getSelectedTextbox)(state);
+      var dynamicText = _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_3__.default.fromTexbox(state, textbox);
+      dynamicText.setStyle.apply(dynamicText, _toConsumableArray([cursorOffset, selectOffset].sort(function (a, b) {
+        return a - b;
+      })).concat([_defineProperty({}, key, value)]));
+      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateText(textbox.id, dynamicText.toReduxState())); // if (wrappers.length > 1){ console.warn('The feature of updating multiple wrappers is yet to be implemented.'); }
+      // return wrapper && PresentationUtils.asyncUpdateWrapper(wrapper)
+      //   .then(resWrapper => {
+      //     dispatch(PresentationActions.receiveWrapper(resWrapper));
+      //   }, (err) => {console.log(err)});
+    };
+  };
+};
+var textColor = updateTextstyleAttribute('fill');
 
 /***/ }),
 
@@ -3139,24 +3197,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "receiveWrapper": () => (/* binding */ receiveWrapper),
 /* harmony export */   "RECEIVE_TEXT": () => (/* binding */ RECEIVE_TEXT),
 /* harmony export */   "receiveText": () => (/* binding */ receiveText),
-/* harmony export */   "RECEIVE_TEXTBOXES": () => (/* binding */ RECEIVE_TEXTBOXES),
-/* harmony export */   "RECEIVE_TEXTBOX": () => (/* binding */ RECEIVE_TEXTBOX),
-/* harmony export */   "receiveTextboxes": () => (/* binding */ receiveTextboxes),
-/* harmony export */   "receiveTextbox": () => (/* binding */ receiveTextbox),
-/* harmony export */   "RECEIVE_TEXTSTYLES": () => (/* binding */ RECEIVE_TEXTSTYLES),
-/* harmony export */   "RECEIVE_TEXTSTYLE": () => (/* binding */ RECEIVE_TEXTSTYLE),
-/* harmony export */   "receiveTextstyles": () => (/* binding */ receiveTextstyles),
-/* harmony export */   "receiveTextstyle": () => (/* binding */ receiveTextstyle),
 /* harmony export */   "fetchPresentation": () => (/* binding */ fetchPresentation),
 /* harmony export */   "updateDoc": () => (/* binding */ updateDoc),
 /* harmony export */   "moveSlide": () => (/* binding */ moveSlide),
 /* harmony export */   "addSlide": () => (/* binding */ addSlide),
+/* harmony export */   "updateWrapper": () => (/* binding */ updateWrapper),
 /* harmony export */   "createText": () => (/* binding */ createText),
-/* harmony export */   "updateText": () => (/* binding */ updateText),
-/* harmony export */   "updateWrapper": () => (/* binding */ updateWrapper)
+/* harmony export */   "updateText": () => (/* binding */ updateText)
 /* harmony export */ });
-/* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
-/* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selectors/selectors */ "./frontend/selectors/selectors.js");
+/* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
+/* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+
 
 
 
@@ -3227,44 +3279,17 @@ var receiveWrapper = function receiveWrapper(wrapper) {
   };
 };
 var RECEIVE_TEXT = "RECEIVE_TEXT";
-var receiveText = function receiveText(data) {
+var receiveText = function receiveText(textData, wrapperData) {
   return {
     type: RECEIVE_TEXT,
-    data: data
-  };
-};
-var RECEIVE_TEXTBOXES = "RECEIVE_TEXTBOXES";
-var RECEIVE_TEXTBOX = "RECEIVE_TEXTBOX";
-var receiveTextboxes = function receiveTextboxes(textboxes) {
-  return {
-    type: RECEIVE_TEXTBOXES,
-    textboxes: textboxes
-  };
-};
-var receiveTextbox = function receiveTextbox(textbox) {
-  return {
-    type: RECEIVE_TEXTBOX,
-    textbox: textbox
-  };
-};
-var RECEIVE_TEXTSTYLES = "RECEIVE_TEXTSTYLES";
-var RECEIVE_TEXTSTYLE = "RECEIVE_TEXTSTYLE";
-var receiveTextstyles = function receiveTextstyles(textstyles) {
-  return {
-    type: RECEIVE_TEXTSTYLES,
-    textstyles: textstyles
-  };
-};
-var receiveTextstyle = function receiveTextstyle(textstyle) {
-  return {
-    type: RECEIVE_TEXTSTYLE,
-    textstyle: textstyle
+    textData: textData,
+    wrapperData: wrapperData
   };
 }; // thunk action creators below
 
 var fetchPresentation = function fetchPresentation() {
   return function (dispatch, getState) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncFetchPresentation().then(function (entities) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncFetchPresentation().then(function (entities) {
       dispatch(receiveEntities(entities)); // const doc = Object.values(entities.docs)[0];
       // doc && dispatch(updatePageSettings({docId: doc.id, pageWidth: doc.width, pageHeight: doc.height}));
       // dispatch(receiveDocs(entities.docs));
@@ -3279,19 +3304,20 @@ var fetchPresentation = function fetchPresentation() {
 };
 var updateDoc = function updateDoc(formDoc) {
   return function (dispatch) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateDoc(formDoc).then(function (doc) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncUpdateDoc(formDoc).then(function (doc) {
       dispatch(receiveDoc(doc));
       return doc;
     });
   };
-};
+}; // slides
+
 var moveSlide = function moveSlide(_ref2) {
   var start = _ref2.start,
       _ref2$end = _ref2.end,
       end = _ref2$end === void 0 ? start : _ref2$end,
       offset = _ref2.offset;
   return function (dispatch) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncMoveSlide({
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncMoveSlide({
       start: start,
       end: end,
       offset: offset
@@ -3303,32 +3329,58 @@ var moveSlide = function moveSlide(_ref2) {
 };
 var addSlide = function addSlide(formSlide) {
   return function (dispatch) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncAddSlide(formSlide).then(function (slide) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncAddSlide(formSlide).then(function (slide) {
       dispatch(receiveSlide(slide));
       return slide;
     });
   };
-};
-var createText = function createText(textboxData) {
-  return function (dispatch) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateText(textboxData).then(function (resData) {
-      dispatch(receiveText(resData));
-      return resData;
-    });
-  };
-};
-var updateText = function updateText(textboxId, textboxData) {
-  return function (dispatch) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateText(textboxId, textboxData).then(function (resData) {
-      dispatch(receiveText(resData));
-      return resData;
-    });
-  };
-};
+}; // wrappers
+
 var updateWrapper = function updateWrapper(formWrapper) {
   return function (dispatch) {
-    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_0__.asyncUpdateWrapper(formWrapper).then(function (resData) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncUpdateWrapper(formWrapper).then(function (resData) {
       dispatch(receiveWrapper(resData));
+      return resData;
+    });
+  };
+}; // texts
+
+var createText = function createText(textData) {
+  return function (dispatch) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncCreateText(textData).then(function (resData) {
+      var wrapperAttributes = resData.wrapperAttributes;
+      var wrapperData = Object.values(wrapperAttributes)[0];
+      dispatch(receiveText(resData, wrapperData));
+      return resData;
+    });
+  };
+};
+var updateText = function updateText(textboxId, textData) {
+  return function (dispatch, getState) {
+    var state = getState();
+    var entities = state.entities,
+        ui = state.ui;
+    var textstyles = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_0__.getTextstylesByTextboxId)(state, textboxId);
+    var textstylesAttributes = textData.textstylesAttributes;
+    var textstylesAttributeIndexedOnOffset = new Map(textstylesAttributes.map(function (attribute) {
+      return [attribute.offset, attribute];
+    }));
+    textstyles.forEach(function (textstyle) {
+      var attribute = textstylesAttributeIndexedOnOffset.get(textstyle.offset);
+
+      if (attribute) {
+        attribute.id = textstyle.id;
+      } else {
+        textstylesAttributes.push({
+          id: textstyle.id,
+          _destroy: 1
+        });
+      }
+    });
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncUpdateText(textboxId, textData).then(function (resData) {
+      var wrapperAttributes = resData.wrapperAttributes;
+      var wrapperData = Object.values(wrapperAttributes)[0];
+      dispatch(receiveText(resData, wrapperData));
       return resData;
     });
   };
@@ -3464,20 +3516,33 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "RECEIVE_PAGE_SETTINGS": () => (/* binding */ RECEIVE_PAGE_SETTINGS),
 /* harmony export */   "RECEIVE_CURRENT_SLIDE": () => (/* binding */ RECEIVE_CURRENT_SLIDE),
 /* harmony export */   "RECEIVE_SELECTED_WRAPPERS": () => (/* binding */ RECEIVE_SELECTED_WRAPPERS),
-/* harmony export */   "REMOVE_SELECTED_WRAPPERS": () => (/* binding */ REMOVE_SELECTED_WRAPPERS),
+/* harmony export */   "RECEIVE_SELECTED_TEXT": () => (/* binding */ RECEIVE_SELECTED_TEXT),
+/* harmony export */   "RECEIVE_MENU_ACTION": () => (/* binding */ RECEIVE_MENU_ACTION),
 /* harmony export */   "CLEAR_UI": () => (/* binding */ CLEAR_UI),
 /* harmony export */   "receiveCurrentSlide": () => (/* binding */ receiveCurrentSlide),
 /* harmony export */   "receiveSelectedWrappers": () => (/* binding */ receiveSelectedWrappers),
-/* harmony export */   "removeSelectedWrappers": () => (/* binding */ removeSelectedWrappers),
+/* harmony export */   "receiveSelectedText": () => (/* binding */ receiveSelectedText),
+/* harmony export */   "receiveMenuAction": () => (/* binding */ receiveMenuAction),
 /* harmony export */   "clearUI": () => (/* binding */ clearUI),
 /* harmony export */   "updateCurrentSlide": () => (/* binding */ updateCurrentSlide),
 /* harmony export */   "updateWrapperSelection": () => (/* binding */ updateWrapperSelection),
-/* harmony export */   "deleteWrapperSelection": () => (/* binding */ deleteWrapperSelection)
+/* harmony export */   "deleteWrapperSelection": () => (/* binding */ deleteWrapperSelection),
+/* harmony export */   "updateUITextSelection": () => (/* binding */ updateUITextSelection),
+/* harmony export */   "updateMenuAction": () => (/* binding */ updateMenuAction)
 /* harmony export */ });
+/* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selectors/selectors */ "./frontend/selectors/selectors.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 var RECEIVE_PAGE_SETTINGS = 'RECEIVE_PAGE_SETTINGS';
 var RECEIVE_CURRENT_SLIDE = 'RECEIVE_CURRENT_SLIDE';
 var RECEIVE_SELECTED_WRAPPERS = 'RECEIVE_SELECTED_WRAPPERS';
-var REMOVE_SELECTED_WRAPPERS = 'REMOVE_SELECTED_WRAPPERS';
+var RECEIVE_SELECTED_TEXT = 'RECEIVE_SELECTED_TEXT';
+var RECEIVE_MENU_ACTION = 'RECEIVE_MENU_ACTION';
 var CLEAR_UI = 'CLEAR_UI';
 var receiveCurrentSlide = function receiveCurrentSlide(slideId) {
   return {
@@ -3494,15 +3559,21 @@ var receiveSelectedWrappers = function receiveSelectedWrappers(_ref) {
     sharedAttributes: sharedAttributes
   };
 };
-var removeSelectedWrappers = function removeSelectedWrappers() {
-  return {
-    type: REMOVE_SELECTED_WRAPPERS
-  };
+var receiveSelectedText = function receiveSelectedText(args) {
+  return _objectSpread({
+    type: RECEIVE_SELECTED_TEXT
+  }, args);
 }; // const receivePageSettings = (pageSettings) => ({
 //   type: RECEIVE_PAGE_SETTINGS,
 //   pageSettings
 // });
 
+var receiveMenuAction = function receiveMenuAction(nextMenuAction) {
+  return {
+    type: RECEIVE_MENU_ACTION,
+    nextMenuAction: nextMenuAction
+  };
+};
 var clearUI = function clearUI() {
   return {
     type: CLEAR_UI
@@ -3575,6 +3646,63 @@ var deleteWrapperSelection = function deleteWrapperSelection(arg) {
       return !arg.includes(id);
     });
     dispatch(receiveSelectedWrappers(getWrapperSelectionInfo(wrapperIds, entities)));
+  };
+};
+var updateUITextSelection = function updateUITextSelection(_ref2) {
+  var cursorOffset = _ref2.cursorOffset,
+      selectOffset = _ref2.selectOffset,
+      textboxId = _ref2.textboxId,
+      uiTextData = _ref2.uiTextData;
+  return function (dispatch, getState) {
+    // cursorOffset: 7
+    // selectOffset: 7
+    // textboxId: 335
+    // uiTextData:
+    // text: "012345679012356789"
+    //   textstylesAttributes: Array(3)
+    //     0: {offset: 0, styleString: "font: 48px comic sans ms; fill: green"}
+    //     1: {offset: 3, styleString: "font: 48px comic sans ms; fill: #ffaf3f"}
+    //     2: {offset: 17, styleString: "font: 48px comic sans ms; fill: green"}
+    var state = getState();
+    var textBox = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_0__.getTextboxById)(state, textboxId);
+    var prevTextstyleAttributes = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_0__.getTextstylesByTextbox)(state, textBox); //array
+
+    var text = uiTextData.text,
+        textstylesAttributes = uiTextData.textstylesAttributes;
+    var textstyleIds = [];
+
+    for (var i = 0, len = prevTextstyleAttributes.length; i < len; i++) {
+      var prevAttribute = prevTextstyleAttributes[i];
+      var newAttribute = textstylesAttributes[i];
+
+      if (newAttribute) {
+        textstylesAttributes[i] = _objectSpread(_objectSpread({}, prevAttribute), newAttribute);
+        textstyleIds.push(prevAttribute.id);
+      } else {
+        textstylesAttributes[i] = _objectSpread(_objectSpread({}, prevAttribute), {}, {
+          offset: -1,
+          destroy: 1
+        });
+      }
+    }
+
+    dispatch(receiveSelectedText({
+      cursorOffset: cursorOffset,
+      selectOffset: selectOffset,
+      textboxData: _defineProperty({}, textboxId, {
+        textboxId: textboxId,
+        text: text,
+        textstyleIds: textstyleIds
+      }),
+      textstyleData: Object.fromEntries(textstylesAttributes.map(function (x) {
+        return [x.id, x];
+      }))
+    }));
+  };
+};
+var updateMenuAction = function updateMenuAction(action) {
+  return function (dispatch, getState) {
+    dispatch(receiveMenuAction(action));
   };
 };
 
@@ -3937,7 +4065,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "MENU_ITEMS": () => (/* binding */ MENU_ITEMS),
 /* harmony export */   "BASE_TOOLBAR_ITEMS": () => (/* binding */ BASE_TOOLBAR_ITEMS),
 /* harmony export */   "TEXTBOX_TOOLBAR_ITEMS": () => (/* binding */ TEXTBOX_TOOLBAR_ITEMS),
-/* harmony export */   "IMAGE_TOOLBAR_ITEMS": () => (/* binding */ IMAGE_TOOLBAR_ITEMS)
+/* harmony export */   "IMAGE_TOOLBAR_ITEMS": () => (/* binding */ IMAGE_TOOLBAR_ITEMS),
+/* harmony export */   "SLIDE_CONTEXT_MENU_ITEMS": () => (/* binding */ SLIDE_CONTEXT_MENU_ITEMS),
+/* harmony export */   "WRAPPER_CONTEXT_MENU_ITEMS": () => (/* binding */ WRAPPER_CONTEXT_MENU_ITEMS)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/color_palette */ "./frontend/components/utils/color_palette.jsx");
@@ -4186,31 +4316,33 @@ var BOLD = {
   name: "Bold",
   icon: [4, 9],
   shortCut: undefined,
-  actionName: undefined
+  actionName: 'bold'
 };
 var ITALIC = {
   name: "Italic",
   icon: [5, 9],
   shortCut: undefined,
-  actionName: undefined
+  actionName: 'italic'
 };
 var UNDERLINE = {
   name: "Underline",
   icon: [6, 9],
   shortCut: undefined,
-  actionName: undefined
+  actionName: 'underline'
 };
 var TEXT_COLOR = {
   name: "Text color",
   icon: [7, 9],
   shortCut: undefined,
-  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default,
+  actionName: 'textColor'
 };
 var HIGHLIGHT_COLOR = {
   name: "Highlight color",
   icon: [8, 9],
   shortCut: undefined,
-  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default,
+  actionName: 'highlightColor'
 };
 var ALIGN = {
   name: "Align",
@@ -4251,6 +4383,12 @@ var RESET_IMAGE = {
   shortCut: undefined,
   actionName: undefined
 };
+var DELETE_WRAPPER = {
+  name: "delete",
+  icon: undefined,
+  shortCut: undefined,
+  actionName: "deleteWrappers"
+};
 var MENU_ITEMS = [{
   name: "Edit",
   icon: undefined,
@@ -4271,6 +4409,8 @@ var MENU_ITEMS = [{
 var BASE_TOOLBAR_ITEMS = [NEW_SLIDE, undefined, ZOOM, SELECT, TEXTBOX, IMAGE, SHAPE];
 var TEXTBOX_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, FILL_COLOR, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, BOLD, ITALIC, UNDERLINE, TEXT_COLOR, HIGHLIGHT_COLOR, undefined, ALIGN]);
 var IMAGE_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, CROP_IMAGE, RESET_IMAGE]);
+var SLIDE_CONTEXT_MENU_ITEMS = [DELETE_SLIDE];
+var WRAPPER_CONTEXT_MENU_ITEMS = [DELETE_WRAPPER];
 
 /***/ }),
 
@@ -4382,6 +4522,9 @@ function DropdownMenu(_ref) {
   };
 
   var childComponent = getChildComponent(item);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    _setActive(active);
+  }, [active]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "dropdown-menu ".concat(_active ? '' : 'hidden', " ").concat(className),
     onBlur: function onBlur(e) {
@@ -4586,6 +4729,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
+var handleContextMenu = function handleContextMenu(e) {
+  e.preventDefault();
+};
+
 function PresentationPage(_ref) {
   var currentSlideId = _ref.currentSlideId,
       doc = _ref.doc,
@@ -4605,6 +4753,13 @@ function PresentationPage(_ref) {
       _loading = _useState2[0],
       _setLoading = _useState2[1];
 
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _rightClick = _useState4[0],
+      _setRightClick = _useState4[1];
+
+  var contextMenuRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+
   var chooseToolbar = function chooseToolbar() {
     switch (uiSelections.slideObjectType) {
       case "Textbox":
@@ -4615,11 +4770,28 @@ function PresentationPage(_ref) {
     }
   };
 
+  var onContextMenu = function onContextMenu(e) {
+    // console.log(contextMenuRef.current.focus())
+    _setRightClick({
+      x: e.clientX,
+      y: e.clientY
+    });
+  };
+
+  var handleContextMenuBlur = function handleContextMenuBlur(e) {
+    _setRightClick(false);
+  };
+
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     fetchPresentationHandler();
 
     _setLoading(true);
   }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    if (_rightClick) {
+      contextMenuRef.current.focus();
+    }
+  }, [_rightClick]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     // console.log(doc);
     // updateCurrentSlideHandler(currentSlideId);
@@ -4634,7 +4806,8 @@ function PresentationPage(_ref) {
     _setDoc(_objectSpread(_objectSpread({}, _doc), doc));
   }, [doc]);
   return _loading ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
-    className: "page presentation"
+    className: "page presentation",
+    onContextMenu: handleContextMenu
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "icon-wrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_product_icon__WEBPACK_IMPORTED_MODULE_2__.default, {
@@ -4669,10 +4842,27 @@ function PresentationPage(_ref) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "filmstrip"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_filmstrip_container__WEBPACK_IMPORTED_MODULE_7__.default, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_workspace_container__WEBPACK_IMPORTED_MODULE_8__.default, {
+    handleContextMenu: onContextMenu,
     slideId: currentSlideId
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "app-switcher"
-  }, "appswitcher")));
+  }, "appswitcher")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
+    className: "context-menu-wrapper ".concat(_rightClick ? 'active' : ''),
+    tabIndex: "0",
+    onMouseDownCapture: function onMouseDownCapture(e) {
+      return e.preventDefault();
+    },
+    onBlur: handleContextMenuBlur,
+    style: {
+      transform: "translate(".concat(_rightClick.x, "px, ").concat(_rightClick.y, "px)")
+    },
+    ref: contextMenuRef
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_3__.default, {
+    className: "context-menu",
+    items: _menu_items__WEBPACK_IMPORTED_MODULE_4__.WRAPPER_CONTEXT_MENU_ITEMS,
+    respondToMouseOut: false,
+    parentHandleBlur: handleContextMenuBlur
+  })));
 }
 
 /***/ }),
@@ -4747,11 +4937,13 @@ __webpack_require__.r(__webpack_exports__);
 
 function Workspace(_ref) {
   var slideId = _ref.slideId,
-      ui = _ref.ui;
+      ui = _ref.ui,
+      handleContextMenu = _ref.handleContextMenu;
   // console.log(ui, slideId, entities)
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "workspace"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlideContainer, {
+    handleContextMenu: handleContextMenu,
     slideId: slideId
   }));
 }
@@ -5612,18 +5804,18 @@ function Headline(_ref3) {
       googleProductBodyText = _ref3.googleProductBodyText;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "one-whole"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h1", null, "Thicc ", productName[0].toUpperCase() + productName.substring(1, productName.length - 1).toLowerCase(), ", So Beautiful, wow~"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h1", null, "Dis ", productName[0].toUpperCase() + productName.substring(1, productName.length - 1).toLowerCase(), ", So Beautiful, wow~"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "headline-items"
   }, productName === 'slides' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(HeadLineItem, {
     title: "Clone",
     iconUrl: window.productIconUrl,
     iconIndex: 3
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Thicc DoggIe Slide is made from scratch by ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Dis DoggIe Slide is made by ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
     style: {
       display: "inline"
     },
     href: "https://www.linkedin.com/in/wenchong-lai-4296424b/"
-  }, "one person"), " in two weeks. He wishes he has more time. Blep."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
+  }, "one human"), " in two weeks, from scratch. He wishes he has more time. Blep."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
     className: "splash button-anchor",
     to: "/presentation/"
   }, "Go to DoggIe Slides")) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(HeadLineItem, {
@@ -5744,7 +5936,8 @@ function throttle(e, timeoutRef, func) {
 }
 
 function SVGWrapper(_ref) {
-  var wrapper = _ref.wrapper,
+  var wrapperId = _ref.wrapperId,
+      wrapper = _ref.wrapper,
       editable = _ref.editable,
       svgDOM = _ref.svgDOM,
       pageWidth = _ref.pageWidth,
@@ -5752,7 +5945,9 @@ function SVGWrapper(_ref) {
       updateWrapperHandler = _ref.updateWrapperHandler,
       updateWrapperSelection = _ref.updateWrapperSelection,
       deleteWrapperSelection = _ref.deleteWrapperSelection,
-      props = _objectWithoutProperties(_ref, ["wrapper", "editable", "svgDOM", "pageWidth", "pageHeight", "updateWrapperHandler", "updateWrapperSelection", "deleteWrapperSelection"]);
+      handleContextMenu = _ref.handleContextMenu,
+      selectedWrapperIds = _ref.selectedWrapperIds,
+      props = _objectWithoutProperties(_ref, ["wrapperId", "wrapper", "editable", "svgDOM", "pageWidth", "pageHeight", "updateWrapperHandler", "updateWrapperSelection", "deleteWrapperSelection", "handleContextMenu", "selectedWrapperIds"]);
 
   var slideObjectId = wrapper.slideObjectId,
       slideObjectType = wrapper.slideObjectType,
@@ -5774,6 +5969,13 @@ function SVGWrapper(_ref) {
       strokeWidth = _wrapper$strokeWidth === void 0 ? "0" : _wrapper$strokeWidth,
       _wrapper$strokeDashar = wrapper.strokeDasharray,
       strokeDasharray = _wrapper$strokeDashar === void 0 ? "" : _wrapper$strokeDashar;
+  var blurTimeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var timeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(function handleBlur(e) {
+    blurTimeoutRef.current = setTimeout(function () {
+      return _setActive(false);
+    }, 0);
+  });
 
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     width: width,
@@ -5796,33 +5998,18 @@ function SVGWrapper(_ref) {
       _rotate = _useState6[0],
       _setRotate = _useState6[1];
 
-  var blurTimeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
-
-  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(selectedWrapperIds.includes(wrapperId)),
       _useState8 = _slicedToArray(_useState7, 2),
       _active = _useState8[0],
       _setActive = _useState8[1];
 
-  var timeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
-  var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(function handleBlur(e) {
-    // e.preventDefault();
-    console.log(wrapper.id, 'blur');
-    blurTimeoutRef.current = setTimeout(function () {
-      _setActive(false);
-    }, 0);
-    svgDOM.removeEventListener('mousedown', eventListenerRef.current);
-  });
-
   function onFocus(e) {
-    e.stopPropagation();
     clearTimeout(blurTimeoutRef.current);
-    svgDOM.addEventListener('mousedown', eventListenerRef.current);
 
     _setActive(true);
   }
 
   function handleMove(e) {
-    e.stopPropagation();
     var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
     var scale = pageWidth / clientRect.width;
     var dx = e.dx,
@@ -5933,10 +6120,10 @@ function SVGWrapper(_ref) {
     switch (slideObjectType) {
       case 'Textbox':
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea_container__WEBPACK_IMPORTED_MODULE_1__.default, {
-          editable: editable,
           textboxId: slideObjectId,
           width: _size.width,
-          height: _size.height
+          height: _size.height,
+          active: _active
         });
       // case 'image': return <SVGImage id={id} editable={editable}/>;
       // case 'diagram': return <SVGShape id={id} editable={editable}/>;
@@ -5946,7 +6133,6 @@ function SVGWrapper(_ref) {
   var component = getComponent();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     return function () {
-      svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
       clearTimeout(timeoutRef.current);
     };
   }, []);
@@ -5975,11 +6161,17 @@ function SVGWrapper(_ref) {
     });
   }, [wrapper]);
   editable && (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    _active ? updateWrapperSelection([wrapper.id]) : deleteWrapperSelection([wrapper.id]);
+    if (_active) {
+      svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
+      updateWrapperSelection([wrapper.id]);
+    } else {
+      svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+      deleteWrapperSelection([wrapper.id]);
+    }
   }, [_active]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     return function () {
-      svgDOM && svgDOM.removeEventListener('dom destroyed', eventListenerRef.current);
+      svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
       clearTimeout(timeoutRef.current);
     };
   }, [svgDOM]);
@@ -5987,7 +6179,10 @@ function SVGWrapper(_ref) {
     className: "SVGWrapper",
     transform: "rotate(".concat(_rotate, ") translate(").concat(_translate.x, ", ").concat(_translate.y, ")"),
     "transform-origin": "".concat(_translate.x + _size.width / 2, " ").concat(_translate.y + _size.height / 2),
-    onMouseDown: editable && svgDOM ? onFocus : null
+    onMouseDown: editable && svgDOM ? onFocus : null,
+    onContextMenu: editable ? function (e) {
+      return handleContextMenu(e, wrapper);
+    } : null
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     width: width,
     height: height,
@@ -6324,7 +6519,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ SVGSlide)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_wrapper_containers */ "./frontend/components/svg/svg_wrapper_containers.js");
+/* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_wrapper_containers */ "./frontend/components/svg/svg_wrapper_containers.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -6345,6 +6541,7 @@ function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) r
 
 
 
+
 var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(function (_ref, ref) {
   var children = _ref.children,
       isPreview = _ref.isPreview,
@@ -6353,7 +6550,11 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
       height = _ref.height,
       slide = _ref.slide,
       slideId = _ref.slideId,
-      props = _objectWithoutProperties(_ref, ["children", "isPreview", "containerWidth", "width", "height", "slide", "slideId"]);
+      menuAction = _ref.menuAction,
+      updateMenuAction = _ref.updateMenuAction,
+      createText = _ref.createText,
+      handleContextMenu = _ref.handleContextMenu,
+      props = _objectWithoutProperties(_ref, ["children", "isPreview", "containerWidth", "width", "height", "slide", "slideId", "menuAction", "updateMenuAction", "createText", "handleContextMenu"]);
 
   var widthAttr = {};
 
@@ -6361,6 +6562,48 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     widthAttr = {
       width: containerWidth
     };
+  }
+
+  function handleMouseDownCapture(e) {
+    menuAction === 'Select' || e.stopPropagation();
+  }
+
+  function handleClick(e) {
+    var rect = e.currentTarget.children[0].children[0].children[0].getBoundingClientRect();
+    var scale = width / rect.width;
+    var x = e.clientX - rect.x;
+    var y = e.clientY - rect.y;
+    var textData = {
+      text: "aaa",
+      wrapperAttributes: {
+        slideId: slideId,
+        groupId: null,
+        zIndex: 1,
+        width: 400,
+        height: 50,
+        translateX: x * scale,
+        translateY: y * scale
+      },
+      textstylesAttributes: [{
+        styleString: "font: 20px Arial; fill: black",
+        offset: 0
+      }]
+    };
+
+    switch (menuAction) {
+      case 'Select':
+        return;
+
+      case 'Text Box':
+        {
+          createText(textData);
+        }
+
+      default:
+        return updateMenuAction('Select');
+    }
+
+    ;
   }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", _extends({
@@ -6373,7 +6616,14 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     viewBox: "1000 1000 ".concat(width, " ").concat(height),
     xmlSpace: "preserve",
     ref: ref
-  }, widthAttr, props), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+  }, widthAttr, props, {
+    onMouseDownCapture: isPreview ? undefined : function (e) {
+      return handleMouseDownCapture(e);
+    },
+    onClick: isPreview ? undefined : function (e) {
+      return handleClick(e);
+    }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     transform: "translate(1000 1000)"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     className: 'svg-background'
@@ -6382,14 +6632,15 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     height: height,
     fill: "#FFFFFF"
   })), (slide ? slide.wrapperIds : []).map(function (wrapperId) {
-    return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_1__.SVGNoWrapperContainer, {
+    return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_2__.SVGNoWrapperContainer, {
       key: wrapperId,
       wrapperId: wrapperId
-    }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_1__.SVGWrapperContainer, {
+    }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_2__.SVGWrapperContainer, {
       key: wrapperId,
       slideId: slideId,
       wrapperId: wrapperId,
-      svgDOM: ref.current
+      svgDOM: ref.current,
+      handleContextMenu: handleContextMenu
     });
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("def", null));
 });
@@ -6429,7 +6680,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "SVGSlidePreviewContainer": () => (/* binding */ SVGSlidePreviewContainer)
 /* harmony export */ });
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
-/* harmony import */ var _svg_slide__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_slide */ "./frontend/components/svg/svg_slide.jsx");
+/* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
+/* harmony import */ var _svg_slide__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./svg_slide */ "./frontend/components/svg/svg_slide.jsx");
+
+
 
 
 
@@ -6456,17 +6711,25 @@ var generateSTP = function generateSTP(isPreview) {
       slide: entities.slides[ownProps.slideId],
       // wrapperIds: entities.slides[ownProps.slideId].wrapperIds,
       width: ui.pageSettings.pageWidth || 0,
-      height: ui.pageSettings.pageHeight || 0
+      height: ui.pageSettings.pageHeight || 0,
+      menuAction: ui.selections.nextMenuAction
     };
   };
 };
 
 var SVGSlideContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(generateSTP(false), function (dispatch, ownProps) {
-  return {};
-})(_svg_slide__WEBPACK_IMPORTED_MODULE_1__.default);
+  return {
+    updateMenuAction: function updateMenuAction(args) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updateMenuAction)(args));
+    },
+    createText: function createText(textData) {
+      dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_2__.createText)(textData));
+    }
+  };
+})(_svg_slide__WEBPACK_IMPORTED_MODULE_3__.default);
 var SVGSlidePreviewContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(generateSTP(true), function (dispatch, ownProps) {
   return {};
-})(_svg_slide__WEBPACK_IMPORTED_MODULE_1__.default);
+})(_svg_slide__WEBPACK_IMPORTED_MODULE_3__.default);
 
 /***/ }),
 
@@ -6529,7 +6792,7 @@ function SVGTextAreaSelect(_ref) {
   var key = start;
 
   for (var i = start + 1; i <= end; i++) {
-    var offset = text._offsetMap.get(i);
+    var offset = text._segmentMap.get(i);
 
     if (offset) {
       if (offset[1] == startOffset[1]) {
@@ -6581,27 +6844,31 @@ function SVGTextAreaSelect(_ref) {
 }
 
 function SVGTextArea(_ref2) {
-  var _ref2$editable = _ref2.editable,
-      editable = _ref2$editable === void 0 ? true : _ref2$editable,
-      width = _ref2.width,
+  var active = _ref2.active,
       textboxId = _ref2.textboxId,
+      width = _ref2.width,
+      height = _ref2.height,
       _ref2$className = _ref2.className,
       className = _ref2$className === void 0 ? '' : _ref2$className,
       defaultFont = _ref2.defaultFont,
       text = _ref2.text,
       styleStrings = _ref2.styleStrings,
       updateTextHandler = _ref2.updateTextHandler,
-      props = _objectWithoutProperties(_ref2, ["editable", "width", "textboxId", "className", "defaultFont", "text", "styleStrings", "updateTextHandler"]);
+      updateUITextSelection = _ref2.updateUITextSelection,
+      props = _objectWithoutProperties(_ref2, ["active", "textboxId", "width", "height", "className", "defaultFont", "text", "styleStrings", "updateTextHandler", "updateUITextSelection"]);
 
   function handleUpdate() {
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
+      // console.log('updateTextHandler', entities.textboxes[textboxId], textRef.current);
       updateTextHandler(textboxId, textRef.current.toReduxState());
-    }, 1000);
+    }, 2000);
   }
 
   function handleKeyDown(e) {
-    if (!_active) {
+    cancelAnimationFrame(animationFrameRef.current);
+
+    if (!active) {
       return;
     }
 
@@ -6612,48 +6879,49 @@ function SVGTextArea(_ref2) {
 
     function _removeText() {
       var minRemoveLength = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var dLen = Math.max(Math.abs(cursorPositionRef.current - selectPositionRef.current), 1);
+      var dLen = Math.max(Math.abs(cursorOffsetRef.current - selectOffsetRef.current), 1);
 
       if (inputCache > 0) {
         inputCacheRef.current = inputCache.slice(0, Math.min(0, inputCache.length - dLen));
         dLen -= Math.min(dLen, inputCache.length);
       }
 
-      var _sort = [cursorPositionRef.current, selectPositionRef.current].sort(function (a, b) {
+      var _sort = [cursorOffsetRef.current, selectOffsetRef.current].sort(function (a, b) {
         return a - b;
       }),
           _sort2 = _slicedToArray(_sort, 2),
           leftOffset = _sort2[0],
           rightOffset = _sort2[1];
 
-      cursorPositionRef.current = textRef.current.remove(Math.min(altKey ? textRef.current.getSegmentStartOffset(leftOffset) : rightOffset - minRemoveLength, rightOffset - dLen), rightOffset);
-      selectPositionRef.current = cursorPositionRef.current;
+      cursorOffsetRef.current = textRef.current.remove(Math.min(altKey ? textRef.current.getSegmentStartOffset(leftOffset) : rightOffset - minRemoveLength, rightOffset - dLen), rightOffset);
+      selectOffsetRef.current = cursorOffsetRef.current;
     }
 
     if (e.metaKey) {
       if (e.key === 'a') {
         updatable = true;
         e.preventDefault();
-        cursorPositionRef.current = 0;
-        selectPositionRef.current = textRef.current.length - 1;
+        cursorOffsetRef.current = 0;
+        selectOffsetRef.current = textRef.current.length - 1;
       }
     } else {
       updatable = true;
       e.preventDefault();
 
       if (e.key === 'Backspace') {
-        _removeText(1); // if (cursorPositionRef.current > 0) cursorPositionRef.current -= 1;
+        _removeText(); // if (cursorOffsetRef.current > 0) cursorOffsetRef.current -= 1;
 
       } else if (KEYCODE_MAP[e.keyCode]) {
         inputCacheRef.current += KEYCODE_MAP[e.keyCode];
+        console.log(e.keyCode);
       } else if (e.key.length > 1) {
         switch (e.keyCode) {
           case 37:
             {
               //left arrow
               updatable = false;
-              cursorPositionRef.current = Math.max(altKey ? textRef.current.getSegmentStartOffset(cursorPositionRef.current) : cursorPositionRef.current - 1, 0);
-              if (!shiftKey) selectPositionRef.current = cursorPositionRef.current;
+              cursorOffsetRef.current = Math.max(altKey ? textRef.current.getSegmentStartOffset(cursorOffsetRef.current) : cursorOffsetRef.current - 1, 0);
+              if (!shiftKey) selectOffsetRef.current = cursorOffsetRef.current;
             }
             ;
             break;
@@ -6662,8 +6930,8 @@ function SVGTextArea(_ref2) {
             {
               //right arrow
               updatable = false;
-              cursorPositionRef.current = Math.min(altKey ? textRef.current.getSegmentEndOffset(cursorPositionRef.current) : cursorPositionRef.current + 1, textRef.current.lastOffset - 1);
-              if (!shiftKey) selectPositionRef.current = cursorPositionRef.current;
+              cursorOffsetRef.current = Math.min(altKey ? textRef.current.getSegmentEndOffset(cursorOffsetRef.current) : cursorOffsetRef.current + 1, textRef.current.lastOffset - 1);
+              if (!shiftKey) selectOffsetRef.current = cursorOffsetRef.current;
             }
             ;
             break;
@@ -6673,7 +6941,7 @@ function SVGTextArea(_ref2) {
             }
         }
       } else {
-        if (selectPositionRef.current !== cursorPositionRef.current) {
+        if (selectOffsetRef.current !== cursorOffsetRef.current) {
           _removeText();
         }
 
@@ -6682,35 +6950,43 @@ function SVGTextArea(_ref2) {
     }
 
     updatable && handleUpdate();
-    requestAnimationFrame(function () {
-      textRef.current.insert(inputCacheRef.current, cursorPositionRef.current);
-      cursorPositionRef.current += inputCacheRef.current.length;
-      if (inputCacheRef.current.length) selectPositionRef.current = cursorPositionRef.current;
+    animationFrameRef.current = requestAnimationFrame(function () {
+      var inputCacheLength = inputCacheRef.current.length;
+
+      if (inputCacheLength) {
+        textRef.current.insert(inputCacheRef.current, cursorOffsetRef.current);
+        cursorOffsetRef.current += inputCacheLength;
+        selectOffsetRef.current = cursorOffsetRef.current;
+      }
+
       inputCacheRef.current = '';
       componentsRef.current = textRef.current.toReactComponents(width);
+      updateUITextSelection({
+        textboxId: textboxId,
+        uiTextData: textRef.current.toReduxState(),
+        cursorOffset: cursorOffsetRef.current,
+        selectOffset: selectOffsetRef.current
+      });
 
-      _setSelectPosition(selectPositionRef.current);
+      _setSelectOffset(selectOffsetRef.current);
 
-      _setCursorPosition(cursorPositionRef.current);
+      _setCursorOffset(cursorOffsetRef.current);
     });
-  }
+  } // function clickHandler(e){
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   _setActive(editable);
+  //   // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._segmentMap);
+  // }
+  // function blurHandler(e){
+  //   e.preventDefault();
+  //   clearTimeout(_timeout.current);
+  //   _timeout.current = setTimeout(() => {
+  //     updateTextHandler(textboxId, textRef.current.toReduxState());
+  //   }, 0);
+  //   _setActive(false);
+  // }
 
-  function clickHandler(e) {
-    e.preventDefault();
-
-    _setActive(editable); // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._offsetMap);
-
-  }
-
-  function blurHandler(e) {
-    e.preventDefault();
-    clearTimeout(_timeout.current);
-    _timeout.current = setTimeout(function () {
-      updateTextHandler(textboxId, textRef.current.toReduxState());
-    }, 0);
-
-    _setActive(false);
-  }
 
   function forceUpdate() {
     _forceUpdate(!_);
@@ -6719,36 +6995,33 @@ function SVGTextArea(_ref2) {
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true),
       _useState2 = _slicedToArray(_useState, 2),
       _ = _useState2[0],
-      _forceUpdate = _useState2[1];
+      _forceUpdate = _useState2[1]; // const [_active, _setActive] = useState(false);
 
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
-      _useState4 = _slicedToArray(_useState3, 2),
-      _active = _useState4[0],
-      _setActive = _useState4[1];
 
   var _timeout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
   var textRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   var inputCacheRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   var componentsRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
-  var cursorPositionRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(0);
+  var animationFrameRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var cursorOffsetRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(0);
+
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _cursorOffset = _useState4[0],
+      _setCursorOffset = _useState4[1];
+
+  var selectOffsetRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(0);
 
   var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0),
       _useState6 = _slicedToArray(_useState5, 2),
-      _cursorPosition = _useState6[0],
-      _setCursorPosition = _useState6[1];
-
-  var selectPositionRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(0);
-
-  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0),
-      _useState8 = _slicedToArray(_useState7, 2),
-      _selectPosition = _useState8[0],
-      _setSelectPosition = _useState8[1];
+      _selectOffset = _useState6[0],
+      _setSelectOffset = _useState6[1];
 
   textRef.current || (textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings));
   componentsRef.current || (componentsRef.current = textRef.current.toReactComponents(width));
 
-  var _textRef$current$getP = textRef.current.getPositionByOffset(_cursorPosition),
+  var _textRef$current$getP = textRef.current.getPositionByOffset(_cursorOffset),
       _textRef$current$getP2 = _slicedToArray(_textRef$current$getP, 3),
       cursorX = _textRef$current$getP2[0],
       cursorY = _textRef$current$getP2[1],
@@ -6759,28 +7032,30 @@ function SVGTextArea(_ref2) {
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
   }, [text, styleStrings]);
-  var actualHeight = Math.max(textRef.current._offsetMap.last[1] + 60, 60);
+  var actualHeight = Math.max(textRef.current._segmentMap.last[1] + 60, 60);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", _extends({}, props, {
-    className: "svg-textarea ".concat(className, " ").concat(_active ? 'active' : ''),
-    onKeyDown: function onKeyDown(e) {
+    className: "svg-textarea ".concat(className, " ").concat(active ? 'active' : ''),
+    onKeyDown: active ? function (e) {
       return handleKeyDown(e);
-    },
+    } : null,
     fill: "none"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
     xlinkHref: "#",
     onClick: function onClick(e) {
-      return clickHandler(e);
-    },
-    onBlur: function onBlur(e) {
-      return blurHandler(e);
-    },
+      return e.preventDefault();
+    } // onBlur={e => blurHandler(e)}
+    ,
     height: actualHeight,
     width: width
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGTextAreaSelect, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    height: height,
+    width: width,
+    pointerEvents: "all"
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGTextAreaSelect, {
     className: "svg-textarea-select",
     text: textRef.current,
-    start: cursorPositionRef.current,
-    end: selectPositionRef.current
+    start: cursorOffsetRef.current,
+    end: selectOffsetRef.current
   }), componentsRef.current), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     className: "cursor",
     width: "2",
@@ -6805,28 +7080,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
-/* harmony import */ var _svg_textarea__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_textarea */ "./frontend/components/svg/svg_textarea.jsx");
+/* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../actions/ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../selectors/selectors */ "./frontend/selectors/selectors.js");
+/* harmony import */ var _svg_textarea__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./svg_textarea */ "./frontend/components/svg/svg_textarea.jsx");
+
+
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, _ref2) {
-  var entities = _ref.entities;
+  var entities = _ref.entities,
+      ui = _ref.ui;
   var textboxId = _ref2.textboxId,
       width = _ref2.width;
   var textbox = entities.textboxes[textboxId];
   return {
+    ui: ui,
+    entities: entities,
     text: textbox.text,
-    styleStrings: textbox.textstyleIds.map(function (id) {
-      return entities.textstyles[id];
-    })
+    styleStrings: (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_3__.getTextstylesByTextbox)({
+      entities: entities
+    }, textbox)
   };
 }, function (dispatch, ownProps) {
   return {
     updateTextHandler: function updateTextHandler(id, data) {
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.updateText)(id, data));
+    },
+    updateUITextSelection: function updateUITextSelection(args) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateUITextSelection)(args));
     }
   };
-})(_svg_textarea__WEBPACK_IMPORTED_MODULE_2__.default));
+})(_svg_textarea__WEBPACK_IMPORTED_MODULE_4__.default));
 
 /***/ }),
 
@@ -6862,6 +7147,7 @@ var mapSTPCreator = function mapSTPCreator(editable) {
       svgDOM: editable ? svgDOM : undefined,
       pageWidth: ui.pageSettings.pageWidth,
       paggHeight: ui.pageSettings.pageHeight,
+      selectedWrapperIds: ui.selections.wrapperIds,
       wrapper: entities.wrappers[wrapperId]
     };
   };
@@ -7310,14 +7596,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
+/* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/redux.js");
 /* harmony import */ var _actions_session_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/session_actions */ "./frontend/actions/session_actions.js");
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
+/* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
+/* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../selectors/selectors */ "./frontend/selectors/selectors.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
 
 
 
@@ -7329,8 +7631,13 @@ var TextStyleReducer = function TextStyleReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.RECEIVE_SELECTED_TEXT:
+      {
+        return _objectSpread(_objectSpread({}, state), action.textstyleData);
+      }
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
-      return _objectSpread(_objectSpread({}, state), action.data.textstylesAttributes);
+      return _objectSpread(_objectSpread({}, state), action.textData.textstylesAttributes);
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
       return action.entities.textstyles;
@@ -7349,11 +7656,23 @@ var TextStyleReducer = function TextStyleReducer() {
 var TextboxsReducer = function TextboxsReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var action = arguments.length > 1 ? arguments[1] : undefined;
-  Object.freeze(state);
 
   switch (action.type) {
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.RECEIVE_SELECTED_TEXT:
+      return _objectSpread(_objectSpread({}, state), action.textboxData);
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
-      return _objectSpread(_objectSpread({}, state), action.data);
+      {
+        var _action$textData = action.textData,
+            id = _action$textData.id,
+            text = _action$textData.text,
+            textstyleIds = _action$textData.textstyleIds;
+        return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, id, {
+          id: id,
+          text: text,
+          textstyleIds: textstyleIds
+        }));
+      }
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
       return action.entities.textboxes;
@@ -7375,6 +7694,11 @@ var WrapperReducer = function WrapperReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
+      {
+        return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.wrapperData.id, action.wrapperData));
+      }
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
       return action.entities.wrappers;
 
@@ -7395,6 +7719,24 @@ var SlidesReducer = function SlidesReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_WRAPPERS:
+      {
+        return _objectSpread({}, state);
+      }
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
+      {
+        var wrapperAttributes = action.textData.wrapperAttributes;
+        var wrapperData = Object.values(wrapperAttributes)[0];
+        var wrapperId = action.wrapperData.id;
+        var slideId = wrapperData.slideId;
+        var slideData = state[slideId];
+        var wrapperIds = Array.from(new Set([].concat(_toConsumableArray(slideData.wrapperIds), [wrapperId])));
+        return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, slideId, _objectSpread(_objectSpread({}, slideData), {}, {
+          wrapperIds: wrapperIds
+        })));
+      }
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
       return action.entities.slides;
 
@@ -7429,7 +7771,7 @@ var DocsReducer = function DocsReducer() {
   }
 };
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,redux__WEBPACK_IMPORTED_MODULE_2__.combineReducers)({
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,redux__WEBPACK_IMPORTED_MODULE_4__.combineReducers)({
   docs: DocsReducer,
   slides: SlidesReducer,
   wrappers: WrapperReducer,
@@ -7602,17 +7944,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-
-function NextActionReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'select';
-  var action = arguments.length > 1 ? arguments[1] : undefined;
-
-  switch (action.type) {
-    default:
-      return 'select';
-  }
-}
-
 var nullState = Object.freeze({
   wrapperIds: [],
   nextMenuAction: 'Select'
@@ -7624,16 +7955,51 @@ function SelectionReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_SELECTED_TEXT:
+      return _objectSpread(_objectSpread({}, state), {}, {
+        selectOffset: action.selectOffset,
+        cursorOffset: action.cursorOffset
+      });
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
+      {
+        return _objectSpread(_objectSpread({}, state), {}, {
+          wrapperIds: [action.wrapperData.id]
+        });
+      }
+      ;
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_WRAPPERS:
+      {
+        return _objectSpread(_objectSpread({}, state), {}, {
+          wrapperIds: state.wrapperIds.filter(function (id) {
+            return action.wrappers[id];
+          })
+        });
+      }
+      ;
+
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_SELECTED_WRAPPERS:
       return action.wrapperIds.length ? _objectSpread(_objectSpread({}, state), {}, {
         wrapperIds: _toConsumableArray(action.wrapperIds)
       }, action.sharedAttributes) : nullState;
 
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_MENU_ACTION:
+      return _objectSpread(_objectSpread({}, nullState), {}, {
+        nextMenuAction: action.nextMenuAction
+      });
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_SLIDE:
+      ;
+
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_CURRENT_SLIDE:
       ;
 
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.CLEAR_UI:
-      return nullState;
+      {
+        console.log(action);
+        return nullState;
+      }
 
     default:
       return state;
@@ -7695,6 +8061,67 @@ var UIReducer = (0,redux__WEBPACK_IMPORTED_MODULE_2__.combineReducers)({
   selections: SelectionReducer
 });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (UIReducer);
+
+/***/ }),
+
+/***/ "./frontend/selectors/selectors.js":
+/*!*****************************************!*\
+  !*** ./frontend/selectors/selectors.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getTextstylesByTextbox": () => (/* binding */ getTextstylesByTextbox),
+/* harmony export */   "getTextstylesByTextboxId": () => (/* binding */ getTextstylesByTextboxId),
+/* harmony export */   "getTextboxByWrapper": () => (/* binding */ getTextboxByWrapper),
+/* harmony export */   "getTextboxById": () => (/* binding */ getTextboxById),
+/* harmony export */   "getSelectedTextbox": () => (/* binding */ getSelectedTextbox),
+/* harmony export */   "getSelectedText": () => (/* binding */ getSelectedText)
+/* harmony export */ });
+var getTextstylesByTextbox = function getTextstylesByTextbox(_ref, textbox) {
+  var entities = _ref.entities;
+  return textbox.textstyleIds.map(function (id) {
+    return entities.textstyles[id];
+  });
+};
+var getTextstylesByTextboxId = function getTextstylesByTextboxId(state, textboxId) {
+  var textbox = getTextboxById(state, textboxId);
+  return getTextstylesByTextbox(state, textbox);
+};
+var getTextboxByWrapper = function getTextboxByWrapper(_ref2, wrapper) {
+  var entities = _ref2.entities;
+  return textbox.textstyleIds.map(function (wrapper) {
+    return entities.textboxes[wrapper.slideObjectId];
+  });
+};
+
+var getWrapperById = function getWrapperById(_ref3, id) {
+  var entities = _ref3.entities;
+  return entities.wrappers[id];
+};
+
+var getTextboxById = function getTextboxById(_ref4, id) {
+  var entities = _ref4.entities;
+  return entities.textboxes[id];
+};
+
+var getSelectedWrapper = function getSelectedWrapper(_ref5) {
+  var ui = _ref5.ui,
+      entities = _ref5.entities;
+  return entities.wrappers[ui.selections.wrapperIds[0] || -1];
+};
+
+var getSelectedTextbox = function getSelectedTextbox(state) {
+  var wrapper = getSelectedWrapper(state);
+  return getTextboxById(state, wrapper.slideObjectId);
+};
+var getSelectedText = function getSelectedText(state) {
+  var textbox = getSelectedTextbox(state);
+  var textstyles = getTextstylesByTextbox(state, textbox);
+  return [textbox, textstyles];
+};
 
 /***/ }),
 
@@ -7802,13 +8229,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ DynamicText)
 /* harmony export */ });
-/* harmony import */ var _monkey_patches_array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../monkey-patches/array */ "./frontend/utils/monkey-patches/array.js");
-/* harmony import */ var _monkey_patches_string__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../monkey-patches/string */ "./frontend/utils/monkey-patches/string.js");
-/* harmony import */ var _monkey_patches_string__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_monkey_patches_string__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _bisect_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./bisect.js */ "./frontend/utils/data-structure/bisect.js");
-/* harmony import */ var _sorted_array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./sorted-array */ "./frontend/utils/data-structure/sorted-array.js");
-/* harmony import */ var _sorted_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./sorted-map */ "./frontend/utils/data-structure/sorted-map.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _monkey_patches_array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../monkey-patches/array */ "./frontend/utils/monkey-patches/array.js");
+/* harmony import */ var _monkey_patches_string__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../monkey-patches/string */ "./frontend/utils/monkey-patches/string.js");
+/* harmony import */ var _monkey_patches_string__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_monkey_patches_string__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _bisect_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./bisect.js */ "./frontend/utils/data-structure/bisect.js");
+/* harmony import */ var _sorted_array__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./sorted-array */ "./frontend/utils/data-structure/sorted-array.js");
+/* harmony import */ var _sorted_map__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./sorted-map */ "./frontend/utils/data-structure/sorted-map.js");
+/* harmony import */ var _string_parsers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../string_parsers */ "./frontend/utils/string_parsers.js");
+/* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../selectors/selectors */ "./frontend/selectors/selectors.js");
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
@@ -7821,15 +8250,25 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -7837,17 +8276,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
@@ -7860,47 +8289,6 @@ var COMMON_CHAR_SIZE_MAP = {};
 var DEFAULT_FONT_SIZE = 14;
 CTX.font = "14px Times";
 
-function parseStyleString(styleString) {
-  var stringObj = Object.fromEntries(styleString.split(/\ *\;\ */).map(function (x) {
-    return x.split(/\ *\:\ /);
-  }));
-  var fontStyles = stringObj.font;
-
-  if (fontStyles) {
-    Object.assign(stringObj, parseFontString(fontStyles)); // delete stringObj.font;
-  }
-
-  return stringObj;
-}
-
-function parseFontString(fontString) {
-  // 0: " 400 16px/1.33 lkj kjlasdf sjldkf "
-  // 1: undefined
-  // 2: "400"
-  // 3: undefined
-  // 4: "16px"
-  // 5: "/1.33"
-  // 6: "lkj kjlasdf sjldkf "
-  if (!fontString) return {};
-  var fontStyles = {};
-
-  var _fontString$split = fontString.split(/(\d+px)(?:\/([\d\.]+(?:px)?))?/),
-      _fontString$split2 = _slicedToArray(_fontString$split, 4),
-      firstString = _fontString$split2[0],
-      fontSize = _fontString$split2[1],
-      lineHeight = _fontString$split2[2],
-      fontFamily = _fontString$split2[3];
-
-  var fontWeight = firstString.match(/\d+|bold/);
-  var fontStyle = firstString.match(/italic/);
-  if (fontSize) fontStyles.fontSize = fontSize;
-  if (lineHeight) fontStyles.lineHeight = lineHeight;
-  if (fontFamily) fontStyles.fontFamily = fontFamily;
-  if (fontWeight) fontStyles.fontWeight = fontWeight[0];
-  if (fontStyle) fontStyles.fontStyle = fontStyle[0];
-  return fontStyles;
-}
-
 var DynamicText = /*#__PURE__*/function () {
   function DynamicText() {
     var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -7911,17 +8299,17 @@ var DynamicText = /*#__PURE__*/function () {
     this._text = '';
     this._bufferSize = 256;
     this._indices = {
-      spaces: new _sorted_array__WEBPACK_IMPORTED_MODULE_3__.default(),
-      tabs: new _sorted_array__WEBPACK_IMPORTED_MODULE_3__.default(),
-      returns: new _sorted_array__WEBPACK_IMPORTED_MODULE_3__.default()
+      spaces: new _sorted_array__WEBPACK_IMPORTED_MODULE_4__.default(),
+      tabs: new _sorted_array__WEBPACK_IMPORTED_MODULE_4__.default(),
+      returns: new _sorted_array__WEBPACK_IMPORTED_MODULE_4__.default()
     };
-    this._styleMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_4__.default(styleStrings.map(function (styleString) {
-      return [styleString.offset, parseStyleString(styleString.styleString)];
+    this._styleMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_5__.default(styleStrings.map(function (styleString) {
+      return [styleString.offset, (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.parseStyleString)(styleString.styleString)];
     }));
-    this._offsetMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_4__.default();
+    this._segmentMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_5__.default();
     this._defaultFont = CTX.font || style.defaultFont;
     if (text[text.length - 1] !== '\0') text = text + '\0';
-    this.insert(text);
+    this.insert(text, 0, true);
   }
 
   _createClass(DynamicText, [{
@@ -7942,14 +8330,15 @@ var DynamicText = /*#__PURE__*/function () {
   }, {
     key: "insert",
     value: function insert(text) {
-      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.length;
+      var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.length;
+      var init = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       length = text.length;
 
       if (length === 0) {
         return;
       }
 
-      index = Math.max(Math.min(this.length, index), 0);
+      offset = Math.max(Math.min(this.length, offset), 0);
       var temp_indices = {
         spaces: [],
         tabs: [],
@@ -7960,15 +8349,15 @@ var DynamicText = /*#__PURE__*/function () {
         var ch = text[i];
 
         if (ch === ' ' || ch === '-') {
-          temp_indices.spaces.push(index + i);
+          temp_indices.spaces.push(offset + i);
         }
 
         if (ch === '\t') {
-          temp_indices.tabs.push(index + i);
+          temp_indices.tabs.push(offset + i);
         }
 
         if (ch === '\n') {
-          temp_indices.returns.push(index + i);
+          temp_indices.returns.push(offset + i);
         }
       }
 
@@ -7977,9 +8366,9 @@ var DynamicText = /*#__PURE__*/function () {
 
         var thisIndices = this._indices[key];
 
-        for (var _i2 = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_2__.bisectLeft)(thisIndices, index), l = thisIndices.length; _i2 < l; _i2++) {
-          // offset existing indices right of index by length
-          thisIndices[_i2] += length;
+        for (var _i = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_3__.bisectLeft)(thisIndices, offset), l = thisIndices.length; _i < l; _i++) {
+          // offset existing indices right of offset by length
+          thisIndices[_i] += length;
         } // add temporary arrays to the indices
 
 
@@ -7987,10 +8376,9 @@ var DynamicText = /*#__PURE__*/function () {
       } // modify style indices
 
 
-      this._styleMap.splice(index, 0, length); // renew text
+      init || this._styleMap.splice(offset, 0, length); // renew text
 
-
-      this._text = this._text.splice(index, 0, text);
+      this._text = this._text.splice(offset, 0, text);
     }
   }, {
     key: "remove",
@@ -8002,10 +8390,10 @@ var DynamicText = /*#__PURE__*/function () {
 
       for (var type in this._indices) {
         var indices = this._indices[type];
-        var key1 = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_2__.bisectLeft)(indices, index1);
-        var key2 = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_2__.bisectLeft)(indices, index2);
+        var key1 = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_3__.bisectLeft)(indices, index1);
+        var key2 = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_3__.bisectLeft)(indices, index2);
 
-        for (var i = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_2__.bisectLeft)(indices, index2), l = indices.length; i < l; i++) {
+        for (var i = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_3__.bisectLeft)(indices, index2), l = indices.length; i < l; i++) {
           // offset existing indices right of index by -(index2 - index1)
           indices[i] -= index2 - index1;
         }
@@ -8014,7 +8402,18 @@ var DynamicText = /*#__PURE__*/function () {
       } // modify style indices
 
 
-      this._styleMap.splice(index1, index2 - index1); // renew text
+      this._styleMap.splice(index1, index2 - index1);
+
+      var _this$_styleMap$getLe = this._styleMap.getLeftEntry(Math.max(index1 - 1, 0)),
+          _this$_styleMap$getLe2 = _slicedToArray(_this$_styleMap$getLe, 2),
+          leftKey = _this$_styleMap$getLe2[0],
+          leftStyle = _this$_styleMap$getLe2[1];
+
+      var style = this._styleMap.get(leftKey);
+
+      if (leftKey > 0 && (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(style)) {
+        this._styleMap["delete"](index1);
+      } // renew text
 
 
       this._text = this._text.splice(index1, index2 - index1);
@@ -8023,59 +8422,101 @@ var DynamicText = /*#__PURE__*/function () {
   }, {
     key: "getSegmentStartIndex",
     value: function getSegmentStartIndex(index) {
-      return this._offsetMap.getLeftIndex(index - 1);
+      return this._segmentMap.getLeftIndex(index - 1);
     }
   }, {
     key: "getSegmentEndIndex",
     value: function getSegmentEndIndex(index) {
-      var keys = this._offsetMap.keys;
-      return this._offsetMap.getRightIndex(index + 1) - 1;
+      var keys = this._segmentMap.keys;
+      return this._segmentMap.getRightIndex(index + 1) - 1;
     }
   }, {
     key: "getSegmentStartOffset",
     value: function getSegmentStartOffset(index) {
       // left arrow
-      return this._offsetMap.getLeftKey(index - 1);
+      if (index >= this._text.length - 1) index = this._text.length - 2;
+
+      var offsetMap = this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g).map(function (str) {
+        return str.length;
+      });
+
+      console.log(this._text, this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g));
+      var aggr = this.length;
+
+      for (var len = offsetMap.length, i = len - 1; i >= 0; i--) {
+        aggr -= offsetMap[i];
+        if (aggr < index) return aggr;
+      }
+
+      return 0;
     }
   }, {
     key: "getSegmentEndOffset",
     value: function getSegmentEndOffset(index) {
       // right arrow
-      var keys = this._offsetMap.keys;
-      return this._offsetMap.getRightKey(index + 1) - 1;
+      if (index >= this._text.length - 1) index = this._text.length - 2;
+
+      var offsetMap = this._text.match(/((?:\n)|(?:[^\w^\n]*[\w]*))/g).map(function (str) {
+        return str.length;
+      });
+
+      var aggr = 0;
+
+      for (var i = 0, len = offsetMap.length; i < len; i++) {
+        aggr += offsetMap[i];
+        if (aggr > index) return aggr;
+      }
+
+      return this._text.length - 2;
     }
   }, {
     key: "lastOffset",
     get: function get() {
-      return this._offsetMap.lastKey;
+      return this._segmentMap.lastKey;
     }
   }, {
     key: "setStyle",
-    value: function setStyle(index1, index2, style) {
-      var sortedKeys = Array.from(this._styleMap).sort(function (a, b) {
+    value: function setStyle(offset1, offset2, style) {
+      offset1 = Math.min(Math.max(0, offset1), this.length);
+      offset2 = Math.min(Math.max(0, offset2), this.length);
+      if (offset2 <= offset1) return false;
+      var styleMap = this._styleMap;
+      var sortedKeys = Array.from(styleMap).sort(function (a, b) {
         return a - b;
       });
-      var i2 = (0,_bisect_js__WEBPACK_IMPORTED_MODULE_2__.bisectLeft)(sortedKeys, index2);
+      var prevStyle = styleMap.getLeftValue(Math.max(0, offset1 - 1));
+      var newStyle = prevStyle;
+      var lastStyle = prevStyle;
+      styleMap.set(offset1, _objectSpread({}, prevStyle));
 
-      var lastStyle = this._styleMap.get(i2);
+      for (var i = offset1; i < offset2; i++) {
+        // to be optimized
+        var currStyle = styleMap.get(i);
 
-      this._styleMap.set(index1, style);
+        if (currStyle) {
+          newStyle = _objectSpread(_objectSpread({}, currStyle), style);
 
-      lastStyle && this._styleMap.set(index2, lastStyle);
+          if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(prevStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(newStyle) && i > 0) {
+            styleMap["delete"](i);
+          } else {
+            styleMap.set(i, newStyle);
+          }
 
-      var _iterator = _createForOfIteratorHelper(sortedKeys),
-          _step;
-
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var i = _step.value;
-          if (i >= index1 && i < index2) this._styleMap["delete"](i);
+          lastStyle = currStyle;
+          prevStyle = newStyle;
         }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
       }
+
+      if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(newStyle) == (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(lastStyle)) {
+        styleMap["delete"](offset2);
+      } else {
+        styleMap.set(offset2, lastStyle);
+      } // this._styleMap.set(index1, style);
+      // lastStyle && this._styleMap.set(index2, lastStyle);
+      // for (let i of sortedKeys)
+      //   if (i >= index1 && i < index2)
+      //     this._styleMap.delete(i);
+
     }
   }, {
     key: "measureSubstringSize",
@@ -8119,7 +8560,7 @@ var DynamicText = /*#__PURE__*/function () {
           offsetY = 0;
       var maxLineHeight = 0;
 
-      this._offsetMap.clear();
+      this._segmentMap.clear();
 
       var tempQueue = [];
       var results = [];
@@ -8136,7 +8577,7 @@ var DynamicText = /*#__PURE__*/function () {
           }));
           results.push(reactComponent);
 
-          this._offsetMap.set(el.l, [el.offsetX, offsetY, el.height]);
+          this._segmentMap.set(el.l, [el.offsetX, offsetY, el.height]);
         }
 
         tempQueue.length = 0;
@@ -8201,7 +8642,8 @@ var DynamicText = /*#__PURE__*/function () {
         return pos < arrs[i].length;
       })) {
         var typeIndex = 0;
-        var minPosition = arrs[typeIndex][positions[typeIndex]] || this.length;
+        var pos = arrs[typeIndex][positions[typeIndex]];
+        var minPosition = isNaN(pos) ? this.length : pos;
 
         for (var j = 1; j < 4; j++) {
           var arrMin = arrs[j][positions[j]];
@@ -8223,7 +8665,7 @@ var DynamicText = /*#__PURE__*/function () {
 
       _processSubstring.call(this, l, this.length);
 
-      this._offsetMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
+      this._segmentMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
 
       _changeLine.call(this);
 
@@ -8234,13 +8676,13 @@ var DynamicText = /*#__PURE__*/function () {
     value: function getPositionByOffset(index) {
       var style = this._styleMap.getLeftValue(index);
 
-      var _this$_offsetMap$getL = this._offsetMap.getLeftEntry(index),
-          _this$_offsetMap$getL2 = _slicedToArray(_this$_offsetMap$getL, 2),
-          leftIndex = _this$_offsetMap$getL2[0],
-          _this$_offsetMap$getL3 = _slicedToArray(_this$_offsetMap$getL2[1], 3),
-          leftX = _this$_offsetMap$getL3[0],
-          y = _this$_offsetMap$getL3[1],
-          lineHeight = _this$_offsetMap$getL3[2];
+      var _this$_segmentMap$get = this._segmentMap.getLeftEntry(index),
+          _this$_segmentMap$get2 = _slicedToArray(_this$_segmentMap$get, 2),
+          leftIndex = _this$_segmentMap$get2[0],
+          _this$_segmentMap$get3 = _slicedToArray(_this$_segmentMap$get2[1], 3),
+          leftX = _this$_segmentMap$get3[0],
+          y = _this$_segmentMap$get3[1],
+          lineHeight = _this$_segmentMap$get3[2];
 
       var size = this.measureSubstringSize(this._text.substring(leftIndex, index), style);
       return [leftX + size.width, y, lineHeight];
@@ -8257,8 +8699,8 @@ var DynamicText = /*#__PURE__*/function () {
       var font = style.font,
           otherstyles = _objectWithoutProperties(style, ["font"]);
 
-      var fontStyles = parseFontString(font);
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_5__.createElement("text", _extends({
+      var fontStyles = (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.parseFontString)(font);
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("text", _extends({
         key: [substring, l, offsetX, offsetY].join('-')
       }, otherstyles, fontStyles, {
         x: offsetX,
@@ -8267,13 +8709,58 @@ var DynamicText = /*#__PURE__*/function () {
     }
   }, {
     key: "toReduxState",
-    value: function toReduxState(textstylesAttributes) {
+    value: function toReduxState() {
+      var _this = this;
+
+      var textstylesAttributes = [];
+
+      this._styleMap.entries.filter(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+            offset = _ref4[0],
+            styleObject = _ref4[1];
+
+        return offset < _this.length;
+      }).forEach(function (_ref5) {
+        var _ref6 = _slicedToArray(_ref5, 2),
+            offset = _ref6[0],
+            styleObject = _ref6[1];
+
+        textstylesAttributes.push({
+          offset: offset,
+          styleString: (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(styleObject)
+        });
+      });
+
       return {
         text: this._text.substring(0, this._text.length - 1),
         textstylesAttributes: textstylesAttributes
-        /*: Array.from(this._styleMap)*/
-
       };
+    }
+  }], [{
+    key: "fromCurrentSelection",
+    value: function fromCurrentSelection(state) {
+      var textData = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_7__.getSelectedText)(state);
+      return new DynamicText(textData[0].text, textData[1].map(function (_ref7) {
+        var offset = _ref7.offset,
+            styleString = _ref7.styleString;
+        return {
+          offset: offset,
+          styleString: styleString
+        };
+      }));
+    }
+  }, {
+    key: "fromTexbox",
+    value: function fromTexbox(state, textbox) {
+      var textstyles = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_7__.getTextstylesByTextbox)(state, textbox);
+      return new DynamicText(textbox.text, textstyles.map(function (_ref8) {
+        var offset = _ref8.offset,
+            styleString = _ref8.styleString;
+        return {
+          offset: offset,
+          styleString: styleString
+        };
+      }));
     }
   }]);
 
@@ -8416,6 +8903,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _bisect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bisect */ "./frontend/utils/data-structure/bisect.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -8503,6 +8998,12 @@ var SortedMap = /*#__PURE__*/function (_Map) {
       return [leftKey, Map.prototype.get.call(this, leftKey)];
     }
   }, {
+    key: "getRightEntry",
+    value: function getRightEntry(key) {
+      var rightKey = this.getRightKey(key);
+      return [rightKey, Map.prototype.get.call(this, rightKey)];
+    }
+  }, {
     key: "setLeftValue",
     value: function setLeftValue(key, val) {
       var keys = this.keys;
@@ -8520,28 +9021,31 @@ var SortedMap = /*#__PURE__*/function (_Map) {
     }
   }, {
     key: "splice",
-    value: function splice(index) {
+    value: function splice(offsetLeft) {
       var removeLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
       var insertLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-      //remove
-      var keys = this.keys;
+      console.log(offsetLeft, removeLength, insertLength);
+      console.log(this.keys); //remove
+
+      var offsets = this.keys.sort(function (a, b) {
+        return a - b;
+      });
 
       if (removeLength > 0) {
-        var index2 = index + removeLength;
-        var key2 = (0,_bisect__WEBPACK_IMPORTED_MODULE_0__.bisectLeft)(keys, index + removeLength);
-        var lastElem = this.get(key2);
+        var offsetRight = offsetLeft + removeLength;
+        var lastElem;
 
-        var _iterator = _createForOfIteratorHelper(keys),
+        var _iterator = _createForOfIteratorHelper(offsets),
             _step;
 
         try {
           for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var key = _step.value;
+            var offset = _step.value;
 
-            if (key >= index) {
-              if (key >= index2) this.set(key - (index2 - index), this.get(key));
-              if (key <= index2) lastElem = this.get(key);
-              this["delete"](key);
+            if (offset >= offsetLeft) {
+              if (offset <= offsetRight) lastElem = this.get(offset);
+              if (offset > offsetRight) this.set(offset - removeLength, this.get(offset));
+              this["delete"](offset);
             }
           }
         } catch (err) {
@@ -8550,16 +9054,23 @@ var SortedMap = /*#__PURE__*/function (_Map) {
           _iterator.f();
         }
 
-        lastElem && this.set(index, lastElem);
+        lastElem && this.set(offsetLeft, lastElem);
       }
 
-      keys = this.keys; //insert
+      offsets = this.keys.sort(function (a, b) {
+        return a - b;
+      });
+      if (insertLength > 0) for (var len = offsets.length, i = len - 1; offsets[i] > offsetLeft; i--) {
+        var _console;
 
-      for (var len = keys.length, i = len - 1; keys[i] > index; i--) {
-        var _key2 = keys[i];
-        this.set(i + insertLength, this.get(i));
-        this["delete"](i);
+        console.log(i);
+        var key = offsets[i];
+        this.set(key + insertLength, this.get(key));
+        this["delete"](key);
+
+        (_console = console).log.apply(_console, _toConsumableArray(this.entries));
       }
+      console.log(this.keys);
     }
   }, {
     key: "keys",
@@ -8688,9 +9199,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "asyncDeleteSlide": () => (/* binding */ asyncDeleteSlide),
 /* harmony export */   "asyncUpdateSlide": () => (/* binding */ asyncUpdateSlide),
 /* harmony export */   "asyncMoveSlide": () => (/* binding */ asyncMoveSlide),
+/* harmony export */   "asyncUpdateWrapper": () => (/* binding */ asyncUpdateWrapper),
 /* harmony export */   "asyncCreateText": () => (/* binding */ asyncCreateText),
 /* harmony export */   "asyncUpdateText": () => (/* binding */ asyncUpdateText),
-/* harmony export */   "asyncUpdateWrapper": () => (/* binding */ asyncUpdateWrapper)
+/* harmony export */   "asyncDeleteWrappers": () => (/* binding */ asyncDeleteWrappers)
 /* harmony export */ });
 var asyncFetchPresentation = function asyncFetchPresentation() {
   return $.ajax({
@@ -8740,26 +9252,6 @@ var asyncMoveSlide = function asyncMoveSlide(data) {
     }
   });
 };
-var asyncCreateText = function asyncCreateText(textboxData) {
-  return $.ajax({
-    // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
-    method: 'POST',
-    url: "/api/texts/".concat(textboxId),
-    data: {
-      textbox: textboxData
-    }
-  });
-};
-var asyncUpdateText = function asyncUpdateText(textboxId, textboxData) {
-  return $.ajax({
-    // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
-    method: 'PATCH',
-    url: "/api/texts/".concat(textboxId),
-    data: {
-      textbox: textboxData
-    }
-  });
-};
 var asyncUpdateWrapper = function asyncUpdateWrapper(wrapper) {
   return $.ajax({
     // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
@@ -8767,6 +9259,36 @@ var asyncUpdateWrapper = function asyncUpdateWrapper(wrapper) {
     url: "/api/wrappers/".concat(wrapper.id),
     data: {
       wrapper: wrapper
+    }
+  });
+};
+var asyncCreateText = function asyncCreateText(textData) {
+  return $.ajax({
+    // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+    method: 'POST',
+    url: "/api/texts",
+    data: {
+      textbox: textData
+    }
+  });
+};
+var asyncUpdateText = function asyncUpdateText(textboxId, textData) {
+  return $.ajax({
+    // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+    method: 'PATCH',
+    url: "/api/texts/".concat(textboxId),
+    data: {
+      textbox: textData
+    }
+  });
+};
+var asyncDeleteWrappers = function asyncDeleteWrappers(slideId, slideData) {
+  return $.ajax({
+    // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+    method: 'PATCH',
+    url: "/api/slides/".concat(slideId),
+    data: {
+      slide: slideData
     }
   });
 };
@@ -8897,6 +9419,96 @@ var asyncLogout = function asyncLogout() {
     url: '/api/session'
   });
 };
+
+/***/ }),
+
+/***/ "./frontend/utils/string_parsers.js":
+/*!******************************************!*\
+  !*** ./frontend/utils/string_parsers.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "parseStyleString": () => (/* binding */ parseStyleString),
+/* harmony export */   "parseFontString": () => (/* binding */ parseFontString),
+/* harmony export */   "toStyleString": () => (/* binding */ toStyleString)
+/* harmony export */ });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function parseStyleString(styleString) {
+  var stringObj = Object.fromEntries(styleString.split(/\ *\;\ */).map(function (x) {
+    return x.split(/\ *\:\ /);
+  }));
+  var fontStyles = stringObj.font;
+
+  if (fontStyles) {
+    Object.assign(stringObj, parseFontString(fontStyles)); // delete stringObj.font;
+  }
+
+  return stringObj;
+}
+function parseFontString(fontString) {
+  if (!fontString) return {};
+  var fontStyles = {};
+
+  var _fontString$split = fontString.split(/(\d+px)(?:\/([\d\.]+(?:px)?))?/),
+      _fontString$split2 = _slicedToArray(_fontString$split, 4),
+      firstString = _fontString$split2[0],
+      fontSize = _fontString$split2[1],
+      lineHeight = _fontString$split2[2],
+      fontFamily = _fontString$split2[3];
+
+  var fontWeight = firstString.match(/\d+|bold/);
+  var fontStyle = firstString.match(/italic/);
+  if (fontSize) fontStyles.fontSize = fontSize;
+  if (lineHeight) fontStyles.lineHeight = lineHeight;
+  if (fontFamily) fontStyles.fontFamily = fontFamily;
+  if (fontWeight) fontStyles.fontWeight = fontWeight[0];
+  if (fontStyle) fontStyles.fontStyle = fontStyle[0];
+  return fontStyles;
+}
+function toStyleString(styleObject) {
+  var fontStyle = styleObject.fontStyle,
+      fontWeight = styleObject.fontWeight,
+      fontSize = styleObject.fontSize,
+      fontFamily = styleObject.fontFamily,
+      args = _objectWithoutProperties(styleObject, ["fontStyle", "fontWeight", "fontSize", "fontFamily"]);
+
+  var fontString = [fontStyle, fontWeight, fontSize, fontFamily].filter(function (x) {
+    return x;
+  }).join(' ');
+  return Object.entries(_objectSpread({
+    font: fontString
+  }, args)).map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+        k = _ref2[0],
+        v = _ref2[1];
+
+    return "".concat(k, ": ").concat(v);
+  }).join("; ");
+}
 
 /***/ }),
 
@@ -45340,6 +45952,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_root__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/root */ "./frontend/components/root.jsx");
 /* harmony import */ var _utils_data_structure_bisect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils/data-structure/bisect */ "./frontend/utils/data-structure/bisect.js");
 /* harmony import */ var _utils_data_structure_sorted_map__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils/data-structure/sorted-map */ "./frontend/utils/data-structure/sorted-map.js");
+/* harmony import */ var _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/data-structure/dynamic-text */ "./frontend/utils/data-structure/dynamic-text.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -45352,9 +45965,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
 window.bisectLeft = _utils_data_structure_bisect__WEBPACK_IMPORTED_MODULE_4__.bisectLeft;
 window.bisectRight = _utils_data_structure_bisect__WEBPACK_IMPORTED_MODULE_4__.bisectRight;
 window.SortedMap = _utils_data_structure_sorted_map__WEBPACK_IMPORTED_MODULE_5__.default;
+window.DynamicText = _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_6__.default;
 document.addEventListener('DOMContentLoaded', function () {
   var store;
 

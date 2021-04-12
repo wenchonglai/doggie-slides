@@ -1,3 +1,20 @@
+section.page.presentation > section.context-menu-wrapper {
+  display: none;
+  position: absolute;
+  height: auto;
+  min-width: 234px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 0 4px 4px 4px;
+  padding: 8px 0;
+  border: 1px solid transparent;
+  outline: none;
+
+  &.active {
+    display: block;
+  }
+}
 .menu-icon{
   width: 18px;
   height: 18px;
@@ -7,13 +24,18 @@
   opacity: .7;
 }
 
+.menu-item {
+  display: flex;
+  flex-direction: row;
+}
+
 section.dropdown-menu, section.dropdown {
-  user-select: none;
   font-family: "Roboto",Helvetica,Arial,sans-serif;
   font-size: 14px;
   line-height: 18px;
   position: relative;
   outline: none;
+  user-select: none;
 
   hr {
     width: 100%;
@@ -50,7 +72,7 @@ section.dropdown-menu, section.dropdown {
   }
 }
 
-ul.docs-menu, ul.toolbar-menu{
+ul.menu{
   section.dropdown-menu {
 
     div.menu-item.no-action  {
@@ -141,7 +163,6 @@ ul.docs-menu {
         padding: 4px 6px;
         border-radius: 4px;
 
-        
         .menu-icon{ display: none; }
         .submenu-indicator {display: none;}
       }

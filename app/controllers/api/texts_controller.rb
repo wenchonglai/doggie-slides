@@ -4,22 +4,22 @@ class Api::TextsController < ApplicationController
   def create
     @text = Textbox.create(text_params);
 
-    if @text.save
-      redirect_to api_text_url(@textbox), status: 303
+    if @text.save!
+      redirect_to api_text_url(@text), status: 303
     else
       render json: @textbox.errors.full_messages, status: 422
     end
   end
 
   def update
-    p text_params
     @textbox = @textboxes.find_by(id: params[:id].to_i);
 
     if !@textbox
       render json: ["Textbox not found"], status: 404
     elsif @textbox.update(text_params)
-      redirect_to api_texts_url, status: 303
+      redirect_to api_text_url(@textbox), status: 303
     else
+
       render json: @textbox.errors.full_messages, status: 422
     end
   end

@@ -9,6 +9,6 @@ class CreateTextstyles < ActiveRecord::Migration[5.2]
     end
 
     add_index :textstyles, :textbox_id
-    add_index :textstyles, [:textbox_id, :offset], unique: true
+    add_index :textstyles, [:textbox_id, :offset]
   end
 end

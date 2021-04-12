@@ -27,7 +27,7 @@ doge = User.create({email: 'demo@dmail.com', password: '123456', firstname: "Dem
 doge_slide = doge.slides[0];
 
 Textbox.create!(
-    text: "Thicc SVG textarea. So Demo, wow",
-    wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 400, height: 100, translate_x: 200, translate_y: 200},
+    text: "01234567890123456789",
+    wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 600, height: 100, translate_x: 100, translate_y: 200},
     textstyles_attributes: [{style_string: "font: 48px comic sans ms; fill: green", offset: 0}]
   );

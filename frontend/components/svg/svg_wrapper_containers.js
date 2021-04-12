@@ -9,6 +9,7 @@ const mapSTPCreator = editable => ({entities, ui}, {wrapperId, svgDOM}) => ({
   svgDOM: editable ? svgDOM : undefined,
   pageWidth: ui.pageSettings.pageWidth,
   paggHeight: ui.pageSettings.pageHeight,
+  selectedWrapperIds: ui.selections.wrapperIds,
   wrapper: entities.wrappers[wrapperId]
 });
 

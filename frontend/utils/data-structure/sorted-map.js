@@ -32,6 +32,11 @@ export default class SortedMap extends Map{
     return [leftKey, Map.prototype.get.call(this, leftKey)];
   }
 
+  getRightEntry(key){
+    const rightKey = this.getRightKey(key);
+    return [rightKey, Map.prototype.get.call(this, rightKey)];
+  }
+
   setLeftValue(key, val){
     const keys = this.keys;
 
@@ -46,37 +51,41 @@ export default class SortedMap extends Map{
     return Map.prototype.get.call(this, this.keys.at(-1));
   }
 
-  splice(index, removeLength = 0, insertLength = 0){
+  splice(offsetLeft, removeLength = 0, insertLength = 0){
+    console.log(offsetLeft, removeLength, insertLength)
+    console.log(this.keys)
     //remove
-    let keys = this.keys;
+    let offsets = this.keys.sort((a, b) => a - b);
 
     if (removeLength > 0){
-      const index2 = index + removeLength;
-      const key2 = bisectLeft(keys, index + removeLength);
-      let lastElem = this.get(key2);
+      const offsetRight = offsetLeft + removeLength;
+      let lastElem;
 
-      for (let key of keys)
-        if (key >= index){
-          if (key >= index2)
-            this.set(key - (index2 - index), this.get(key));
-          if (key <= index2)
-            lastElem = this.get(key);
+      for (let offset of offsets)
+        if (offset >= offsetLeft){
 
-          this.delete(key);
+          if (offset <= offsetRight)
+            lastElem = this.get(offset);
+          if (offset > offsetRight)
+            this.set(offset - removeLength, this.get(offset));
+          this.delete(offset);
         }
-      
-        lastElem && this.set(index, lastElem);
+
+      lastElem && this.set(offsetLeft, lastElem);
     }
 
-    keys = this.keys;
+    offsets = this.keys.sort((a, b) => a - b);
 
-    //insert
-    for (let len = keys.length, i = len - 1; keys[i] > index; i --){
-      let key = keys[i];
+    if (insertLength > 0)
+      for (let len = offsets.length, i = len - 1; offsets[i] > offsetLeft; i --){
+        console.log(i);
+        let key = offsets[i];
 
-      this.set(i + insertLength, this.get(i));
-      this.delete(i);
-    }
+        this.set(key + insertLength, this.get(key));
+        this.delete(key);
+        console.log(...this.entries)
+      }
+    console.log(this.keys)
   }
   get keys(){ return Array.from(Map.prototype.keys.call(this)).sort((a, b) => a - b); }
   get values(){ return this.keys.map(key => this.get(key)); }

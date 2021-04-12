@@ -31,7 +31,6 @@ const DUPLICATE_SLIDE = { name: "Duplicate Slide", icon: undefined, shortCut: un
 const DELETE_SLIDE = { name: "Delete Slide", icon: undefined, shortCut: undefined, actionName: "deleteSlide"};
 const SKIP_SLIDE = { name: "Skip Slide", icon: undefined, shortCut: undefined, actionName: "skipSlide"};
 const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, actionName: undefined};
-
 const FILL_COLOR = { name: "Fill color", icon: [0, 9], shortCut: undefined, children: ColorPalette, actionName: 'fillColor'};
 const BORDER_COLOR = { name: "Border color", icon: [1, 9], shortCut: undefined, children: ColorPalette, actionName: 'borderColor'};
 const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined, children: [
@@ -55,11 +54,11 @@ const BORDER_DASH = { name: "Border dash", icon: [3, 9], shortCut: undefined, ch
   { name: "long dash", shortCut: undefined, actionName: "borderDash", value: "12 4"},
 ]};
 
-const BOLD = { name: "Bold", icon: [4, 9], shortCut: undefined, actionName: undefined};
-const ITALIC = { name: "Italic", icon: [5, 9], shortCut: undefined, actionName: undefined};
-const UNDERLINE = { name: "Underline", icon: [6, 9], shortCut: undefined, actionName: undefined};
-const TEXT_COLOR = { name: "Text color", icon: [7, 9], shortCut: undefined, children: ColorPalette};
-const HIGHLIGHT_COLOR = { name: "Highlight color", icon: [8, 9], shortCut: undefined, children: ColorPalette};
+const BOLD = { name: "Bold", icon: [4, 9], shortCut: undefined, actionName: 'bold'};
+const ITALIC = { name: "Italic", icon: [5, 9], shortCut: undefined, actionName: 'italic'};
+const UNDERLINE = { name: "Underline", icon: [6, 9], shortCut: undefined, actionName: 'underline'};
+const TEXT_COLOR = { name: "Text color", icon: [7, 9], shortCut: undefined, children: ColorPalette, actionName: 'textColor'};
+const HIGHLIGHT_COLOR = { name: "Highlight color", icon: [8, 9], shortCut: undefined, children: ColorPalette, actionName: 'highlightColor'};
 
 const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, actionName: undefined, children: [
   { name: "Left", icon: [0, 6], shortCut: undefined, actionName: undefined},
@@ -71,6 +70,7 @@ const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, actionName: u
 const CROP_IMAGE = { name: "Crop image", icon: [5, 10], shortCut: undefined, actionName: undefined};
 const RESET_IMAGE = { name: "Reset image", icon: [6, 10], shortCut: undefined, actionName: undefined};
 
+const DELETE_WRAPPER = { name: "delete", icon: undefined, shortCut: undefined, actionName: "deleteWrappers"};
 
 export const MENU_ITEMS = [
   { name: "Edit", icon: undefined, children: [
@@ -103,4 +103,12 @@ export const IMAGE_TOOLBAR_ITEMS = [
   ...BASE_TOOLBAR_ITEMS, undefined, 
   BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined,
   CROP_IMAGE, RESET_IMAGE
+];
+
+export const SLIDE_CONTEXT_MENU_ITEMS = [
+  DELETE_SLIDE
+];
+
+export const WRAPPER_CONTEXT_MENU_ITEMS = [
+  DELETE_WRAPPER
 ];

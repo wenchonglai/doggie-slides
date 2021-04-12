@@ -12,8 +12,6 @@ class Textbox < ApplicationRecord
 
   before_validation :set_default_values
 
-  validates :text, presence: true
-
   has_many :textstyles, dependent: :destroy, inverse_of: :textbox
   has_one :slide, through: :wrapper
 

@@ -63,6 +63,6 @@ class User < ApplicationRecord
 
   private
   def ensure_doc!
-    Doc.create!({owner_id: self.id, filename: "Thicc doc, so untitled. wow~"})
+    Doc.create!({owner_id: self.id, filename: "Dis doc, so untitled. wow~"})
   end
 end

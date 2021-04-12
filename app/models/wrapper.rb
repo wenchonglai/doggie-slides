@@ -27,7 +27,7 @@ class Wrapper < ApplicationRecord
 
   delegate :user, :doc, to: :slide
 
-  belongs_to :slide, touch: true
+  belongs_to :slide, touch: true, inverse_of: :wrappers
   belongs_to :slide_object, polymorphic: true, inverse_of: :wrapper, dependent: :destroy
 
   validates_presence_of :slide_object

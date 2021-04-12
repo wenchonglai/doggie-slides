@@ -11,7 +11,7 @@
 #
 class Textstyle < ApplicationRecord
   validates :style_string, :offset, presence: true
-  validates :offset, uniqueness: {scope: :textbox_id}
+  # validates :offset, uniqueness: {scope: :textbox_id}
 
   belongs_to :textbox, inverse_of: :textstyles
   validates_presence_of :textbox

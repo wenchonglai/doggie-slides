@@ -1,3 +1,4 @@
+import { getTextstylesByTextboxId } from '../selectors/selectors';
 import * as PresentationUtils from '../utils/presentation_utils';
 import { receiveCurrentSlide, updatePageSettings } from './ui_actions';
 
@@ -34,19 +35,11 @@ export const receiveWrappers = (wrappers) => ({type: RECEIVE_WRAPPERS, wrappers}
 export const receiveWrapper = (wrapper) => ({type: RECEIVE_WRAPPER, wrapper});
 
 export const RECEIVE_TEXT = "RECEIVE_TEXT";
-export const receiveText = (data) => ({type: RECEIVE_TEXT, data});
-
-export const RECEIVE_TEXTBOXES = "RECEIVE_TEXTBOXES";
-export const RECEIVE_TEXTBOX = "RECEIVE_TEXTBOX";
-
-export const receiveTextboxes = (textboxes) => ({type: RECEIVE_TEXTBOXES, textboxes});
-export const receiveTextbox = (textbox) => ({type: RECEIVE_TEXTBOX, textbox});
-
-export const RECEIVE_TEXTSTYLES = "RECEIVE_TEXTSTYLES";
-export const RECEIVE_TEXTSTYLE = "RECEIVE_TEXTSTYLE";
-
-export const receiveTextstyles = (textstyles) => ({type: RECEIVE_TEXTSTYLES, textstyles});
-export const receiveTextstyle = (textstyle) => ({type: RECEIVE_TEXTSTYLE, textstyle});
+export const receiveText = (textData, wrapperData) => ({
+  type: RECEIVE_TEXT, 
+  textData, 
+  wrapperData
+});
 
 // thunk action creators below
 
@@ -72,6 +65,8 @@ export const updateDoc = (formDoc) => (dispatch) =>
       return doc;
     });
 
+// slides
+
 export const moveSlide = ({start, end=start, offset}) => (dispatch) => {
   return PresentationUtils.asyncMoveSlide({start, end, offset})
     .then((slides) => {
@@ -87,19 +82,7 @@ export const addSlide = (formSlide) => (dispatch) =>
       return slide;
     });
 
-export const createText = (textboxData) => (dispatch) => 
-  PresentationUtils.asyncUpdateText(textboxData)
-    .then((resData) => {
-      dispatch(receiveText(resData));
-      return resData;
-    });
-
-export const updateText = (textboxId, textboxData) => (dispatch) => 
-  PresentationUtils.asyncUpdateText(textboxId, textboxData)
-    .then((resData) => {
-      dispatch(receiveText(resData));
-      return resData;
-    });
+// wrappers
 
 export const updateWrapper = (formWrapper) => (dispatch) => 
   PresentationUtils.asyncUpdateWrapper(formWrapper)
@@ -107,4 +90,44 @@ export const updateWrapper = (formWrapper) => (dispatch) =>
       dispatch(receiveWrapper(resData));
       return resData;
     });
-    
+
+// texts
+export const createText = (textData) => (dispatch) =>
+  PresentationUtils.asyncCreateText(textData)
+    .then((resData) => {
+      const wrapperAttributes = resData.wrapperAttributes;
+      const wrapperData = Object.values(wrapperAttributes)[0];
+
+      dispatch(receiveText(resData, wrapperData));
+      return resData;
+    });
+
+export const updateText = (textboxId, textData) => (dispatch, getState) => {
+  const state = getState();
+  const {entities, ui} = state;
+  const textstyles = getTextstylesByTextboxId(state, textboxId);
+
+  const textstylesAttributes = textData.textstylesAttributes;
+  const textstylesAttributeIndexedOnOffset = new Map(
+    textstylesAttributes.map(attribute => [attribute.offset, attribute])
+  );
+  
+  textstyles.forEach(textstyle => {
+    let attribute = textstylesAttributeIndexedOnOffset.get(textstyle.offset);
+
+    if (attribute){
+      attribute.id = textstyle.id;
+    } else {
+      textstylesAttributes.push({id: textstyle.id, _destroy: 1});
+    }
+  });
+  
+  return PresentationUtils.asyncUpdateText(textboxId, textData)
+    .then((resData) => {
+      const wrapperAttributes = resData.wrapperAttributes;
+      const wrapperData = Object.values(wrapperAttributes)[0];
+      
+      dispatch(receiveText(resData, wrapperData));
+      return resData;
+    });
+}

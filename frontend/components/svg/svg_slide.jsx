@@ -1,11 +1,52 @@
 import React, {useState, useEffect, useRef} from 'react';
+import { updateMenuAction } from '../../actions/ui_actions';
 
 import {SVGWrapperContainer, SVGNoWrapperContainer} from './svg_wrapper_containers';
 
-const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, height, slide, slideId, ...props}, ref) => {
+const ReactSVG = React.forwardRef(({
+  children, isPreview, containerWidth, width, height, slide, slideId,
+  menuAction, updateMenuAction, createText, handleContextMenu,
+  ...props
+}, ref) => {
+
 	let widthAttr = {};
 
   if (containerWidth) { widthAttr = {width: containerWidth}; }
+
+  function handleMouseDownCapture(e){
+    menuAction === 'Select' || e.stopPropagation();
+  }
+
+  function handleClick(e){
+    const rect = e.currentTarget.children[0].children[0].children[0].getBoundingClientRect();
+    const scale = width / rect.width;
+    const x = e.clientX - rect.x;
+    const y = e.clientY - rect.y;
+    const textData = {
+      text: "aaa", 
+      wrapperAttributes: {
+        slideId,
+        groupId: null,
+        zIndex: 1,
+        width: 400,
+        height: 50,
+        translateX: x * scale,
+        translateY: y * scale,
+      },
+      textstylesAttributes: [{
+        styleString: "font: 20px Arial; fill: black",
+        offset: 0
+      }]
+    };
+
+    switch (menuAction){
+      case 'Select': return;
+      case 'Text Box': {
+        createText(textData);
+      }
+      default: return updateMenuAction('Select');
+    };
+  }
 
 	return (
 		<svg
@@ -20,6 +61,8 @@ const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, 
       ref={ref}
       {...widthAttr}
       {...props}
+      onMouseDownCapture={isPreview ? undefined : (e) => handleMouseDownCapture(e)}
+      onClick={isPreview ? undefined : (e) => handleClick(e)}
     >
       
 			<g transform="translate(1000 1000)">
@@ -29,7 +72,10 @@ const ReactSVG = React.forwardRef(({children, isPreview, containerWidth, width, 
         { (slide ? slide.wrapperIds : []).map(wrapperId => (
             isPreview ?
               <SVGNoWrapperContainer key={wrapperId} wrapperId = {wrapperId}/> :
-              <SVGWrapperContainer key={wrapperId} slideId={slideId} wrapperId = {wrapperId} svgDOM={ref.current}/>
+              <SVGWrapperContainer 
+                key={wrapperId} slideId={slideId} wrapperId = {wrapperId} svgDOM={ref.current}
+                handleContextMenu={handleContextMenu}
+              />
           ))
         }
         

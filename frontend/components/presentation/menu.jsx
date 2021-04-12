@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { connect } from 'react-redux';
 import MenuItemContainer from './menu_item_container'
 import MenuContainer from './menu_container'
@@ -16,7 +16,6 @@ function DropdownMenu({className, item, active=false, requireClick=true, tier = 
   }
 
   const toggleVisibility = (e) => {
-   
     _setActive(!_active);
 
     item.children || (parentHandleBlur && parentHandleBlur(e));
@@ -67,6 +66,10 @@ function DropdownMenu({className, item, active=false, requireClick=true, tier = 
   }
 
   let childComponent = getChildComponent(item);
+
+  useEffect(() => {
+    _setActive(active);
+  }, [active]);
 
   return (
     <section

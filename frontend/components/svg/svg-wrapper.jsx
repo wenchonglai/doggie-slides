@@ -12,49 +12,44 @@ function throttle(e, timeoutRef, func, ...args){
       );
     }; break;
     default: {
+
       clearTimeout(timeoutRef.current)
     }
   }
 }
 
 export default function SVGWrapper({
-  wrapper, editable, svgDOM, pageWidth, pageHeight,
+  wrapperId, wrapper, editable, svgDOM, pageWidth, pageHeight,
   updateWrapperHandler, updateWrapperSelection, deleteWrapperSelection,
+  handleContextMenu, selectedWrapperIds,
   ...props
 }){
-  const {
+  const { 
     slideObjectId, slideObjectType,
     translateX=0, translateY=0, rotate=0, width = 300, height = 200,
     fill="none", stroke="none", strokeWidth="0", strokeDasharray=""
   } = wrapper;
-  const [_size, _setSize] = useState({width, height});
-  const [_translate, _setTranslate] = useState({x: translateX, y: translateY});
-  const [_rotate, _setRotate] = useState(rotate); 
+
+  
   const blurTimeoutRef = useRef();
-  const [_active, _setActive] = useState(false);
   const timeoutRef = useRef();
   const eventListenerRef = useRef(
     function handleBlur(e){
-      // e.preventDefault();
-      console.log(wrapper.id, 'blur');
-      blurTimeoutRef.current = setTimeout(() => {
-        _setActive(false);
-      }, 0)
-      
-      svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+      blurTimeoutRef.current = setTimeout(() => _setActive(false), 0)
     }
   );
+    
+  const [_size, _setSize] = useState({width, height});
+  const [_translate, _setTranslate] = useState({x: translateX, y: translateY});
+  const [_rotate, _setRotate] = useState(rotate); 
+  const [_active, _setActive] = useState(selectedWrapperIds.includes(wrapperId));
 
   function onFocus(e){
-    e.stopPropagation();
-    clearTimeout(blurTimeoutRef.current);
-    svgDOM.addEventListener('mousedown', eventListenerRef.current);
-    
+    clearTimeout(blurTimeoutRef.current)
     _setActive(true);
   }
   
   function handleMove(e){
-    e.stopPropagation();
     const clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
     const scale = pageWidth / clientRect.width;
     const {dx, dy} = e;
@@ -138,9 +133,9 @@ export default function SVGWrapper({
       case 'Textbox': 
       return (
         <SVGTextAreaContainer
-        editable={editable}
-        textboxId={slideObjectId}
-        width={_size.width} height={_size.height}
+          textboxId={slideObjectId}
+          width={_size.width} height={_size.height}
+          active={_active}
         />);
         // case 'image': return <SVGImage id={id} editable={editable}/>;
         // case 'diagram': return <SVGShape id={id} editable={editable}/>;
@@ -151,7 +146,6 @@ export default function SVGWrapper({
 
     useEffect(() => {
       return () => {
-        svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
         clearTimeout(timeoutRef.current);
       }
     }, []);
@@ -165,14 +159,19 @@ export default function SVGWrapper({
     }, [wrapper]);
 
     editable && useEffect(() => {
-      _active ?
-      updateWrapperSelection([wrapper.id]) :
-      deleteWrapperSelection([wrapper.id])
+      if (_active){
+        svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
+        updateWrapperSelection([wrapper.id]);
+      } else {
+        
+        svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+        deleteWrapperSelection([wrapper.id]);
+      }
     }, [_active])
     
     useEffect(() => {
       return () => {
-        svgDOM && svgDOM.removeEventListener('dom destroyed', eventListenerRef.current);
+        svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
         clearTimeout(timeoutRef.current);
       }
     }, [svgDOM]);
@@ -182,6 +181,7 @@ export default function SVGWrapper({
       transform={`rotate(${_rotate}) translate(${_translate.x}, ${_translate.y})`}
       transform-origin={`${_translate.x + _size.width / 2} ${_translate.y +_size.height / 2}`}
       onMouseDown={editable && svgDOM ? onFocus : null}
+      onContextMenu={editable ? e => handleContextMenu(e, wrapper) : null}
     > 
       <rect 
         width={width} height={height}
@@ -194,7 +194,6 @@ export default function SVGWrapper({
               active={_active}
               {...{svgDOM, handleMove, handleRotate, handleResize}}
               width={_size.width} height={_size.height}
-              
             >
               {component}
             </SVGEditFrame> : 
