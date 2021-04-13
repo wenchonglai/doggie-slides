@@ -18,7 +18,7 @@ export const newSlide = () => (dispatch, getState) => {
 
       dispatch(PresentationActions.receiveSlides(resSlides));
       dispatch(UIActions.receiveCurrentSlide(newSlideId));
-    }, (err) => {console.log(err)});
+    }, (err) => {console.error(err)});
 }
 
 export const deleteSlide = () => (dispatch, getState) => {
@@ -35,7 +35,7 @@ export const deleteSlide = () => (dispatch, getState) => {
 
       dispatch(PresentationActions.receiveSlides(resSlides));
       dispatch(UIActions.receiveCurrentSlide(newSlideId));
-    }, (err) => {console.log(err)});
+    }, (err) => {console.error(err)});
 }
 
 export const skipSlide = () => (dispatch, getState) => {
@@ -55,7 +55,7 @@ export const textbox = () => (dispatch, getState) => {
   // PresentationUtils.asyncUpdateSlide(reqSlide)
   //   .then(resSlide => {
   //     dispatch(PresentationActions.receiveSlide(resSlide));
-  //   }, (err) => {console.log(err)});
+  //   }, (err) => {console.error(err)});
 }
 
 export const updateWrapperAttribute = (key) => 
@@ -72,7 +72,7 @@ export const updateWrapperAttribute = (key) =>
     return wrapper && PresentationUtils.asyncUpdateWrapper(wrapper)
       .then(resWrapper => {
         dispatch(PresentationActions.receiveWrapper(resWrapper));
-      }, (err) => {console.log(err)});
+      }, (err) => {console.error(err)});
   }
 
 export const fillColor = updateWrapperAttribute('fill');
@@ -99,7 +99,7 @@ export const deleteWrappers = () => (dispatch, getState) => {
     });
 }
 
-export const updateTextstyleAttribute = (key) => 
+export const updateTextstyleAttributeCreator = (key) => 
   (value) => (dispatch, getState) => {
     const state = getState();
     const {entities, ui} = state;
@@ -113,24 +113,31 @@ export const updateTextstyleAttribute = (key) =>
       );
     const dynamicTextReduxState = dynamicText.toReduxState();
 
-    // dispatch(UIActions.updateUITextSelection({
-    //   ...ui.selections,
-    //   textboxId: textbox.id,
-    //   uiTextData: dynamicTextReduxState
-    // }));
-    // cursorOffset: 7
-  // selectOffset: 7
-  // textboxId: 335
-  // uiTextData:
-  // text: "012345679012356789"
-  //   textstylesAttributes: Array(3)
-  //     0: {offset: 0, styleString: "font: 48px comic sans ms; fill: green"}
-  //     1: {offset: 3, styleString: "font: 48px comic sans ms; fill: #ffaf3f"}
-  //     2: {offset: 17, styleString: "font: 48px comic sans ms; fill: green"}
     dispatch(PresentationActions.updateText(textbox.id, dynamicTextReduxState));
   }
 
-export const textColor = updateTextstyleAttribute('fill');
-export const bold = updateTextstyleAttribute('fontWeight');
-export const italic = updateTextstyleAttribute('fontStyle');
-export const underline = updateTextstyleAttribute('textDecoration');
+export const textColor = updateTextstyleAttributeCreator('fill');
+export const bold = updateTextstyleAttributeCreator('fontWeight');
+export const italic = updateTextstyleAttributeCreator('fontStyle');
+export const underline = updateTextstyleAttributeCreator('textDecoration');
+export const fontFamily = updateTextstyleAttributeCreator('fontFamily');
+export const fontSize = updateTextstyleAttributeCreator('fontSize');
+
+export const updateFontSizeCreator = (value) =>
+  () => (dispatch, getState) => {
+    const state = getState();
+    const {selectOffset, cursorOffset} = state.ui.selections;
+    const textbox = getSelectedTextbox(state);
+    const dynamicText = DynamicText
+      .fromTexbox(state, textbox)
+      .changeFontSize(
+        ...[cursorOffset, selectOffset].sort((a, b) => a - b),
+        value
+      );
+    const dynamicTextReduxState = dynamicText.toReduxState();
+    
+    dispatch(PresentationActions.updateText(textbox.id, dynamicTextReduxState));
+  }
+
+export const increaseFontSize = updateFontSizeCreator(2);
+export const decreaseFontSize = updateFontSizeCreator(-2);

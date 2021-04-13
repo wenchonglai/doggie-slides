@@ -38,7 +38,7 @@ export function toStyleString(styleObject){
   const fontString = [fontStyle, fontWeight, fontSize, fontFamily]
     .filter(x => x)
     .join(' ');
-console.log(styleObject, fontString, args)
+
   return Object.entries({...args, font: fontString})
     .filter(([k, v]) => v !== undefined)
     .map(([k, v]) => `${k}: ${v}`)

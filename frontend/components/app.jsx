@@ -21,7 +21,6 @@ function App({errors, history, clearErrorsHandler}){
     });
   
     return () => {
-      console.log(unListen);
       unListenRef.current && 
         unListenRef.current.unlisten();
     }

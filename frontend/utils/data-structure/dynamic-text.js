@@ -161,7 +161,6 @@ export default class DynamicText{
     // const style = this._styleMap.get(leftKey);
 
     // if ( index1 > 0 &&  toStyleString(leftStyle) === toStyleString(style)) {
-    //   console.log(index1);
     //   this._styleMap.delete(index1);
     // }
 
@@ -212,7 +211,21 @@ export default class DynamicText{
   get lastOffset(){
     return this._segmentMap.lastKey;
   }
+  changeFontSize(offset1, offset2, value){
+    this.setStyle(offset1, offset2, {'_': true});
+    
+    for (let i = offset1; i < offset2; i++){
+      let style = this._styleMap.get(i);
 
+      if (style && style.fontSize){
+        let currFontSize = Number(style.fontSize.replace('px', ''));
+        style.fontSize = (Number(currFontSize + value) || currFontSize) + 'px';
+      }
+    }
+
+    return this.setStyle(offset1, offset2, {'_': undefined});
+  }
+  
   setStyle(offset1 = 0, offset2 = this.length, style){
     if (offset1 >= offset2) return this;
   // .o...a....b..c...... - currStyle
@@ -435,19 +448,3 @@ export default class DynamicText{
     };
   }
 }
-
-// let dt = new DynamicText('01239');
-
-// console.time();
-// dt.insertAt(4, '45678');
-// console.timeEnd();
-// console.time();
-// dt.insertAt(5, 'abcd', {color: 'red'});
-// console.timeEnd();
-// console.time();
-// dt.insertAt(10, '!!!!', {color: 'red'});
-// console.timeEnd();
-// console.log(dt.fragments.toString());
-// console.time();
-// console.timeEnd();
-// console.log(dt, dt.fragments._offsets, dt.toString(), dt.toSVG());

@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import { connect } from 'react-redux';
 import MenuItemContainer from './menu_item_container'
 import MenuContainer from './menu_container'
-import * as ItemThunkActions from '../../actions/item_thunk_actions'
 
 function DropdownMenu({
   className, item, active=false, data, requireClick=true, tier = 0, parentHandleBlur, 
@@ -27,10 +26,10 @@ function DropdownMenu({
     item.children || (parentHandleBlur && parentHandleBlur(e));
   }
   
-  const handleBlur = (e) => {
+  const handleBlur = (e, value) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!e.target.contains(e.relatedTarget)){
       clearTimeout(_timeout.current);
       _setActive(false);
@@ -47,60 +46,59 @@ function DropdownMenu({
   const getChildComponent = (item) => {
     let childComponent = null;
     let children = item.children;
-    let ChilcContainerClass;
     
-    if (children === undefined || children === null) {
-    } else if (Array.isArray(children)){
-      childComponent = (
-        <MenuContainer
-          tier={tier + 1}
-          items={children}
-          requireClick={false}
-          parentHandleBlur={handleBlur}
-          parentData={_data}
-        />
-        );
-      } else {
-        const ChildContainerClass = connect(
-          null, dispatch => ({dispatch})
-          )(children);
-          
-          return (
-            <ChildContainerClass 
-            item={item}
-            tier={tier + 1}
-            requireClick={false}
-            parentHandleBlur={handleBlur}
-            parentHandleChange={handleChange}
-            parentData={_data}
-            />);
-          }
-          
-          return childComponent;
-        }
-        
-        let childComponent = getChildComponent(item);
-        
-        useEffect(() => {
-          _setActive(active);
-        }, [active]);
-        
-        useEffect(() => {
-          _setData(data);
-        }, [data]);
+  if (children === undefined || children === null) {
+  } else if (Array.isArray(children)){
+    childComponent = (
+      <MenuContainer
+        tier={tier + 1}
+        items={children}
+        requireClick={false}
+        parentHandleBlur={handleBlur}
+        parentData={_data}
+      />
+      );
+  } else {
+    const ChildContainerClass = connect(
+      null, dispatch => ({dispatch})
+    )(children);
+    
+    return (
+      <ChildContainerClass 
+      item={item}
+      tier={tier + 1}
+      requireClick={false}
+      parentHandleBlur={handleBlur}
+      parentHandleChange={handleChange}
+      parentData={_data}
+      />);
+    }
+    
+    return childComponent;
+  }
+      
+  let childComponent = getChildComponent(item);
+  
+  useEffect(() => {
+    _setActive(active);
+  }, [active]);
+  
+  useEffect(() => {
+    _setData(data);
+  }, [data]);
 
-        return (
-          <section
-          className={`dropdown-menu ${(item.type === 'boolean' ? _data : _active) ? '' : 'hidden'} ${className}`}
-          onBlur={e => requireClick ? handleBlur(e) : undefined}
-          onMouseLeave={requireClick ? undefined : e => handleBlur(e)}
-          tabIndex="0"
-          >
+  return (
+    <section
+      className={`dropdown-menu ${item.type} ${(item.type === 'boolean' ? _data : _active) ? '' : 'hidden'} ${className}`}
+      onBlur={e => requireClick ? handleBlur(e) : undefined}
+      onMouseLeave={requireClick ? undefined : e => handleBlur(e)}
+      tabIndex="0"
+    >
       <MenuItemContainer
         className='button dropdown-button'
         item={item} 
         onClick={requireClick ? (e) => {toggleVisibility(e)} : null}
-        onMouseOver={requireClick ? null : () => handleMouseOver() }
+        onMouseOver={requireClick ? null : (e) => handleMouseOver(e) }
         parentHandleChange={handleChange}
         parentData={_data}
       />
@@ -117,10 +115,10 @@ function DropdownMenu({
 
 const DropdownMenuContainer = connect(
   (state, {item}) => ({
-    state,
     data: item && item.key && (
       (item.key instanceof Function) ?
-        (item.key)(state) : state.ui.selections[item.key]
+        (item.key)(state) : 
+        state.ui.selections[item.key]
     )
   }), 
   dispatch => ({dispatch})
@@ -131,14 +129,14 @@ export default function Menu({className = "", items, tier = 0, requireClick=true
     <ul className={`menu tier-${tier} ${className}`}>
       { items.map((item, i) => 
           ( item ? ( 
-              <li key={item.name}>
+              <div key={item.name}>
                 <DropdownMenuContainer
                   item={item}
                   className={items.className || ""}
                   active={nextMenuAction === item.name}
                   parentHandleBlur={parentHandleBlur}
                 />
-              </li>
+              </div>
             ) : <hr className='separator' key={i}/>
           )
         )

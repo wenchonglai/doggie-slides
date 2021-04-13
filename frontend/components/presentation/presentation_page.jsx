@@ -30,7 +30,6 @@ export default function PresentationPage({
   }
 
   const onContextMenu = function(e){
-    // console.log(contextMenuRef.current.focus())
     _setRightClick({x: e.clientX, y: e.clientY});
   }
 
@@ -49,7 +48,6 @@ export default function PresentationPage({
 
 
   useEffect(() => {
-    // console.log(doc);
     // updateCurrentSlideHandler(currentSlideId);
     if (doc){
       if (!currentSlideId){

@@ -36,7 +36,6 @@ function SVGTextAreaSelect({className, text, start, end}){
   if (endOffset[1] == startOffset[1]){
     blocks.push(<rect key={key} x={startOffset[0]} y={startOffset[1] - startOffset[2]} width={endOffset[0] - startOffset[0]} height={startOffset[2]}/>);
   } else {
-    console.log(key);
     blocks.push(<rect key={key} x={0} y={endOffset[1] - startOffset[2]} width={endOffset[0]} height={startOffset[2]}/>);
   }
 
@@ -56,7 +55,6 @@ export default function SVGTextArea({
     clearTimeout(_timeout.current);
 
     _timeout.current = setTimeout(() => {
-      // console.log('updateTextHandler', entities.textboxes[textboxId], textRef.current);
       updateTextHandler(textboxId, textRef.current.toReduxState());
     }, 2000);
   }
@@ -114,7 +112,6 @@ export default function SVGTextArea({
           // if (cursorOffsetRef.current > 0) cursorOffsetRef.current -= 1;
       } else if (KEYCODE_MAP[e.keyCode]) {
         inputCacheRef.current += KEYCODE_MAP[e.keyCode];
-        console.log(e.keyCode);
       } else if (e.key.length > 1){
         switch (e.keyCode){
           case 37: { //left arrow
@@ -138,7 +135,6 @@ export default function SVGTextArea({
             if (!shiftKey) selectOffsetRef.current = cursorOffsetRef.current;
           }; break; 
           default: {
-            // console.log(e.keyCode);
           }
         }
 
@@ -182,7 +178,6 @@ export default function SVGTextArea({
   //   e.preventDefault();
   //   e.stopPropagation();
   //   _setActive(editable);
-  //   // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._segmentMap);
   // }
 
   // function blurHandler(e){
@@ -221,7 +216,6 @@ export default function SVGTextArea({
   const [cursorX, cursorY, lineHeight] = (textRef.current.getPositionByOffset(_cursorOffset));
 
   useEffect(() => {
-    // console.log(styleStrings);
     textRef.current = new DynamicText(text, styleStrings);
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();

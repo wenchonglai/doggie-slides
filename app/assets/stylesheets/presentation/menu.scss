@@ -74,11 +74,82 @@ section.dropdown-menu, section.dropdown {
 
 ul.menu{
   section.dropdown-menu {
+    &.input {
+      > div.dropdown-body {
+        min-width: 0;
+        padding: 4px 0;
+
+        div.dropdown-button {
+          padding: 4px 0;
+        }
+      }
+
+      div.menu-item {
+        justify-content: center;
+      }
+    }
 
     div.menu-item {
       position: relative;
       display: flex;
       align-items: center;
+
+      &.inc-dec-button, &.input{
+        padding: 0px;
+        border-radius: 0;
+        border: 1px solid #dadce0;
+        margin: 0;
+      }
+
+      &.inc-dec-button{
+        > .icon-box {
+          > .menu-icon{
+            transform: scale(0.666);
+          }
+        }
+      }
+
+      &.input {
+        border-left: none;
+        border-right: none;
+        > .icon-box {
+          width: 40px;
+          position: relative;
+          display: flex;
+          justify-content: center;
+
+          > input {
+            border: none;
+            outline-width: 3px;
+            text-align: center;
+            width: calc(100% - 6px);
+            height: 16px;
+          }
+        }
+        > .submenu-indicator {
+          display: none;
+        }
+      }
+
+      &.input-dropdown {
+        width: 40px;
+        > .icon-box {
+          display: none;
+        }
+        > .submenu-indicator {
+          display: none;
+        }
+      }
+
+      &.font {
+        > div.icon-box {
+          box-sizing: border-box;
+          padding: 0 8px;
+          width: 84px;
+          font-size: 11px;
+          font-weight: 500;
+        }
+      }
 
       &.color {
         padding: 1px 3px;
@@ -180,7 +251,7 @@ ul.docs-menu {
   }
   
   &.tier-0 {
-    > li > section.dropdown-menu {
+    > div > section.dropdown-menu {
       > div.dropdown-button {
         padding: 4px 6px;
         border-radius: 4px;
@@ -219,7 +290,7 @@ ul.toolbar-menu.tier-0  {
     margin: 0 4px;
   }
   
-  li:hover {
+  div:hover {
     > section.hidden > div > .menu-item-name{
       visibility: visible;
       opacity: 1;
@@ -228,13 +299,13 @@ ul.toolbar-menu.tier-0  {
     }
   }
 
-  > li > section:not(.hidden){
+  > div > section:not(.hidden){
     > div.dropdown-button .menu-icon {
       opacity: 1;
     }
   }
 
-  > li > section {
+  > div > section {
     > div.dropdown-button {
       margin: 3px 1px;
       padding: 3px 3px;

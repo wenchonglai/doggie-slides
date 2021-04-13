@@ -2985,11 +2985,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "borderWeight": () => (/* binding */ borderWeight),
 /* harmony export */   "borderDash": () => (/* binding */ borderDash),
 /* harmony export */   "deleteWrappers": () => (/* binding */ deleteWrappers),
-/* harmony export */   "updateTextstyleAttribute": () => (/* binding */ updateTextstyleAttribute),
+/* harmony export */   "updateTextstyleAttributeCreator": () => (/* binding */ updateTextstyleAttributeCreator),
 /* harmony export */   "textColor": () => (/* binding */ textColor),
 /* harmony export */   "bold": () => (/* binding */ bold),
 /* harmony export */   "italic": () => (/* binding */ italic),
-/* harmony export */   "underline": () => (/* binding */ underline)
+/* harmony export */   "underline": () => (/* binding */ underline),
+/* harmony export */   "fontFamily": () => (/* binding */ fontFamily),
+/* harmony export */   "fontSize": () => (/* binding */ fontSize),
+/* harmony export */   "updateFontSizeCreator": () => (/* binding */ updateFontSizeCreator),
+/* harmony export */   "increaseFontSize": () => (/* binding */ increaseFontSize),
+/* harmony export */   "decreaseFontSize": () => (/* binding */ decreaseFontSize)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3035,7 +3040,7 @@ var newSlide = function newSlide() {
       dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlides(resSlides));
       dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.receiveCurrentSlide(newSlideId));
     }, function (err) {
-      console.log(err);
+      console.error(err);
     });
   };
 };
@@ -3057,7 +3062,7 @@ var deleteSlide = function deleteSlide() {
       dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlides(resSlides));
       dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.receiveCurrentSlide(newSlideId));
     }, function (err) {
-      console.log(err);
+      console.error(err);
     });
   };
 };
@@ -3082,7 +3087,7 @@ var textbox = function textbox() {
     }); // PresentationUtils.asyncUpdateSlide(reqSlide)
     //   .then(resSlide => {
     //     dispatch(PresentationActions.receiveSlide(resSlide));
-    //   }, (err) => {console.log(err)});
+    //   }, (err) => {console.error(err)});
   };
 };
 var updateWrapperAttribute = function updateWrapperAttribute(key) {
@@ -3105,7 +3110,7 @@ var updateWrapperAttribute = function updateWrapperAttribute(key) {
       return wrapper && _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_4__.asyncUpdateWrapper(wrapper).then(function (resWrapper) {
         dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveWrapper(resWrapper));
       }, function (err) {
-        console.log(err);
+        console.error(err);
       });
     };
   };
@@ -3139,7 +3144,7 @@ var deleteWrappers = function deleteWrappers() {
     });
   };
 };
-var updateTextstyleAttribute = function updateTextstyleAttribute(key) {
+var updateTextstyleAttributeCreator = function updateTextstyleAttributeCreator(key) {
   return function (value) {
     return function (dispatch, getState) {
       var _DynamicText$fromTexb;
@@ -3156,29 +3161,39 @@ var updateTextstyleAttribute = function updateTextstyleAttribute(key) {
         return a - b;
       })).concat([_defineProperty({}, key, value)]));
 
-      var dynamicTextReduxState = dynamicText.toReduxState(); // dispatch(UIActions.updateUITextSelection({
-      //   ...ui.selections,
-      //   textboxId: textbox.id,
-      //   uiTextData: dynamicTextReduxState
-      // }));
-      // cursorOffset: 7
-      // selectOffset: 7
-      // textboxId: 335
-      // uiTextData:
-      // text: "012345679012356789"
-      //   textstylesAttributes: Array(3)
-      //     0: {offset: 0, styleString: "font: 48px comic sans ms; fill: green"}
-      //     1: {offset: 3, styleString: "font: 48px comic sans ms; fill: #ffaf3f"}
-      //     2: {offset: 17, styleString: "font: 48px comic sans ms; fill: green"}
-
+      var dynamicTextReduxState = dynamicText.toReduxState();
       dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateText(textbox.id, dynamicTextReduxState));
     };
   };
 };
-var textColor = updateTextstyleAttribute('fill');
-var bold = updateTextstyleAttribute('fontWeight');
-var italic = updateTextstyleAttribute('fontStyle');
-var underline = updateTextstyleAttribute('textDecoration');
+var textColor = updateTextstyleAttributeCreator('fill');
+var bold = updateTextstyleAttributeCreator('fontWeight');
+var italic = updateTextstyleAttributeCreator('fontStyle');
+var underline = updateTextstyleAttributeCreator('textDecoration');
+var fontFamily = updateTextstyleAttributeCreator('fontFamily');
+var fontSize = updateTextstyleAttributeCreator('fontSize');
+var updateFontSizeCreator = function updateFontSizeCreator(value) {
+  return function () {
+    return function (dispatch, getState) {
+      var _DynamicText$fromTexb2;
+
+      var state = getState();
+      var _state$ui$selections = state.ui.selections,
+          selectOffset = _state$ui$selections.selectOffset,
+          cursorOffset = _state$ui$selections.cursorOffset;
+      var textbox = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_2__.getSelectedTextbox)(state);
+
+      var dynamicText = (_DynamicText$fromTexb2 = _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_3__.default.fromTexbox(state, textbox)).changeFontSize.apply(_DynamicText$fromTexb2, _toConsumableArray([cursorOffset, selectOffset].sort(function (a, b) {
+        return a - b;
+      })).concat([value]));
+
+      var dynamicTextReduxState = dynamicText.toReduxState();
+      dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateText(textbox.id, dynamicTextReduxState));
+    };
+  };
+};
+var increaseFontSize = updateFontSizeCreator(2);
+var decreaseFontSize = updateFontSizeCreator(-2);
 
 /***/ }),
 
@@ -3769,7 +3784,6 @@ function App(_ref) {
       }
     });
     return function () {
-      console.log(unListen);
       unListenRef.current && unListenRef.current.unlisten();
     };
   }, []);
@@ -3983,8 +3997,7 @@ function FilmStrip(_ref2) {
     setMoveToPage(-1);
   }
 
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {// console.log(currentSlideId);
-    // history.replace(`/presentation/${currentSlideId}`);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {// history.replace(`/presentation/${currentSlideId}`);
   }, [currentSlideId]);
   var slidesComponents = Object.values(slides).sort(function (a, b) {
     return a.page - b.page;
@@ -4087,6 +4100,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/data-structure/dynamic-text */ "./frontend/utils/data-structure/dynamic-text.js");
 /* harmony import */ var _utils_color_palette__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/color_palette */ "./frontend/components/utils/color_palette.jsx");
+var _FONT_SIZE;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -4269,37 +4286,30 @@ var BORDER_WEIGHT = {
   shortCut: undefined,
   children: [{
     name: "none",
-    shortCut: undefined,
     actionName: "borderWeight",
     value: "none"
   }, undefined, {
     name: "1px",
-    shortCut: undefined,
     actionName: "borderWeight",
     value: 1
   }, {
     name: "2px",
-    shortCut: undefined,
     actionName: "borderWeight",
     value: 2
   }, {
     name: "3px",
-    shortCut: undefined,
     actionName: "borderWeight",
     value: 3
   }, {
     name: "4px",
-    shortCut: undefined,
     actionName: "borderWeight",
     value: 4
   }, {
     name: "6px",
-    shortCut: undefined,
     actionName: "borderWeight",
     value: 6
   }, {
     name: "8px",
-    shortCut: undefined,
     actionName: "borderWeight",
     value: 8
   }]
@@ -4310,37 +4320,30 @@ var BORDER_DASH = {
   shortCut: undefined,
   children: [{
     name: "none",
-    shortCut: undefined,
     actionName: "borderDash",
     value: ""
   }, undefined, {
     name: "short dash",
-    shortCut: undefined,
     actionName: "borderDash",
     value: "4 4"
   }, {
     name: "dash",
-    shortCut: undefined,
     actionName: "borderDash",
     value: "6 4"
   }, {
     name: "dotted",
-    shortCut: undefined,
     actionName: "borderDash",
     value: "1 1"
   }, {
     name: "dash dotted",
-    shortCut: undefined,
     actionName: "borderDash",
     value: "8 2 1 2"
   }, {
     name: "dash double dotted",
-    shortCut: undefined,
     actionName: "borderDash",
     value: "8 2 1 1 1 2"
   }, {
     name: "long dash",
-    shortCut: undefined,
     actionName: "borderDash",
     value: "12 4"
   }]
@@ -4358,13 +4361,161 @@ function getCommonTextStyleByKey(key) {
   };
 }
 
+var FONT = {
+  name: "Font",
+  key: getCommonTextStyleByKey("fontFamily"),
+  type: 'font',
+  shortCut: undefined,
+  children: [{
+    name: "Arial",
+    type: 'font-item',
+    value: "Arial",
+    actionName: 'fontFamily'
+  }, {
+    name: "Comic Sans MS",
+    type: 'font-item',
+    value: "Comic Sans MS",
+    actionName: 'fontFamily'
+  }, {
+    name: "Courier New",
+    type: 'font-item',
+    value: "Courier New",
+    actionName: 'fontFamily'
+  }, {
+    name: "Georgia",
+    type: 'font-item',
+    value: "Georgia",
+    actionName: 'fontFamily'
+  }, {
+    name: "Helvetica",
+    type: 'font-item',
+    value: "Helvetica",
+    actionName: 'fontFamily'
+  }, {
+    name: "Impact",
+    type: 'font-item',
+    value: "Impact",
+    actionName: 'fontFamily'
+  }, {
+    name: "Times New Roman",
+    type: 'font-item',
+    value: "Times New Roman",
+    actionName: 'fontFamily'
+  }, {
+    name: "Trebuchet MS",
+    type: 'font-item',
+    value: "Trebuchet MS",
+    actionName: 'fontFamily'
+  }, {
+    name: "Verdana",
+    type: 'font-item',
+    value: "Verdana",
+    actionName: 'fontFamily'
+  }]
+};
+var DECREASE_FONT_SIZE = {
+  name: "Decrease Font Size",
+  icon: [7, 11],
+  type: 'inc-dec-button',
+  actionName: 'decreaseFontSize'
+};
+var FONT_SIZE = (_FONT_SIZE = {
+  name: "Font Size",
+  type: 'input',
+  key: getCommonTextStyleByKey("fontSize")
+}, _defineProperty(_FONT_SIZE, "type", 'input'), _defineProperty(_FONT_SIZE, "actionName", 'fontSize'), _defineProperty(_FONT_SIZE, "children", [{
+  name: "6",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "6px"
+}, {
+  name: "7",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "7px"
+}, {
+  name: "8",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "8px"
+}, {
+  name: "9",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "9px"
+}, {
+  name: "10",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "10px"
+}, {
+  name: "11",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "11px"
+}, {
+  name: "12",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "12px"
+}, {
+  name: "14",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "14px"
+}, {
+  name: "18",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "18px"
+}, {
+  name: "24",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "24px"
+}, {
+  name: "30",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "30px"
+}, {
+  name: "36",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "36px"
+}, {
+  name: "48",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "48px"
+}, {
+  name: "60",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "60px"
+}, {
+  name: "72",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "72px"
+}, {
+  name: "96",
+  actionName: "fontSize",
+  type: 'input-dropdown',
+  value: "96px"
+}]), _FONT_SIZE);
+var INCREASE_FONT_SIZE = {
+  name: "Increase Font Size",
+  icon: [6, 11],
+  type: 'inc-dec-button',
+  actionName: 'increaseFontSize'
+};
 var BOLD = {
   name: "Bold",
   icon: [4, 9],
   type: 'boolean',
   trueValue: 'bold',
   key: getCommonTextStyleByKey('fontWeight'),
-  shortCut: undefined,
   actionName: 'bold'
 };
 var ITALIC = {
@@ -4373,7 +4524,6 @@ var ITALIC = {
   type: 'boolean',
   trueValue: 'italic',
   key: getCommonTextStyleByKey('fontStyle'),
-  shortCut: undefined,
   actionName: 'italic'
 };
 var UNDERLINE = {
@@ -4382,7 +4532,6 @@ var UNDERLINE = {
   type: 'boolean',
   trueValue: 'underline',
   key: getCommonTextStyleByKey('textDecoration'),
-  shortCut: undefined,
   actionName: 'underline'
 };
 var TEXT_COLOR = {
@@ -4390,7 +4539,6 @@ var TEXT_COLOR = {
   icon: [7, 9],
   type: 'color',
   key: getCommonTextStyleByKey('fill'),
-  shortCut: undefined,
   children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_2__.default,
   actionName: 'textColor'
 };
@@ -4464,7 +4612,7 @@ var MENU_ITEMS = [{
   children: [NEW_SLIDE, DUPLICATE_SLIDE, DELETE_SLIDE, SKIP_SLIDE]
 }];
 var BASE_TOOLBAR_ITEMS = [NEW_SLIDE, undefined, ZOOM, SELECT, TEXTBOX, IMAGE, SHAPE];
-var TEXTBOX_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, FILL_COLOR, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, BOLD, ITALIC, UNDERLINE, TEXT_COLOR, HIGHLIGHT_COLOR, undefined, ALIGN]);
+var TEXTBOX_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, FILL_COLOR, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, FONT, DECREASE_FONT_SIZE, FONT_SIZE, INCREASE_FONT_SIZE, undefined, BOLD, ITALIC, UNDERLINE, TEXT_COLOR, HIGHLIGHT_COLOR, undefined, ALIGN]);
 var IMAGE_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, CROP_IMAGE, RESET_IMAGE]);
 var SLIDE_CONTEXT_MENU_ITEMS = [DELETE_SLIDE];
 var WRAPPER_CONTEXT_MENU_ITEMS = [DELETE_WRAPPER];
@@ -4486,7 +4634,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _menu_item_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./menu_item_container */ "./frontend/components/presentation/menu_item_container.jsx");
 /* harmony import */ var _menu_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./menu_container */ "./frontend/components/presentation/menu_container.js");
-/* harmony import */ var _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../actions/item_thunk_actions */ "./frontend/actions/item_thunk_actions.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -4498,7 +4645,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
 
 
 
@@ -4543,7 +4689,7 @@ function DropdownMenu(_ref) {
     item.children || parentHandleBlur && parentHandleBlur(e);
   };
 
-  var handleBlur = function handleBlur(e) {
+  var handleBlur = function handleBlur(e, value) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -4564,7 +4710,6 @@ function DropdownMenu(_ref) {
   var getChildComponent = function getChildComponent(item) {
     var childComponent = null;
     var children = item.children;
-    var ChilcContainerClass;
 
     if (children === undefined || children === null) {} else if (Array.isArray(children)) {
       childComponent = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_3__.default, {
@@ -4601,7 +4746,7 @@ function DropdownMenu(_ref) {
     _setData(data);
   }, [data]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
-    className: "dropdown-menu ".concat((item.type === 'boolean' ? _data : _active) ? '' : 'hidden', " ").concat(className),
+    className: "dropdown-menu ".concat(item.type, " ").concat((item.type === 'boolean' ? _data : _active) ? '' : 'hidden', " ").concat(className),
     onBlur: function onBlur(e) {
       return requireClick ? handleBlur(e) : undefined;
     },
@@ -4615,8 +4760,8 @@ function DropdownMenu(_ref) {
     onClick: requireClick ? function (e) {
       toggleVisibility(e);
     } : null,
-    onMouseOver: requireClick ? null : function () {
-      return handleMouseOver();
+    onMouseOver: requireClick ? null : function (e) {
+      return handleMouseOver(e);
     },
     parentHandleChange: handleChange,
     parentData: _data
@@ -4628,7 +4773,6 @@ function DropdownMenu(_ref) {
 var DropdownMenuContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(function (state, _ref2) {
   var item = _ref2.item;
   return {
-    state: state,
     data: item && item.key && (item.key instanceof Function ? item.key(state) : state.ui.selections[item.key])
   };
 }, function (dispatch) {
@@ -4649,7 +4793,7 @@ function Menu(_ref3) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
     className: "menu tier-".concat(tier, " ").concat(className)
   }, items.map(function (item, i) {
-    return item ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", {
+    return item ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
       key: item.name
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(DropdownMenuContainer, {
       item: item,
@@ -4705,45 +4849,110 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/item_thunk_actions */ "./frontend/actions/item_thunk_actions.js");
 /* harmony import */ var _utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/menu_icon */ "./frontend/components/utils/menu_icon.jsx");
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 
 
-function MenuItem(_ref) {
-  var _ref$className = _ref.className,
-      className = _ref$className === void 0 ? "" : _ref$className,
-      item = _ref.item,
-      dispatch = _ref.dispatch,
-      onClick = _ref.onClick,
-      onMouseMove = _ref.onMouseMove,
-      parentData = _ref.parentData,
-      parentHandleChange = _ref.parentHandleChange;
+
+
+var handleBlur = function handleBlur(e) {
+  var currentTarget = e.nativeEvent.path[3];
+  var htmlElement = e.relatedTarget;
+
+  while (htmlElement) {
+    if (htmlElement === currentTarget) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    htmlElement = htmlElement.parentNode;
+  }
+};
+
+function filterInput(value) {
+  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+      _ref$min = _ref.min,
+      min = _ref$min === void 0 ? 1 : _ref$min,
+      _ref$max = _ref.max,
+      max = _ref$max === void 0 ? 100 : _ref$max;
+
+  if (Number.isNaN(Number(value))) {
+    return undefined;
+  } else {
+    return Math.max(Math.min(value, max), min);
+  }
+}
+
+function MenuItem(_ref2) {
+  var _ref2$className = _ref2.className,
+      className = _ref2$className === void 0 ? "" : _ref2$className,
+      item = _ref2.item,
+      dispatch = _ref2.dispatch,
+      onClick = _ref2.onClick,
+      onMouseMove = _ref2.onMouseMove,
+      parentData = _ref2.parentData,
+      parentHandleChange = _ref2.parentHandleChange;
 
   function handleClick(e) {
-    if (typeof item.actionName == 'string') {
-      item.children || dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName](item.type === 'boolean' ? parentData !== item.trueValue ? item.trueValue : undefined : item.value));
+    var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+    console.log(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName], value, item.value);
+
+    if (!item.children) {
+      dispatch((typeof item.actionName == 'string' ? _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName] : item.actionName)(item.type === 'boolean' ? parentData !== item.trueValue ? item.trueValue : undefined : value === undefined ? item.value : value));
     }
 
     onClick(e);
-    parentHandleChange && parentHandleChange(e);
+    parentHandleChange && parentHandleChange(e, value === undefined ? item.value : value);
   }
 
+  function getMenuIcon(type) {
+    switch (type) {
+      case 'font':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, parentData && parentData.length > 12 ? parentData.substring(0, 10) + '...' : parentData);
+
+      case 'input':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+          type: "text",
+          onBlur: handleBlur,
+          onChange: function onChange(e) {
+            parentHandleChange && parentHandleChange(e, e.currentTarget.value + 'px' || 0);
+          },
+          onKeyDown: function onKeyDown(e) {
+            if (e.key === 'Enter') {
+              var value = filterInput(parentData.replace('px', ''));
+              if (value) dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName](value + 'px'));
+            }
+          },
+          value: parentData ? parentData.replace('px', '') : ''
+        });
+
+      default:
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__.default, {
+          className: "menu-item-icon",
+          icon: item.icon
+        });
+    }
+  }
+
+  var style = item.type === 'font-item' ? {
+    style: {
+      fontFamily: item.value
+    }
+  } : {};
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "menu-item ".concat(className, " ").concat(item.type || '', " ").concat(item.actionName ? '' : 'no-action'),
     onMouseMove: onMouseMove,
     onClick: handleClick
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "icon-box"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__.default, {
-    className: "menu-item-icon",
-    icon: item.icon
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, getMenuIcon(item.type), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "color-box",
     style: {
       backgroundColor: parentData || ''
     }
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", _extends({
     className: "menu-item-name"
-  }, item.name), item.children ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, style), item.name), item.children ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "submenu-indicator"
   }) : null);
 }
@@ -4869,7 +5078,6 @@ function PresentationPage(_ref) {
   };
 
   var onContextMenu = function onContextMenu(e) {
-    // console.log(contextMenuRef.current.focus())
     _setRightClick({
       x: e.clientX,
       y: e.clientY
@@ -4891,7 +5099,6 @@ function PresentationPage(_ref) {
     }
   }, [_rightClick]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    // console.log(doc);
     // updateCurrentSlideHandler(currentSlideId);
     if (doc) {
       if (!currentSlideId) {
@@ -5037,7 +5244,6 @@ function Workspace(_ref) {
   var slideId = _ref.slideId,
       ui = _ref.ui,
       handleContextMenu = _ref.handleContextMenu;
-  // console.log(ui, slideId, entities)
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "workspace"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlideContainer, {
@@ -6926,7 +7132,6 @@ function SVGTextAreaSelect(_ref) {
       height: startOffset[2]
     }));
   } else {
-    console.log(key);
     blocks.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
       key: key,
       x: 0,
@@ -6958,7 +7163,6 @@ function SVGTextArea(_ref2) {
   function handleUpdate() {
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
-      // console.log('updateTextHandler', entities.textboxes[textboxId], textRef.current);
       updateTextHandler(textboxId, textRef.current.toReduxState());
     }, 2000);
   }
@@ -7011,7 +7215,6 @@ function SVGTextArea(_ref2) {
 
       } else if (KEYCODE_MAP[e.keyCode]) {
         inputCacheRef.current += KEYCODE_MAP[e.keyCode];
-        console.log(e.keyCode);
       } else if (e.key.length > 1) {
         switch (e.keyCode) {
           case 37:
@@ -7035,8 +7238,7 @@ function SVGTextArea(_ref2) {
             break;
 
           default:
-            {// console.log(e.keyCode);
-            }
+            {}
         }
       } else {
         if (selectOffsetRef.current !== cursorOffsetRef.current) {
@@ -7074,7 +7276,6 @@ function SVGTextArea(_ref2) {
   //   e.preventDefault();
   //   e.stopPropagation();
   //   _setActive(editable);
-  //   // console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY, textRef.current._segmentMap);
   // }
   // function blurHandler(e){
   //   e.preventDefault();
@@ -7126,7 +7327,6 @@ function SVGTextArea(_ref2) {
       lineHeight = _textRef$current$getP2[2];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    // console.log(styleStrings);
     textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings);
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
@@ -8538,7 +8738,6 @@ var DynamicText = /*#__PURE__*/function () {
       // const [leftKey, leftStyle] = this._styleMap.getLeftEntry(Math.max(index1, 0));
       // const style = this._styleMap.get(leftKey);
       // if ( index1 > 0 &&  toStyleString(leftStyle) === toStyleString(style)) {
-      //   console.log(index1);
       //   this._styleMap.delete(index1);
       // }
       // renew text
@@ -8589,6 +8788,26 @@ var DynamicText = /*#__PURE__*/function () {
     key: "lastOffset",
     get: function get() {
       return this._segmentMap.lastKey;
+    }
+  }, {
+    key: "changeFontSize",
+    value: function changeFontSize(offset1, offset2, value) {
+      this.setStyle(offset1, offset2, {
+        '_': true
+      });
+
+      for (var i = offset1; i < offset2; i++) {
+        var _style = this._styleMap.get(i);
+
+        if (_style && _style.fontSize) {
+          var currFontSize = Number(_style.fontSize.replace('px', ''));
+          _style.fontSize = (Number(currFontSize + value) || currFontSize) + 'px';
+        }
+      }
+
+      return this.setStyle(offset1, offset2, {
+        '_': undefined
+      });
     }
   }, {
     key: "setStyle",
@@ -8900,21 +9119,7 @@ var DynamicText = /*#__PURE__*/function () {
   }]);
 
   return DynamicText;
-}(); // let dt = new DynamicText('01239');
-// console.time();
-// dt.insertAt(4, '45678');
-// console.timeEnd();
-// console.time();
-// dt.insertAt(5, 'abcd', {color: 'red'});
-// console.timeEnd();
-// console.time();
-// dt.insertAt(10, '!!!!', {color: 'red'});
-// console.timeEnd();
-// console.log(dt.fragments.toString());
-// console.time();
-// console.timeEnd();
-// console.log(dt, dt.fragments._offsets, dt.toString(), dt.toSVG());
-
+}();
 
 
 
@@ -9618,7 +9823,6 @@ function toStyleString(styleObject) {
   var fontString = [fontStyle, fontWeight, fontSize, fontFamily].filter(function (x) {
     return x;
   }).join(' ');
-  console.log(styleObject, fontString, args);
   return Object.entries(_objectSpread(_objectSpread({}, args), {}, {
     font: fontString
   })).filter(function (_ref) {

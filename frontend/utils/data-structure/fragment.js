@@ -20,7 +20,6 @@ class Fragment{
   get length(){ return this.text.length; }
   get width(){ 
     ctx.font = this._style.font || '400 16px sans-serif';
-    console.log(this._style.font, ctx.font);
     return ctx.measureText(this.text).width;
   }
   get styleString(){

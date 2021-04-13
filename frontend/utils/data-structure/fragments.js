@@ -73,15 +73,4 @@ class Fragments{
 }
 
 const fs = new Fragments();
-// fs.insert(new Fragment('abc'));
-// fs.insert(new Fragment('defg'));
-// fs.insert(new Fragment('12'), 1);
-// fs.insert(new Fragment('0'), 0);
-// fs.insert(new Fragment('5555'), 4);
-// console.log(fs.toString(), fs.length, fs.toString().length);
-// fs.delete(2);
-// console.log(fs, fs.toString(), fs.length, fs.toString().length);
-// fs.set(1, 'random');
-// console.log(fs, fs.toString(), fs.length, fs.toString().length); 
-
 export default Fragments;

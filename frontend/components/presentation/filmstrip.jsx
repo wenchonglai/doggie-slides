@@ -73,7 +73,6 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
   }
 
   useEffect(() => {
-    // console.log(currentSlideId);
     // history.replace(`/presentation/${currentSlideId}`);
   }, [currentSlideId]);
 
