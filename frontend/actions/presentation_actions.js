@@ -124,7 +124,6 @@ export const updateText = (textboxId, textData) => (dispatch, getState) => {
     }
   });
   
-console.warn(textData);
   return PresentationUtils.asyncUpdateText(textboxId, textData)
     .then((resData) => {
       const wrapperAttributes = resData.wrapperAttributes;

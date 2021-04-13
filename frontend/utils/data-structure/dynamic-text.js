@@ -226,7 +226,7 @@ export default class DynamicText{
     let leftCurrStyle = styleMap.getLeftValue(offset1);
     let newStyle = {...leftCurrStyle, ...style};
     let leftNewStyle = newStyle;
-    
+
     if (toStyleString(newStyle) !== toStyleString(leftCurrStyle))
       styleMap.set(offset1, newStyle);
 
@@ -271,6 +271,7 @@ export default class DynamicText{
     // for (let i of sortedKeys)
     //   if (i >= index1 && i < index2)
     //     this._styleMap.delete(i);
+
     return this;
   }
 

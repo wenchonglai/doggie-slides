@@ -20,7 +20,7 @@ export function parseFontString(fontString){
   if (!fontString) return {};
 
   const fontStyles = {};
-  const [firstString, fontSize, lineHeight, fontFamily] = fontString.split(/(\d+px)(?:\/([\d\.]+(?:px)?))?/);
+  const [firstString, fontSize, lineHeight, fontFamily] = fontString.split(/\ *(\d+px)(?:\/([\d\.]+(?:px)?))?\ */);
   const fontWeight = firstString.match(/\d+|bold/);
   const fontStyle = firstString.match(/italic/);
 
@@ -38,8 +38,8 @@ export function toStyleString(styleObject){
   const fontString = [fontStyle, fontWeight, fontSize, fontFamily]
     .filter(x => x)
     .join(' ');
-
-  return Object.entries({font: fontString, ...args})
+console.log(styleObject, fontString, args)
+  return Object.entries({...args, font: fontString})
     .filter(([k, v]) => v !== undefined)
     .map(([k, v]) => `${k}: ${v}`)
     .join("; ");

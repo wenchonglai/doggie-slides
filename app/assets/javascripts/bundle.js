@@ -3388,7 +3388,6 @@ var updateText = function updateText(textboxId, textData) {
         });
       }
     });
-    console.warn(textData);
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncUpdateText(textboxId, textData).then(function (resData) {
       var wrapperAttributes = resData.wrapperAttributes;
       var wrapperData = Object.values(wrapperAttributes)[0];
@@ -4720,8 +4719,6 @@ function MenuItem(_ref) {
       parentHandleChange = _ref.parentHandleChange;
 
   function handleClick(e) {
-    console.log(handleClick);
-
     if (typeof item.actionName == 'string') {
       item.children || dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName](item.type === 'boolean' ? parentData !== item.trueValue ? item.trueValue : undefined : item.value));
     }
@@ -9595,7 +9592,7 @@ function parseFontString(fontString) {
   if (!fontString) return {};
   var fontStyles = {};
 
-  var _fontString$split = fontString.split(/(\d+px)(?:\/([\d\.]+(?:px)?))?/),
+  var _fontString$split = fontString.split(/\ *(\d+px)(?:\/([\d\.]+(?:px)?))?\ */),
       _fontString$split2 = _slicedToArray(_fontString$split, 4),
       firstString = _fontString$split2[0],
       fontSize = _fontString$split2[1],
@@ -9621,9 +9618,10 @@ function toStyleString(styleObject) {
   var fontString = [fontStyle, fontWeight, fontSize, fontFamily].filter(function (x) {
     return x;
   }).join(' ');
-  return Object.entries(_objectSpread({
+  console.log(styleObject, fontString, args);
+  return Object.entries(_objectSpread(_objectSpread({}, args), {}, {
     font: fontString
-  }, args)).filter(function (_ref) {
+  })).filter(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 2),
         k = _ref2[0],
         v = _ref2[1];

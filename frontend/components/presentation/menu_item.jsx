@@ -8,7 +8,6 @@ export default function MenuItem({
 }){
 
   function handleClick(e){
-    console.log(handleClick);
     if (typeof item.actionName == 'string'){
       item.children || dispatch(ItemThunkActions[item.actionName](
         item.type === 'boolean' ? 
