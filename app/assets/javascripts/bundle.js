@@ -2984,10 +2984,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "borderColor": () => (/* binding */ borderColor),
 /* harmony export */   "borderWeight": () => (/* binding */ borderWeight),
 /* harmony export */   "borderDash": () => (/* binding */ borderDash),
-/* harmony export */   "bold": () => (/* binding */ bold),
 /* harmony export */   "deleteWrappers": () => (/* binding */ deleteWrappers),
 /* harmony export */   "updateTextstyleAttribute": () => (/* binding */ updateTextstyleAttribute),
-/* harmony export */   "textColor": () => (/* binding */ textColor)
+/* harmony export */   "textColor": () => (/* binding */ textColor),
+/* harmony export */   "bold": () => (/* binding */ bold),
+/* harmony export */   "italic": () => (/* binding */ italic),
+/* harmony export */   "underline": () => (/* binding */ underline)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3112,20 +3114,11 @@ var fillColor = updateWrapperAttribute('fill');
 var borderColor = updateWrapperAttribute('stroke');
 var borderWeight = updateWrapperAttribute('strokeWidth');
 var borderDash = updateWrapperAttribute('stroke-dasharray');
-var bold = function bold() {
-  return function (dispatch, getState) {
-    var _getState5 = getState(),
-        ui = _getState5.ui,
-        entities = _getState5.entities;
-
-    console.log(ui);
-  };
-};
 var deleteWrappers = function deleteWrappers() {
   return function (dispatch, getState) {
-    var _getState6 = getState(),
-        entities = _getState6.entities,
-        ui = _getState6.ui;
+    var _getState5 = getState(),
+        entities = _getState5.entities,
+        ui = _getState5.ui;
 
     var slideId = ui.slideSettings.slideId;
 
@@ -3163,12 +3156,29 @@ var updateTextstyleAttribute = function updateTextstyleAttribute(key) {
         return a - b;
       })).concat([_defineProperty({}, key, value)]));
 
-      var dynamicTextReduxState = dynamicText.toReduxState();
+      var dynamicTextReduxState = dynamicText.toReduxState(); // dispatch(UIActions.updateUITextSelection({
+      //   ...ui.selections,
+      //   textboxId: textbox.id,
+      //   uiTextData: dynamicTextReduxState
+      // }));
+      // cursorOffset: 7
+      // selectOffset: 7
+      // textboxId: 335
+      // uiTextData:
+      // text: "012345679012356789"
+      //   textstylesAttributes: Array(3)
+      //     0: {offset: 0, styleString: "font: 48px comic sans ms; fill: green"}
+      //     1: {offset: 3, styleString: "font: 48px comic sans ms; fill: #ffaf3f"}
+      //     2: {offset: 17, styleString: "font: 48px comic sans ms; fill: green"}
+
       dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateText(textbox.id, dynamicTextReduxState));
     };
   };
 };
 var textColor = updateTextstyleAttribute('fill');
+var bold = updateTextstyleAttribute('fontWeight');
+var italic = updateTextstyleAttribute('fontStyle');
+var underline = updateTextstyleAttribute('textDecoration');
 
 /***/ }),
 
@@ -3365,12 +3375,12 @@ var updateText = function updateText(textboxId, textData) {
     var textstylesAttributeIndexedOnOffset = new Map(textstylesAttributes.map(function (attribute) {
       return [attribute.offset, attribute];
     }));
-    console.log(entities.textboxes[textboxId]);
     textstyles.forEach(function (textstyle) {
       var attribute = textstylesAttributeIndexedOnOffset.get(textstyle.offset);
 
-      if (attribute) {
+      if (attribute && attribute.offset >= 0) {
         attribute.id = textstyle.id;
+        delete attribute.textboxId;
       } else {
         textstylesAttributes.push({
           id: textstyle.id,
@@ -3378,6 +3388,7 @@ var updateText = function updateText(textboxId, textData) {
         });
       }
     });
+    console.warn(textData);
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncUpdateText(textboxId, textData).then(function (resData) {
       var wrapperAttributes = resData.wrapperAttributes;
       var wrapperData = Object.values(wrapperAttributes)[0];
@@ -3669,9 +3680,8 @@ var updateUITextSelection = function updateUITextSelection(_ref2) {
     var prevTextstyleAttributes = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_0__.getTextstylesByTextbox)(state, textBox); //array
 
     var text = uiTextData.text,
-        textstylesAttributes = uiTextData.textstylesAttributes; // console.warn(uiTextData);
-
-    var textstyleIds = []; // console.warn(...prevTextstyleAttributes, ...textstylesAttributes);
+        textstylesAttributes = uiTextData.textstylesAttributes;
+    var textstyleIds = [];
 
     for (var i = 0, len = prevTextstyleAttributes.length, textLen = text.length; i < len; i++) {
       var prevAttribute = prevTextstyleAttributes[i];
@@ -3679,13 +3689,15 @@ var updateUITextSelection = function updateUITextSelection(_ref2) {
 
       if (newAttribute && (!textLen || newAttribute.offset < textLen)) {
         textstylesAttributes[i] = _objectSpread(_objectSpread({}, prevAttribute), newAttribute);
-        textstyleIds.push(prevAttribute.id);
       } else {
-        textstylesAttributes[i] = _objectSpread(_objectSpread({}, prevAttribute), {}, {
+        textstylesAttributes[i] = {
+          id: prevAttribute.id,
           offset: -1,
-          destroy: 1
-        });
+          _destroy: 1
+        };
       }
+
+      textstyleIds.push(prevAttribute.id);
     }
 
     dispatch(receiveSelectedText({
@@ -3696,7 +3708,9 @@ var updateUITextSelection = function updateUITextSelection(_ref2) {
         text: text,
         textstyleIds: textstyleIds
       }),
-      textstyleData: Object.fromEntries(textstylesAttributes.map(function (x) {
+      textstyleData: Object.fromEntries(textstylesAttributes.filter(function (x) {
+        return x.id !== undefined;
+      }).map(function (x) {
         return [x.id, x];
       }))
     }));
@@ -4072,7 +4086,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "WRAPPER_CONTEXT_MENU_ITEMS": () => (/* binding */ WRAPPER_CONTEXT_MENU_ITEMS)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
-/* harmony import */ var _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/color_palette */ "./frontend/components/utils/color_palette.jsx");
+/* harmony import */ var _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/data-structure/dynamic-text */ "./frontend/utils/data-structure/dynamic-text.js");
+/* harmony import */ var _utils_color_palette__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/color_palette */ "./frontend/components/utils/color_palette.jsx");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+
 
 
 var NEW_SLIDE = {
@@ -4221,15 +4249,19 @@ var SELECT = {
 var FILL_COLOR = {
   name: "Fill color",
   icon: [0, 9],
+  type: 'color',
+  key: "fill",
   shortCut: undefined,
-  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default,
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_2__.default,
   actionName: 'fillColor'
 };
 var BORDER_COLOR = {
   name: "Border color",
   icon: [1, 9],
+  type: 'color',
+  key: "stroke",
   shortCut: undefined,
-  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default,
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_2__.default,
   actionName: 'borderColor'
 };
 var BORDER_WEIGHT = {
@@ -4314,36 +4346,60 @@ var BORDER_DASH = {
     value: "12 4"
   }]
 };
+
+function getCommonTextStyleByKey(key) {
+  return function (state) {
+    var _state$ui$selections = state.ui.selections,
+        selectOffset = _state$ui$selections.selectOffset,
+        cursorOffset = _state$ui$selections.cursorOffset;
+    var dynamicText = _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default.fromCurrentSelection(state);
+    return dynamicText.getCommonStyle.apply(dynamicText, _toConsumableArray([selectOffset, cursorOffset].sort(function (a, b) {
+      return a - b;
+    })).concat([key]));
+  };
+}
+
 var BOLD = {
   name: "Bold",
   icon: [4, 9],
+  type: 'boolean',
+  trueValue: 'bold',
+  key: getCommonTextStyleByKey('fontWeight'),
   shortCut: undefined,
   actionName: 'bold'
 };
 var ITALIC = {
   name: "Italic",
   icon: [5, 9],
+  type: 'boolean',
+  trueValue: 'italic',
+  key: getCommonTextStyleByKey('fontStyle'),
   shortCut: undefined,
   actionName: 'italic'
 };
 var UNDERLINE = {
   name: "Underline",
   icon: [6, 9],
+  type: 'boolean',
+  trueValue: 'underline',
+  key: getCommonTextStyleByKey('textDecoration'),
   shortCut: undefined,
   actionName: 'underline'
 };
 var TEXT_COLOR = {
   name: "Text color",
   icon: [7, 9],
+  type: 'color',
+  key: getCommonTextStyleByKey('fill'),
   shortCut: undefined,
-  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default,
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_2__.default,
   actionName: 'textColor'
 };
 var HIGHLIGHT_COLOR = {
   name: "Highlight color",
   icon: [8, 9],
   shortCut: undefined,
-  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_1__.default,
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_2__.default,
   actionName: 'highlightColor'
 };
 var ALIGN = {
@@ -4431,6 +4487,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var _menu_item_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./menu_item_container */ "./frontend/components/presentation/menu_item_container.jsx");
 /* harmony import */ var _menu_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./menu_container */ "./frontend/components/presentation/menu_container.js");
+/* harmony import */ var _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../actions/item_thunk_actions */ "./frontend/actions/item_thunk_actions.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -4448,22 +4505,29 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
 function DropdownMenu(_ref) {
   var className = _ref.className,
       item = _ref.item,
       _ref$active = _ref.active,
       active = _ref$active === void 0 ? false : _ref$active,
+      data = _ref.data,
       _ref$requireClick = _ref.requireClick,
       requireClick = _ref$requireClick === void 0 ? true : _ref$requireClick,
       _ref$tier = _ref.tier,
       tier = _ref$tier === void 0 ? 0 : _ref$tier,
       parentHandleBlur = _ref.parentHandleBlur,
-      children = _ref.children;
+      dispatch = _ref.dispatch;
 
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(active),
       _useState2 = _slicedToArray(_useState, 2),
       _active = _useState2[0],
       _setActive = _useState2[1];
+
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(data),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _data = _useState4[0],
+      _setData = _useState4[1];
 
   var _timeout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
@@ -4494,6 +4558,10 @@ function DropdownMenu(_ref) {
 
   };
 
+  var handleChange = function handleChange(e, value) {
+    _setData(value);
+  };
+
   var getChildComponent = function getChildComponent(item) {
     var childComponent = null;
     var children = item.children;
@@ -4504,7 +4572,8 @@ function DropdownMenu(_ref) {
         tier: tier + 1,
         items: children,
         requireClick: false,
-        parentHandleBlur: handleBlur
+        parentHandleBlur: handleBlur,
+        parentData: _data
       });
     } else {
       var ChildContainerClass = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(null, function (dispatch) {
@@ -4516,7 +4585,9 @@ function DropdownMenu(_ref) {
         item: item,
         tier: tier + 1,
         requireClick: false,
-        parentHandleBlur: handleBlur
+        parentHandleBlur: handleBlur,
+        parentHandleChange: handleChange,
+        parentData: _data
       });
     }
 
@@ -4527,8 +4598,11 @@ function DropdownMenu(_ref) {
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     _setActive(active);
   }, [active]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    _setData(data);
+  }, [data]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
-    className: "dropdown-menu ".concat(_active ? '' : 'hidden', " ").concat(className),
+    className: "dropdown-menu ".concat((item.type === 'boolean' ? _data : _active) ? '' : 'hidden', " ").concat(className),
     onBlur: function onBlur(e) {
       return requireClick ? handleBlur(e) : undefined;
     },
@@ -4544,28 +4618,41 @@ function DropdownMenu(_ref) {
     } : null,
     onMouseOver: requireClick ? null : function () {
       return handleMouseOver();
-    }
+    },
+    parentHandleChange: handleChange,
+    parentData: _data
   }), childComponent ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "dropdown-body"
   }, getChildComponent(item)) : null);
 }
 
-function Menu(_ref2) {
-  var _ref2$className = _ref2.className,
-      className = _ref2$className === void 0 ? "" : _ref2$className,
-      items = _ref2.items,
-      _ref2$tier = _ref2.tier,
-      tier = _ref2$tier === void 0 ? 0 : _ref2$tier,
-      _ref2$requireClick = _ref2.requireClick,
-      requireClick = _ref2$requireClick === void 0 ? true : _ref2$requireClick,
-      nextMenuAction = _ref2.nextMenuAction,
-      parentHandleBlur = _ref2.parentHandleBlur;
+var DropdownMenuContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_1__.connect)(function (state, _ref2) {
+  var item = _ref2.item;
+  return {
+    state: state,
+    data: item && item.key && (item.key instanceof Function ? item.key(state) : state.ui.selections[item.key])
+  };
+}, function (dispatch) {
+  return {
+    dispatch: dispatch
+  };
+})(DropdownMenu);
+function Menu(_ref3) {
+  var _ref3$className = _ref3.className,
+      className = _ref3$className === void 0 ? "" : _ref3$className,
+      items = _ref3.items,
+      _ref3$tier = _ref3.tier,
+      tier = _ref3$tier === void 0 ? 0 : _ref3$tier,
+      _ref3$requireClick = _ref3.requireClick,
+      requireClick = _ref3$requireClick === void 0 ? true : _ref3$requireClick,
+      nextMenuAction = _ref3.nextMenuAction,
+      parentHandleBlur = _ref3.parentHandleBlur;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
     className: "menu tier-".concat(tier, " ").concat(className)
   }, items.map(function (item, i) {
     return item ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", {
       key: item.name
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(DropdownMenu, {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(DropdownMenuContainer, {
       item: item,
       className: items.className || "",
       active: nextMenuAction === item.name,
@@ -4628,24 +4715,36 @@ function MenuItem(_ref) {
       item = _ref.item,
       dispatch = _ref.dispatch,
       onClick = _ref.onClick,
-      onMouseMove = _ref.onMouseMove;
+      onMouseMove = _ref.onMouseMove,
+      parentData = _ref.parentData,
+      parentHandleChange = _ref.parentHandleChange;
 
   function handleClick(e) {
+    console.log(handleClick);
+
     if (typeof item.actionName == 'string') {
-      item.children || dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName](item.value));
+      item.children || dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName](item.type === 'boolean' ? parentData !== item.trueValue ? item.trueValue : undefined : item.value));
     }
 
     onClick(e);
+    parentHandleChange && parentHandleChange(e);
   }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-    className: "menu-item ".concat(className, " ").concat(item.actionName ? '' : 'no-action'),
+    className: "menu-item ".concat(className, " ").concat(item.type || '', " ").concat(item.actionName ? '' : 'no-action'),
     onMouseMove: onMouseMove,
     onClick: handleClick
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "icon-box"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__.default, {
     className: "menu-item-icon",
     icon: item.icon
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "color-box",
+    style: {
+      backgroundColor: parentData || ''
+    }
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "menu-item-name"
   }, item.name), item.children ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "submenu-indicator"
@@ -7034,7 +7133,7 @@ function SVGTextArea(_ref2) {
     textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings);
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
-  }, [text, styleStrings]);
+  }, [styleStrings]);
   var actualHeight = Math.max(textRef.current._segmentMap.last[1] + 60, 60);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", _extends({}, props, {
     className: "svg-textarea ".concat(className, " ").concat(active ? 'active' : ''),
@@ -7317,12 +7416,14 @@ function ColorPalette(_ref2) {
       color = _ref2$color === void 0 ? '' : _ref2$color,
       item = _ref2.item,
       dispatch = _ref2.dispatch,
-      parentHandleBlur = _ref2.parentHandleBlur;
+      parentHandleBlur = _ref2.parentHandleBlur,
+      parentHandleChange = _ref2.parentHandleChange;
 
   // this code is identical to menu_item.jsx; DRY it up when necessary
-  function handleClick(e, color) {
+  function handleChange(e, color) {
     dispatch(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_2__[item.actionName](color));
     parentHandleBlur && parentHandleBlur(e);
+    parentHandleChange && parentHandleChange(e, color);
   }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -7330,7 +7431,7 @@ function ColorPalette(_ref2) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "transparent",
     onClick: function onClick(e) {
-      return handleClick(e, "");
+      return handleChange(e, "");
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_1__.default, {
     className: "item-icon",
@@ -7349,7 +7450,7 @@ function ColorPalette(_ref2) {
       tooltip: tooltip,
       border: border,
       onClick: function onClick(e) {
-        return handleClick(e, color);
+        return handleChange(e, color);
       }
     });
   }));
@@ -8000,7 +8101,6 @@ function SelectionReducer() {
 
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.CLEAR_UI:
       {
-        console.log(action);
         return nullState;
       }
 
@@ -8083,6 +8183,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "getSelectedTextbox": () => (/* binding */ getSelectedTextbox),
 /* harmony export */   "getSelectedText": () => (/* binding */ getSelectedText)
 /* harmony export */ });
+/* harmony import */ var _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/data-structure/dynamic-text */ "./frontend/utils/data-structure/dynamic-text.js");
+
 var getTextstylesByTextbox = function getTextstylesByTextbox(_ref, textbox) {
   var entities = _ref.entities;
   return textbox.textstyleIds.map(function (id) {
@@ -8298,7 +8400,9 @@ var DynamicText = /*#__PURE__*/function () {
       tabs: new _sorted_array__WEBPACK_IMPORTED_MODULE_4__.default(),
       returns: new _sorted_array__WEBPACK_IMPORTED_MODULE_4__.default()
     };
-    this._styleMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_5__.default(styleStrings.map(function (styleString) {
+    this._styleMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_5__.default(styleStrings.filter(function (styleString) {
+      return styleString.offset >= 0 && styleString.offset <= text.length;
+    }).map(function (styleString) {
       return [styleString.offset, (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.parseStyleString)(styleString.styleString)];
     }));
     this._segmentMap = new _sorted_map__WEBPACK_IMPORTED_MODULE_5__.default();
@@ -8321,6 +8425,25 @@ var DynamicText = /*#__PURE__*/function () {
       if (width) return width;else {
         return COMMON_CHAR_SIZE_MAP[font][ch] = CTX.measureText(ch);
       }
+    }
+  }, {
+    key: "getCommonStyle",
+    value: function getCommonStyle() {
+      var offset1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var offset2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.length;
+      var key = arguments.length > 2 ? arguments[2] : undefined;
+      var styleMap = this._styleMap;
+      var leftOffset = styleMap.getLeftKey(offset1);
+      var rightOffset = styleMap.getLeftKey(offset2 - 1);
+      var style = styleMap.get(leftOffset)[key];
+
+      for (var i = leftOffset + 1; i <= rightOffset; i += 1) {
+        //optimization needed
+        var styles = styleMap.get(i);
+        if (styles && style !== styles[key]) return undefined;
+      }
+
+      return style;
     }
   }, {
     key: "insert",
@@ -8402,19 +8525,17 @@ var DynamicText = /*#__PURE__*/function () {
       var endingStyle = this._styleMap.getLeftValue(index2); // delete all styles between index1 and index2
 
 
-      this._styleMap.splice(index1, index2 - index1); //set style at index to endingStyle 
+      this._styleMap.splice(index1, index2 - index1); //set style at index1 to endingStyle 
 
 
       this._styleMap.set(index1, endingStyle); // delete endingStyle if it is the same with the previous one
 
 
-      var prevStyle = this._styleMap.get(index1 - 1);
+      var prevStyle = this._styleMap.getLeftValue(index1 - 1);
 
-      if (prevStyle && (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(prevStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(endingStyle)) {
+      if (index1 > 0 && prevStyle && (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(prevStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(endingStyle)) {
         this._styleMap["delete"](index1);
-      }
-
-      console.log(endingStyle, prevStyle, this._styleMap); // { let index = Math.max(1, index1);  // avoid deleting style at index 0
+      } // { let index = Math.max(1, index1);  // avoid deleting style at index 0
       //   this._styleMap.splice(index, index2 - index);
       // }
       // const [leftKey, leftStyle] = this._styleMap.getLeftEntry(Math.max(index1, 0));
@@ -8424,6 +8545,7 @@ var DynamicText = /*#__PURE__*/function () {
       //   this._styleMap.delete(index1);
       // }
       // renew text
+
 
       this._text = this._text.splice(index1, index2 - index1);
       return index1;
@@ -8497,6 +8619,9 @@ var DynamicText = /*#__PURE__*/function () {
 
         if (currStyle) {
           newStyle = _objectSpread(_objectSpread({}, currStyle), style);
+          Object.keys(style).forEach(function (key) {
+            if (style[key] === undefined) delete newStyle[key];
+          });
 
           if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftNewStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(newStyle)) {
             styleMap["delete"](i);
@@ -8504,6 +8629,7 @@ var DynamicText = /*#__PURE__*/function () {
             styleMap.set(i, newStyle);
           }
 
+          leftCurrStyle = currStyle;
           leftNewStyle = newStyle;
         }
       }
@@ -8511,21 +8637,19 @@ var DynamicText = /*#__PURE__*/function () {
       var _styleMap$getRightEnt = styleMap.getRightEntry(offset2),
           _styleMap$getRightEnt2 = _slicedToArray(_styleMap$getRightEnt, 2),
           rightOffset = _styleMap$getRightEnt2[0],
-          rightCurrStyle = _styleMap$getRightEnt2[1];
+          rightCurrStyle = _styleMap$getRightEnt2[1]; // reset style at offset2 to leftCurrStyle if there is no style value at offset2 
 
-      if (rightOffset > offset2) {
-        if (offset2 < this.length - 1) styleMap.set(offset2, rightCurrStyle);
-        styleMap["delete"](rightOffset);
-      }
 
-      if ((0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftNewStyle) == (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(rightCurrStyle)) {
-        styleMap["delete"](offset2);
-      } // this._styleMap.set(index1, style);
+      if (offset2 < this.length - 1 && offset2 !== rightOffset) styleMap.set(offset2, leftCurrStyle);
+      var rightNewStyle = styleMap.get(offset2); // delete the updated style at offset2 if it is identical to the new style at the left 
+
+      if (rightNewStyle && (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(rightNewStyle) === (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftNewStyle)) styleMap["delete"](offset2); // delete the style at the offset to the immediate right of offset2, if any, if it is identical to leftNewStyle
+
+      if (rightCurrStyle && rightOffset > offset2 && (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(leftNewStyle) == (0,_string_parsers__WEBPACK_IMPORTED_MODULE_6__.toStyleString)(rightCurrStyle)) styleMap["delete"](rightOffset); // this._styleMap.set(index1, style);
       // lastStyle && this._styleMap.set(index2, lastStyle);
       // for (let i of sortedKeys)
       //   if (i >= index1 && i < index2)
       //     this._styleMap.delete(i);
-
 
       return this;
     }
@@ -9499,10 +9623,16 @@ function toStyleString(styleObject) {
   }).join(' ');
   return Object.entries(_objectSpread({
     font: fontString
-  }, args)).map(function (_ref) {
+  }, args)).filter(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 2),
         k = _ref2[0],
         v = _ref2[1];
+
+    return v !== undefined;
+  }).map(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+        k = _ref4[0],
+        v = _ref4[1];
 
     return "".concat(k, ": ").concat(v);
   }).join("; ");

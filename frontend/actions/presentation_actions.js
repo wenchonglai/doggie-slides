@@ -108,20 +108,23 @@ export const updateText = (textboxId, textData) => (dispatch, getState) => {
 
   const textstyles = getTextstylesByTextboxId(state, textboxId);
   const textstylesAttributes = textData.textstylesAttributes;
+
   const textstylesAttributeIndexedOnOffset = new Map(
     textstylesAttributes.map(attribute => [attribute.offset, attribute])
   );
-  console.log(entities.textboxes[textboxId]);
-  
+
   textstyles.forEach(textstyle => {
     let attribute = textstylesAttributeIndexedOnOffset.get(textstyle.offset);
-    if (attribute){
+
+    if (attribute && attribute.offset >= 0){
       attribute.id = textstyle.id;
+      delete attribute.textboxId;
     } else {
       textstylesAttributes.push({id: textstyle.id, _destroy: 1});
     }
   });
-
+  
+console.warn(textData);
   return PresentationUtils.asyncUpdateText(textboxId, textData)
     .then((resData) => {
       const wrapperAttributes = resData.wrapperAttributes;

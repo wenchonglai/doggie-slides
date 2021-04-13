@@ -6,7 +6,6 @@ const nullState = Object.freeze({wrapperIds: [], nextMenuAction: 'Select'});
 
 function SelectionReducer(state = nullState, action){
   Object.freeze(state);
-
   switch (action.type){
     case UIActions.RECEIVE_SELECTED_TEXT: 
       return {
@@ -37,7 +36,6 @@ function SelectionReducer(state = nullState, action){
     case PresentationActions.RECEIVE_SLIDE:;
     case UIActions.RECEIVE_CURRENT_SLIDE:;
     case UIActions.CLEAR_UI:{
-      console.log(action);
       return nullState;}
     default: return state;
   }

@@ -36,8 +36,12 @@ export default class DynamicText{
 
     this._styleMap = new SortedMap(
       styleStrings
-        .map(styleString => 
-          [styleString.offset, parseStyleString(styleString.styleString)]
+        .filter(
+          styleString => styleString.offset >= 0 && 
+            styleString.offset <= text.length
+        ).map(
+          styleString => 
+            [styleString.offset, parseStyleString(styleString.styleString)]
         )
     );
 
@@ -63,6 +67,22 @@ export default class DynamicText{
     else {
       return COMMON_CHAR_SIZE_MAP[font][ch] = CTX.measureText(ch);
     }
+  }
+
+  getCommonStyle(offset1 = 0, offset2 = this.length, key){
+    let styleMap = this._styleMap;
+    let leftOffset = styleMap.getLeftKey(offset1);
+    let rightOffset = styleMap.getLeftKey(offset2 - 1);
+    let style = styleMap.get(leftOffset)[key];
+
+    for (let i = leftOffset + 1; i <= rightOffset; i += 1){ //optimization needed
+      let styles = styleMap.get(i);
+
+      if (styles && style !== styles[key]) 
+        return undefined;
+    }
+
+    return style;
   }
 
   insert(text, offset = this.length, init = false){
@@ -122,16 +142,16 @@ export default class DynamicText{
     // delete all styles between index1 and index2
     this._styleMap.splice(index1, index2 - index1);
 
-    //set style at index to endingStyle 
+    //set style at index1 to endingStyle 
     this._styleMap.set(index1, endingStyle)
 
     // delete endingStyle if it is the same with the previous one
-    const prevStyle = this._styleMap.get(index1 - 1);
+    const prevStyle = this._styleMap.getLeftValue(index1 - 1);
 
-    if ( prevStyle && toStyleString(prevStyle) === toStyleString(endingStyle)) {
+    if (index1 > 0 && prevStyle && toStyleString(prevStyle) === toStyleString(endingStyle)) {
       this._styleMap.delete(index1);
     }
-    console.log(endingStyle, prevStyle, this._styleMap)
+    
 
     // { let index = Math.max(1, index1);  // avoid deleting style at index 0
     //   this._styleMap.splice(index, index2 - index);
@@ -215,29 +235,36 @@ export default class DynamicText{
 
       if (currStyle){
         newStyle = {...currStyle, ...style};
+        Object.keys(style).forEach((key) => {
+          if (style[key] === undefined)
+            delete newStyle[key];
+        });
         
         if (toStyleString(leftNewStyle) === toStyleString(newStyle)){
           styleMap.delete(i);
         } else {
           styleMap.set(i, newStyle);
         }
+        leftCurrStyle = currStyle;
         leftNewStyle = newStyle;
       }
     }
 
     let [rightOffset, rightCurrStyle] = styleMap.getRightEntry(offset2);  
 
-    if (rightOffset > offset2){
-      if (offset2 < this.length - 1)
-        styleMap.set(offset2, rightCurrStyle);
+    // reset style at offset2 to leftCurrStyle if there is no style value at offset2 
+    if (offset2 < this.length - 1 && offset2 !== rightOffset)
+      styleMap.set(offset2, leftCurrStyle);
 
-      styleMap.delete(rightOffset);
-    }
-
-    if (toStyleString(leftNewStyle) == toStyleString(rightCurrStyle)){
+    let rightNewStyle = styleMap.get(offset2);
+    // delete the updated style at offset2 if it is identical to the new style at the left 
+    if (rightNewStyle && toStyleString(rightNewStyle) === toStyleString(leftNewStyle))
       styleMap.delete(offset2);
-    }
 
+    // delete the style at the offset to the immediate right of offset2, if any, if it is identical to leftNewStyle
+    if (rightCurrStyle && rightOffset > offset2 && toStyleString(leftNewStyle) == toStyleString(rightCurrStyle))
+      styleMap.delete(rightOffset);
+    
     // this._styleMap.set(index1, style);
     // lastStyle && this._styleMap.set(index2, lastStyle);
 

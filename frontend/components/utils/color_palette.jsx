@@ -22,16 +22,20 @@ function ColorPicker({color, tooltip, border, onClick}){
   )
 }
 
-export default function ColorPalette({color = '', item, dispatch, parentHandleBlur}){
+export default function ColorPalette({
+  color = '', item, dispatch, 
+  parentHandleBlur, parentHandleChange
+}){
   // this code is identical to menu_item.jsx; DRY it up when necessary
-  function handleClick(e, color){
+  function handleChange(e, color){
     dispatch(ItemThunkActions[item.actionName](color));
     parentHandleBlur && parentHandleBlur(e);
+    parentHandleChange && parentHandleChange(e, color);
   }
 
   return (
     <div className='color-palette'>
-      <div className='transparent' onClick={e => handleClick(e, "")}>
+      <div className='transparent' onClick={e => handleChange(e, "")}>
         <MenuIcon className='item-icon' icon={[0, 12]}/>
         <div className='item-name'>Transparent</div>
       </div>
@@ -39,7 +43,7 @@ export default function ColorPalette({color = '', item, dispatch, parentHandleBl
         { COLORS.map( ([color, tooltip, border]) => (
             <ColorPicker
               key={color} {...{color, tooltip, border}}
-              onClick={e => handleClick(e, color)}
+              onClick={e => handleChange(e, color)}
             />
           ))
         }

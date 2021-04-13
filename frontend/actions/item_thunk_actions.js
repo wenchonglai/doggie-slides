@@ -80,12 +80,6 @@ export const borderColor = updateWrapperAttribute('stroke');
 export const borderWeight = updateWrapperAttribute('strokeWidth');
 export const borderDash = updateWrapperAttribute('stroke-dasharray');
 
-export const bold = (...args) => (dispatch, getState) => {
-  const {ui, entities} = getState();
-
-  console.log(ui);
-}
-
 export const deleteWrappers = () => (dispatch, getState) => {
   const {entities, ui} = getState();
   const slideId = ui.slideSettings.slideId;
@@ -119,7 +113,24 @@ export const updateTextstyleAttribute = (key) =>
       );
     const dynamicTextReduxState = dynamicText.toReduxState();
 
+    // dispatch(UIActions.updateUITextSelection({
+    //   ...ui.selections,
+    //   textboxId: textbox.id,
+    //   uiTextData: dynamicTextReduxState
+    // }));
+    // cursorOffset: 7
+  // selectOffset: 7
+  // textboxId: 335
+  // uiTextData:
+  // text: "012345679012356789"
+  //   textstylesAttributes: Array(3)
+  //     0: {offset: 0, styleString: "font: 48px comic sans ms; fill: green"}
+  //     1: {offset: 3, styleString: "font: 48px comic sans ms; fill: #ffaf3f"}
+  //     2: {offset: 17, styleString: "font: 48px comic sans ms; fill: green"}
     dispatch(PresentationActions.updateText(textbox.id, dynamicTextReduxState));
   }
 
 export const textColor = updateTextstyleAttribute('fill');
+export const bold = updateTextstyleAttribute('fontWeight');
+export const italic = updateTextstyleAttribute('fontStyle');
+export const underline = updateTextstyleAttribute('textDecoration');

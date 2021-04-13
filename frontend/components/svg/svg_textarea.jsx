@@ -175,7 +175,6 @@ export default function SVGTextArea({
 
       _setSelectOffset(selectOffsetRef.current);
       _setCursorOffset(cursorOffsetRef.current);
-
     });
   }
 
@@ -226,7 +225,7 @@ export default function SVGTextArea({
     textRef.current = new DynamicText(text, styleStrings);
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
-  }, [text, styleStrings])
+  }, [styleStrings])
 
   const actualHeight = Math.max(textRef.current._segmentMap.last[1] + 60, 60);
 

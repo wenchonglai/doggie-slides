@@ -40,6 +40,7 @@ export function toStyleString(styleObject){
     .join(' ');
 
   return Object.entries({font: fontString, ...args})
+    .filter(([k, v]) => v !== undefined)
     .map(([k, v]) => `${k}: ${v}`)
     .join("; ");
 }

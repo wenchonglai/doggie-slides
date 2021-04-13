@@ -107,24 +107,22 @@ export const updateUITextSelection = ({cursorOffset, selectOffset, textboxId, ui
   //     0: {offset: 0, styleString: "font: 48px comic sans ms; fill: green"}
   //     1: {offset: 3, styleString: "font: 48px comic sans ms; fill: #ffaf3f"}
   //     2: {offset: 17, styleString: "font: 48px comic sans ms; fill: green"}
-
     const state = getState();
     const textBox = getTextboxById(state, textboxId);       
     const prevTextstyleAttributes = getTextstylesByTextbox(state, textBox);  //array
     const {text, textstylesAttributes} = uiTextData;
-    // console.warn(uiTextData);
     const textstyleIds = [];
-    // console.warn(...prevTextstyleAttributes, ...textstylesAttributes);
+
     for (let i = 0, len = prevTextstyleAttributes.length, textLen = text.length; i < len; i++){
       let prevAttribute = prevTextstyleAttributes[i];
       let newAttribute = textstylesAttributes[i];
 
       if (newAttribute && (!textLen || newAttribute.offset < textLen) ){
         textstylesAttributes[i] = {...prevAttribute, ...newAttribute};
-        textstyleIds.push(prevAttribute.id);
       } else {
-        textstylesAttributes[i] = {...prevAttribute, offset: -1, destroy: 1}
+        textstylesAttributes[i] = {id: prevAttribute.id, offset: -1, _destroy: 1}
       }
+      textstyleIds.push(prevAttribute.id);
     }
 
     dispatch(receiveSelectedText({
@@ -138,7 +136,9 @@ export const updateUITextSelection = ({cursorOffset, selectOffset, textboxId, ui
         }
       },
       textstyleData: Object.fromEntries(
-        textstylesAttributes.map(x => [x.id, x])
+        textstylesAttributes
+          .filter(x => x.id !== undefined)
+          .map(x => [x.id, x])
       )
     }))
   }

@@ -1,4 +1,5 @@
 import {addSlide} from '../../actions/presentation_actions';
+import DynamicText from '../../utils/data-structure/dynamic-text';
 import ColorPalette from '../utils/color_palette';
 
 const NEW_SLIDE = {
@@ -31,8 +32,8 @@ const DUPLICATE_SLIDE = { name: "Duplicate Slide", icon: undefined, shortCut: un
 const DELETE_SLIDE = { name: "Delete Slide", icon: undefined, shortCut: undefined, actionName: "deleteSlide"};
 const SKIP_SLIDE = { name: "Skip Slide", icon: undefined, shortCut: undefined, actionName: "skipSlide"};
 const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, actionName: undefined};
-const FILL_COLOR = { name: "Fill color", icon: [0, 9], shortCut: undefined, children: ColorPalette, actionName: 'fillColor'};
-const BORDER_COLOR = { name: "Border color", icon: [1, 9], shortCut: undefined, children: ColorPalette, actionName: 'borderColor'};
+const FILL_COLOR = { name: "Fill color", icon: [0, 9], type: 'color', key: "fill", shortCut: undefined, children: ColorPalette, actionName: 'fillColor'};
+const BORDER_COLOR = { name: "Border color", icon: [1, 9], type: 'color', key: "stroke", shortCut: undefined, children: ColorPalette, actionName: 'borderColor'};
 const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined, children: [
   { name: "none", shortCut: undefined, actionName: "borderWeight", value: "none"},
   undefined,
@@ -54,10 +55,18 @@ const BORDER_DASH = { name: "Border dash", icon: [3, 9], shortCut: undefined, ch
   { name: "long dash", shortCut: undefined, actionName: "borderDash", value: "12 4"},
 ]};
 
-const BOLD = { name: "Bold", icon: [4, 9], shortCut: undefined, actionName: 'bold'};
-const ITALIC = { name: "Italic", icon: [5, 9], shortCut: undefined, actionName: 'italic'};
-const UNDERLINE = { name: "Underline", icon: [6, 9], shortCut: undefined, actionName: 'underline'};
-const TEXT_COLOR = { name: "Text color", icon: [7, 9], shortCut: undefined, children: ColorPalette, actionName: 'textColor'};
+function getCommonTextStyleByKey(key){
+  return (state) => {
+    let {selectOffset, cursorOffset} = state.ui.selections;
+    let dynamicText = DynamicText.fromCurrentSelection(state);
+    return dynamicText.getCommonStyle(...[selectOffset, cursorOffset].sort((a, b) => a - b), key);
+  }
+}
+
+const BOLD = { name: "Bold", icon: [4, 9], type: 'boolean', trueValue: 'bold', key: getCommonTextStyleByKey('fontWeight'), shortCut: undefined, actionName: 'bold'};
+const ITALIC = { name: "Italic", icon: [5, 9], type: 'boolean', trueValue: 'italic', key: getCommonTextStyleByKey('fontStyle'), shortCut: undefined, actionName: 'italic'};
+const UNDERLINE = { name: "Underline", icon: [6, 9], type: 'boolean', trueValue: 'underline', key: getCommonTextStyleByKey('textDecoration'), shortCut: undefined, actionName: 'underline'};
+const TEXT_COLOR = { name: "Text color", icon: [7, 9], type: 'color', key: getCommonTextStyleByKey('fill'), shortCut: undefined, children: ColorPalette, actionName: 'textColor'};
 const HIGHLIGHT_COLOR = { name: "Highlight color", icon: [8, 9], shortCut: undefined, children: ColorPalette, actionName: 'highlightColor'};
 
 const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, actionName: undefined, children: [

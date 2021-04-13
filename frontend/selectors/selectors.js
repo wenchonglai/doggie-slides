@@ -1,3 +1,5 @@
+import DynamicText from "../utils/data-structure/dynamic-text";
+
 export const getTextstylesByTextbox = ( {entities}, textbox) => {
   return textbox.textstyleIds.map(id => entities.textstyles[id]);
 }
