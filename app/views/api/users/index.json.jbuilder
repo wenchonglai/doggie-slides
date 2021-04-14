@@ -54,4 +54,12 @@ if @user
       end
     end
   end
+
+  json.images do
+    (@user.images).map do |image|
+      json.set! image.id do
+        json.partial! "api/images/image", image: image
+      end
+    end
+  end
 end

@@ -13,12 +13,9 @@ class Api::TextsController < ApplicationController
 
   def update
     @textbox = @textboxes.find_by(id: params[:id].to_i);
-    p params
     if !@textbox
       render json: ["Textbox not found"], status: 404
     elsif @textbox.update(text_params)
-      p @textbox
-      p @textbox.textstyles
       redirect_to api_text_url(@textbox), status: 303
     else
       render json: @textbox.errors.full_messages, status: 422

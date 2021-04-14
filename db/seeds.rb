@@ -5,8 +5,15 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+require 'open-uri'
+
+Image.all do |image|
+  image.file.purge
+end
+
 Textbox.destroy_all
 User.destroy_all
+Image.destroy_all
 Doc.destroy_all
 Slide.destroy_all
 
@@ -26,8 +33,17 @@ end
 doge = User.create({email: 'demo@dmail.com', password: '123456', firstname: "Demo", lastname: "Doge"});
 doge_slide = doge.slides[0];
 
+doge_image_file = OpenURI.open_uri('https://jka-lab-seeds.s3-us-west-1.amazonaws.com/doge-original.jpg');
+doge_image_file.rewind
+
 Textbox.create!(
     text: "01234567890123456789",
-    wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 600, height: 100, translate_x: 100, translate_y: 200},
-    textstyles_attributes: [{style_string: "font: 48px comic sans ms; fill: green", offset: 0}]
+    wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 600, height: 100, translate_x: 100, translate_y: 25},
+    textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: green", offset: 0}]
   );
+
+doge_image = Image.create(
+  wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 0, height: 0, translate_x: 100, translate_y: 200},
+);
+
+doge_image.file.attach(io: doge_image_file, filename: 'doge.jpg');

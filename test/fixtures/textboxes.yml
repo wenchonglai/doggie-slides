@@ -3,7 +3,7 @@
 # Table name: textboxes
 #
 #  id         :bigint           not null, primary key
-#  text       :text             not null
+#  text       :text             default("")
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
