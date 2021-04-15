@@ -2,10 +2,10 @@ class Api::ImagesController < ApplicationController
   before_action :ensure_current_user
 
   def create
-    @image = Image.create(image_params);
+    @image = Image.new(image_params);
 
-    if @image.save!
-      redirect_to api_text_url(@image), status: 303
+    if @image.save
+      redirect_to api_image_url(@image), status: 303
     else
       render json: @image.errors.full_messages, status: 422
     end
@@ -29,7 +29,7 @@ class Api::ImagesController < ApplicationController
     if !@image
       render json: ["image not found"], status: 404
     elsif @image.destroy
-      redirect_to api_texts_url, status: 303
+      redirect_to api_images_url, status: 303
     else
       render json: @image.errors.full_messages, status: 422
     end
@@ -60,8 +60,9 @@ class Api::ImagesController < ApplicationController
         :width, :height,
         :x, :y,
         :scale_x, :scale_y,
-        :rotate
-        :style_string
+        :rotate,
+        :style_string,
+        :file,
         wrapper_attributes: [
           :id, :slide_id, :group_id,
           :slide_object_id, :slide_object_type,

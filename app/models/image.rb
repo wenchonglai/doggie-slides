@@ -16,8 +16,9 @@
 #
 class Image < ApplicationRecord
   include SlideObject
-
+  
   attr_accessor :skip_set_dimensions
+  before_validation :set_default_values
   after_commit ({unless: :skip_set_dimensions}) { |image| set_dimensions(image) }
   
   has_one :slide, through: :wrapper
@@ -25,6 +26,17 @@ class Image < ApplicationRecord
   has_one_attached :file
 
   private 
+  def set_default_values
+    self.width ||= 0
+    self.height ||= 0
+    self.x ||= 0.0
+    self.y ||= 0.0
+    self.rotate ||= 0.0
+    self.scale_x ||= 1.0
+    self.scale_y ||= 1.0
+    self.style_string ||= ""
+  end
+
   def set_dimensions(image)
     if Image.exists?(image.id)
       wrapper = image.wrapper
@@ -55,10 +67,10 @@ class Image < ApplicationRecord
         image.save!
 
         if wrapper.width == 0.0 || wrapper.height == 0.0
+          wrapper.crop_width = width * scale
+          wrapper.crop_height = height * scale
           wrapper.width = width * scale
           wrapper.height = height * scale
-          wrapper.crop_width = width * scale if wrapper.crop_width.zero?
-          wrapper.crop_height = height * scale if wrapper.crop_height.zero?
           wrapper.save!
         end
       else

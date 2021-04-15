@@ -135,3 +135,10 @@ export const updateText = (textboxId, textData) => (dispatch, getState) => {
       return resData;
     });
 }
+
+export const uploadImage = (formData) => (dispatch, getState) => {
+  return PresentationUtils.asyncUploadImage(formData)
+    .then((resData) => {
+      console.log(resData);
+    })
+}

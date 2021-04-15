@@ -22,35 +22,29 @@ function filterInput(value, {min = 1, max = 100} = {}){
   }
 }
 
-function ImageUpload({item}){
-  const handleChange = (e) => {
+function ImageUpload({item, handleChange}){
+  const handleSubmit = (e) => {
     const reader = new FileReader();
     const formData = new FormData(e.currentTarget);
-    const file = formData.get("image[href]");
+    const file = formData.get("image[file]");
 
     reader.onloadend = (e) => {
-      console.log(e);
-      const image = new Image();
-      image.src = e.target.result;
 
-      image.onload = function(){
-        const height = this.height;
-        const width = this.width;
-        console.log(this, width, height);
-      }
+      handleChange(e, formData);
     }
 
-    if (reader)
+    
+    if (file)
       reader.readAsDataURL(file);
   }
   return (
-    <form onChange={e => handleChange(e)}>
+    <form onChange={e => handleSubmit(e)}>
       <label onClick={e => {e.stopPropagation()}}> 
         <MenuIcon className='menu-item-icon' icon={item.icon}/>
         {item.name}
         <input style={
           {opacity: 0, zIndex: -1, position: "absolute"}}
-          type="file" name="image[href]" accept="image/*"
+          type="file" name="image[file]" accept="image/*"
         />
       </label>
     </form>
@@ -65,7 +59,7 @@ export default function MenuItem({
   function handleChange(e, value = undefined){
     let func;
 
-    switch (item.actionName){
+    switch (typeof item.actionName){
       case 'string': func = ItemThunkActions[item.actionName]; break;
       default: func = item.actionName; break;
     }
@@ -76,9 +70,7 @@ export default function MenuItem({
     }
 
     if (!item.children){
-      dispatch(
-        func(value)
-      );
+      dispatch(func(value) );
     }
 
     onClick(e);
@@ -127,7 +119,7 @@ export default function MenuItem({
       onClick={handleChange}
     >
       { item.type === 'image-upload' ? 
-        <ImageUpload item={item} /> :
+        <ImageUpload item={item} handleChange={handleChange}/> :
         ( <>
             <div className='icon-box'>
               {getMenuIcon(item.type)}

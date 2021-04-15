@@ -42,11 +42,12 @@ doge_image = Image.create(
   },
 );
 
+doge_image.file.attach(io: doge_image_file, filename: 'doge.jpg');
+
 Textbox.create!(
   text: "01234567890123456789",
   wrapper_attributes: {
-    slide_id: doge_slide.id, z_index: 0, x: 100, y: 25, width: 600, height: 100},
+    slide_id: doge_slide.id, z_index: 0, x: 100, y: 25, width: 600, height: 100,
+  },
   textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: green", offset: 0}]
 );
-
-doge_image.file.attach(io: doge_image_file, filename: 'doge.jpg');

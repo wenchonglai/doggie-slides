@@ -141,3 +141,11 @@ export const updateFontSizeCreator = (value) =>
 
 export const increaseFontSize = updateFontSizeCreator(2);
 export const decreaseFontSize = updateFontSizeCreator(-2);
+
+export const uploadFromComputer = (formData) => (dispatch, getState) => {
+  const {ui} = getState();
+  const slideId = ui.slideSettings.slideId;
+
+  formData.append("image[wrapper_attributes[slide_id]]", slideId);
+  return dispatch(PresentationActions.uploadImage(formData));
+}

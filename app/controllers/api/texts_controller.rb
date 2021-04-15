@@ -2,7 +2,7 @@ class Api::TextsController < ApplicationController
   before_action :ensure_current_user
 
   def create
-    @text = Textbox.create(text_params);
+    @text = Textbox.new(text_params);
 
     if @text.save!
       redirect_to api_text_url(@text), status: 303

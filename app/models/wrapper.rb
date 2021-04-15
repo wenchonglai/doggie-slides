@@ -23,8 +23,7 @@
 class Wrapper < ApplicationRecord
   attr_accessor :skip_set_dimensions
 
-  before_validation :set_default_values
-  after_commit ({unless: :skip_set_dimensions}) { |wrapper| set_dimensions(wrapper) }
+  before_validation :set_default_values, exception: :destroy
 
   validates(
     :slide_id, :z_index, 
@@ -42,24 +41,17 @@ class Wrapper < ApplicationRecord
 
   private 
   def set_default_values
-    self.width ||= 300.0
-    self.height ||= 200.0
+    self.width ||= 600.0
+    self.height ||= 400.0
     self.x ||= 0.0
     self.y ||= 0.0
     self.crop_x ||= 0
     self.crop_y ||= 0
-    self.crop_width ||= 0
-    self.crop_height ||= 0
+    p [self.crop_width, self.width]
+    self.crop_width = self.width if self.crop_width == 0
+    self.crop_height = self.height if self.crop_height == 0
     self.rotate ||= 0.0
     self.stroke_width ||= 0.0
   end
 
-  def set_dimensions(wrapper)
-    if wrapper.width && wrapper.height
-      wrapper.crop_width = wrapper.width if wrapper.crop_width.zero?
-      wrapper.crop_height = wrapper.height if wrapper.crop_height.zero?
-      wrapper.skip_set_dimensions = true
-      wrapper.save!
-    end
-  end
 end

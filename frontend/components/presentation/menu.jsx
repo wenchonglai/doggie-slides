@@ -29,9 +29,8 @@ function DropdownMenu({
   const handleBlur = (e, value) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (!e.target.contains(e.relatedTarget)){
-      clearTimeout(_timeout.current);
+      
+    if (!e.target.contains || !e.target.contains(e.relatedTarget)){
       _setActive(false);
       parentHandleBlur && parentHandleBlur(e);
     }

@@ -2994,7 +2994,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "fontSize": () => (/* binding */ fontSize),
 /* harmony export */   "updateFontSizeCreator": () => (/* binding */ updateFontSizeCreator),
 /* harmony export */   "increaseFontSize": () => (/* binding */ increaseFontSize),
-/* harmony export */   "decreaseFontSize": () => (/* binding */ decreaseFontSize)
+/* harmony export */   "decreaseFontSize": () => (/* binding */ decreaseFontSize),
+/* harmony export */   "uploadFromComputer": () => (/* binding */ uploadFromComputer)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3194,6 +3195,16 @@ var updateFontSizeCreator = function updateFontSizeCreator(value) {
 };
 var increaseFontSize = updateFontSizeCreator(2);
 var decreaseFontSize = updateFontSizeCreator(-2);
+var uploadFromComputer = function uploadFromComputer(formData) {
+  return function (dispatch, getState) {
+    var _getState6 = getState(),
+        ui = _getState6.ui;
+
+    var slideId = ui.slideSettings.slideId;
+    formData.append("image[wrapper_attributes[slide_id]]", slideId);
+    return dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.uploadImage(formData));
+  };
+};
 
 /***/ }),
 
@@ -3228,7 +3239,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "addSlide": () => (/* binding */ addSlide),
 /* harmony export */   "updateWrapper": () => (/* binding */ updateWrapper),
 /* harmony export */   "createText": () => (/* binding */ createText),
-/* harmony export */   "updateText": () => (/* binding */ updateText)
+/* harmony export */   "updateText": () => (/* binding */ updateText),
+/* harmony export */   "uploadImage": () => (/* binding */ uploadImage)
 /* harmony export */ });
 /* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selectors/selectors */ "./frontend/selectors/selectors.js");
 /* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
@@ -3408,6 +3420,13 @@ var updateText = function updateText(textboxId, textData) {
       var wrapperData = Object.values(wrapperAttributes)[0];
       dispatch(receiveText(resData, wrapperData));
       return resData;
+    });
+  };
+};
+var uploadImage = function uploadImage(formData) {
+  return function (dispatch, getState) {
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncUploadImage(formData).then(function (resData) {
+      console.log(resData);
     });
   };
 };
@@ -4700,9 +4719,7 @@ function DropdownMenu(_ref) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!e.target.contains(e.relatedTarget)) {
-      clearTimeout(_timeout.current);
-
+    if (!e.target.contains || !e.target.contains(e.relatedTarget)) {
       _setActive(false);
 
       parentHandleBlur && parentHandleBlur(e);
@@ -4858,6 +4875,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/menu_icon */ "./frontend/components/utils/menu_icon.jsx");
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 
 
 
@@ -4891,31 +4910,24 @@ function filterInput(value) {
 }
 
 function ImageUpload(_ref2) {
-  var item = _ref2.item;
+  var item = _ref2.item,
+      handleChange = _ref2.handleChange;
 
-  var handleChange = function handleChange(e) {
+  var handleSubmit = function handleSubmit(e) {
     var reader = new FileReader();
     var formData = new FormData(e.currentTarget);
-    var file = formData.get("image[href]");
+    var file = formData.get("image[file]");
 
     reader.onloadend = function (e) {
-      console.log(e);
-      var image = new Image();
-      image.src = e.target.result;
-
-      image.onload = function () {
-        var height = this.height;
-        var width = this.width;
-        console.log(this, width, height);
-      };
+      handleChange(e, formData);
     };
 
-    if (reader) reader.readAsDataURL(file);
+    if (file) reader.readAsDataURL(file);
   };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
     onChange: function onChange(e) {
-      return handleChange(e);
+      return handleSubmit(e);
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", {
     onClick: function onClick(e) {
@@ -4931,7 +4943,7 @@ function ImageUpload(_ref2) {
       position: "absolute"
     },
     type: "file",
-    name: "image[href]",
+    name: "image[file]",
     accept: "image/*"
   })));
 }
@@ -4950,7 +4962,7 @@ function MenuItem(_ref3) {
     var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
     var func;
 
-    switch (item.actionName) {
+    switch (_typeof(item.actionName)) {
       case 'string':
         func = _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName];
         break;
@@ -5017,7 +5029,8 @@ function MenuItem(_ref3) {
     onMouseMove: onMouseMove,
     onClick: handleChange
   }, item.type === 'image-upload' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(ImageUpload, {
-    item: item
+    item: item,
+    handleChange: handleChange
   }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "icon-box"
   }, getMenuIcon(item.type), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -7364,7 +7377,7 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     var x = e.clientX - rect.x;
     var y = e.clientY - rect.y;
     var textData = {
-      text: "aaa",
+      text: "wow",
       wrapperAttributes: {
         slideId: slideId,
         groupId: null,

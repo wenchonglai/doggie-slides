@@ -23,7 +23,7 @@ const ReactSVG = React.forwardRef(({
     const x = e.clientX - rect.x;
     const y = e.clientY - rect.y;
     const textData = {
-      text: "aaa", 
+      text: "wow", 
       wrapperAttributes: {
         slideId,
         groupId: null,
