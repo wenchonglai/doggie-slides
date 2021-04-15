@@ -21,7 +21,8 @@ function App({errors, history, clearErrorsHandler}){
     });
   
     return () => {
-      unListenRef.current.unlisten();
+      unListenRef.current && 
+        unListenRef.current.unlisten();
     }
   }, []);
 

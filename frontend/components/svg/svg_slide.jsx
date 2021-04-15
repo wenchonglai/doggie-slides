@@ -1,111 +1,115 @@
-import React, {useState, useEffect} from 'react';
-import SVGTextArea from './svg-textarea';
+import React, {useState, useEffect, useRef} from 'react';
+import { updateMenuAction } from '../../actions/ui_actions';
 
-// const CONTROL_POINT_SETTINGS = {
-//   radius: 4
-// }
+import {SVGWrapperContainer, SVGNoWrapperContainer} from './svg_wrapper_containers';
 
-// const SVGControlPoint = function({x, y}){
-//   function handleDrag(e) {
+const ReactSVG = React.forwardRef(({
+  children, isPreview, containerWidth, width, height, slide, slideId,
+  menuAction, updateMenuAction, createText, handleContextMenu,
+  ...props
+}, ref) => {
 
-//   }
-  
-//   return (
-//     <g>
-//       <a onDrag={e => handleDrag(e)}>
-//         <circle cx={0} cy={0} radius={CONTROL_POINT_SETTINGS.radius}/>
-//       </a>
-//     </g>
-//   );
-// }
+	let widthAttr = {};
 
-// const SVGEditFrame = function({width, height, rotation=0}){
-//   const halfWidth = width / 2;
-//   const halfHeight = height / 2;
-
-//   const controlPoints = [
-//     <SVGControlPoint key={0} type="vertex" transform={`translate(${-halfWidth} ${-halfHeight}`}/>,
-//     <SVGControlPoint key={1} type="edge" transform={`translate(${0} ${-halfHeight}`}/>,
-//     <SVGControlPoint key={2} type="vertex" transform={`translate(${halfWidth} ${-halfHeight}`}/>,
-//     <SVGControlPoint key={3} type="edge" transform={`translate(${-halfWidth} ${0}`}/>,
-//     <SVGControlPoint key={4} type="edge" transform={`translate(${0} ${-halfHeight - 30}`}/>,
-//     <SVGControlPoint key={5} type="edge" transform={`translate(${halfWidth} ${0}`}/>,
-//     <SVGControlPoint key={6} type="vertex" transform={`translate(${-halfWidth} ${halfHeight}`}/>,
-//     <SVGControlPoint key={7} type="edge" transform={`translate(${0} ${halfHeight}`}/>,
-//     <SVGControlPoint key={8} type="vertex" transform={`translate(${halfWidth} ${halfHeight}`}/>
-//   ];
-
-//   return (
-//     <g className='svg-edit-frame'>
-//       <rect width={width} height={height} trasform={`rotate(${rotation}deg) translate(${-halfWidth} ${-halfHeight})`}/>
-//       <path path="M0 0 L0 -30" transform={}/>
-//       {controlPoints}
-//     </g>
-//   )
-// }
-
-// const SVGWrapper = function({wrapper, textboxes, images, shapes, allowEdit, ...props}){
-//   function getComponent(){
-//     let {type, id} = wrapper;
-
-//     switch (type){
-//       case 'textbox': return <SVGTextbox id={id} allowEdit={allowEdit}/>;
-//       case 'image': return <SVGImage id={id} allowEdit={allowEdit}/>;
-//       case 'diagram': return <SVGShape id={id} allowEdit={allowEdit}/>;
-//     }
-//   }
-
-//   return (
-//     <g className='SVGNoWrapper' transform={wrapper.transformString}>
-//       {allowEdit ? <SVGEditFrame />: null}
-//       {getComponent()}
-//     </g>
-//   )
-// }
-
-// const mapSTPCreator = allowEdit => ({entities}, ownProps) => ({
-//   allowEdit,
-//   wrapper: entities.wrapper[ownProps.wrapperId],
-// });
-
-// const SVGWrapperContainer = connect(
-//   mapSTPCreator(true),
-//   null
-// )(SVGWrapper);
-
-// const SVGNoWrapperContainer = connect(
-//   mapSTPCreator(false),
-//   null
-// )(SVGWrapper);
-
-export default function SVGSlide({isPreview, containerWidth, width, height, slide = {}}){
-  let widthAttr = {};
   if (containerWidth) { widthAttr = {width: containerWidth}; }
-console.log(slide);
-  return (
-    <svg 
+
+  function handleMouseDownCapture(e){
+    menuAction === 'Select' || e.stopPropagation();
+  }
+
+  function handleClick(e){
+    const rect = e.currentTarget.children[0].children[0].children[0].getBoundingClientRect();
+    const scale = width / rect.width;
+    const x = e.clientX - rect.x;
+    const y = e.clientY - rect.y;
+    const textData = {
+      text: "aaa", 
+      wrapperAttributes: {
+        slideId,
+        groupId: null,
+        zIndex: 1,
+        width: 400,
+        height: 50,
+        translateX: x * scale,
+        translateY: y * scale,
+      },
+      textstylesAttributes: [{
+        styleString: "font: 20px Arial; fill: black",
+        offset: 0
+      }]
+    };
+
+    switch (menuAction){
+      case 'Select': return;
+      case 'Text Box': {
+        createText(textData);
+      }
+      default: return updateMenuAction('Select');
+    };
+  }
+
+	return (
+		<svg
       version="1.1" 
-      className="svg-slide"
+      className="react-svg svg-slide"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      viewBox={`0 0 ${width} ${height}`}
+      width="100%"
+      height="100%"
+      viewBox={`1000 1000 ${width} ${height}`}
       xmlSpace="preserve"
+      ref={ref}
       {...widthAttr}
-    > 
-      <g>
-        <rect width={width} height={height} fill="#FFFFFF"></rect>
-      </g>
-      {/* { (slide.wrapperIds || []).map(wrapperId => (
-          // <SVGNoWrapperContainer wrapperId={wrapperId} />
-        )
-      } */}
-      <text x={width - 100} y={height - 100} alignmentBaseline="middle" textAnchor="middle" fontSize="20">{`Page ${slide.page}`}</text>
-      <rect x='200' width="1200" y ="300" height="200" stroke='#777' fill="none">
+      {...props}
+      onMouseDownCapture={isPreview ? undefined : (e) => handleMouseDownCapture(e)}
+      onClick={isPreview ? undefined : (e) => handleClick(e)}
+    >
+      
+			<g transform="translate(1000 1000)">
+        <g className={'svg-background'}>
+          <rect width={width} height={height} fill="#FFFFFF"></rect>
+        </g>
+        { (slide ? slide.wrapperIds : []).map(wrapperId => (
+            isPreview ?
+              <SVGNoWrapperContainer key={wrapperId} wrapperId = {wrapperId}/> :
+              <SVGWrapperContainer 
+                key={wrapperId} slideId={slideId} wrapperId = {wrapperId} svgDOM={ref.current}
+                handleContextMenu={handleContextMenu}
+              />
+          ))
+        }
         
-      </rect>
-      <SVGTextArea transform={"translate(400 420)"} value={`Title for Slide #${slide.id}`}/>
-      <SVGTextArea transform={"translate(400 720)"} value={`Subtitle for ${slide.id}`}/>
-      <rect x='500' width="600" y ="600" height="200" stroke='#777' fill="none"></rect>
-    </svg>
+        {/* <text x={width - 100} y={height - 100} alignmentBaseline="middle" textAnchor="middle" fontSize="20">{`Page ${slide.page}`}</text>
+        <rect x='200' width="1200" y ="300" height="200" stroke='#777' fill="none">
+          
+        </rect>
+        <SVGTextArea transform={"translate(400 420)"} value={`Title for Slide #${slide.id}`}/>
+        <SVGTextArea transform={"translate(400 720)"} value={`Subtitle for ${slide.id}`}/>
+        <rect x='500' width="600" y ="600" height="200" stroke='#777' fill="none"></rect> */}
+      </g>  
+      <def>
+        
+      </def>
+		</svg>
+	);
+});
+
+
+const useSVG = function (svgRef){
+	const [ svg, setSVG ] = useState(undefined);
+
+	useEffect( () => {
+		setSVG(svgRef.current);
+	}, []);
+
+	return [svg];
+}
+
+export default function SVGSlide(props){
+  let svgRef = useRef();
+  let svg = useSVG(svgRef);
+
+  return (
+    <ReactSVG ref={svgRef} {...props} />
   )
 }

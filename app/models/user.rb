@@ -24,6 +24,9 @@ class User < ApplicationRecord
 
   has_many :docs, foreign_key: :owner_id, class_name: :Doc, dependent: :destroy
   has_many :slides, through: :docs, source: :slides
+  has_many :wrappers, through: :slides
+  has_many :textboxes, through: :slides
+  has_many :textstyles, through: :textboxes
   
   def self.find_by_credentials(email, password)
     @user = User.find_by(email: email)
@@ -60,6 +63,6 @@ class User < ApplicationRecord
 
   private
   def ensure_doc!
-    Doc.create!({owner_id: self.id})
+    Doc.create!({owner_id: self.id, filename: "Dis doc, so untitled. wow~"})
   end
 end

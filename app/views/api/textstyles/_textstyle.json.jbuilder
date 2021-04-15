@@ -1,0 +1,1 @@
+json.extract! textstyle, :id, :textbox_id, :style_string, :offset

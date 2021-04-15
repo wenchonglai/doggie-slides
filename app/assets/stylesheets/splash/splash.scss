@@ -193,10 +193,16 @@ section.splash {
 }
 
 @media (max-width: 768px){
-  section.splash > section.section-intro > div.one-whole > div.headline-items {
-    flex-wrap: wrap;
-
-    > div.headline-item {
+  body {
+    overflow-y: auto;
+  }
+  section.splash > section.section-intro > div.one-whole {
+    h1 { 
+      font-size: 36px; 
+      margin-top: 18px;
+    }
+    >div.headline-items {
+      flex-wrap: wrap;
       flex-basis: 100%;
     }
   }

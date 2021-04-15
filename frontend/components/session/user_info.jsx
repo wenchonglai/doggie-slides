@@ -1,5 +1,5 @@
 import React from 'react';
-import DropdownMenu from '../utils/dropdown_menu';
+import DropDown from '../utils/dropdown';
 
 export default function UserInfo({user, logoutHandler, history}){
   const handleLogout = (e) => { 
@@ -12,12 +12,12 @@ export default function UserInfo({user, logoutHandler, history}){
   const profile = (<div className="profile-image">{(user.firstname || '?')[0]}</div>);
   
   return (
-    <DropdownMenu className='user-info'>
+    <DropDown className='user-info'>
       {profile}
       <section>
         <section>
           <div className="user-profile">{profile}</div>
-          <div className="user-name">{`${user.firstname} ${user.lastname}, wow`}</div>
+          <div className="user-name">{`${user.firstname} ${user.lastname}, wow~`}</div>
           <div className="user-email">{user.email}</div>
         </section>
         <section className='bottom-bar'>
@@ -26,6 +26,6 @@ export default function UserInfo({user, logoutHandler, history}){
           </button>
         </section>
       </section>
-    </DropdownMenu>
+    </DropDown>
   )
 }

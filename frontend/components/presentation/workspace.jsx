@@ -1,12 +1,11 @@
 import React from 'react';
-import SVGSlideContainer from '../svg/svg_slide_container'
+import {SVGSlideContainer} from '../svg/svg_slide_containers'
 
-export default function Workspace({slideId, ui}){
-  // console.log(ui, slideId, entities)
-  console.log(ui, slideId);
+export default function Workspace({slideId, ui, handleContextMenu}){
+
   return (
     <section className='workspace'>
-      <SVGSlideContainer slideId={slideId}/>
+      <SVGSlideContainer handleContextMenu={handleContextMenu} slideId={slideId}/>
     </section>
   )
 }

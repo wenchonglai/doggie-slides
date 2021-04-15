@@ -68,12 +68,13 @@ function HeadLineItem({title, iconIndex, children}){
 function Headline({productName, googleProductBodyText}){
   return (
     <div className='one-whole'>
-      <h1>Thicc {productName[0].toUpperCase() + productName.substring(1,productName.length - 1).toLowerCase()}, So Beautiful, wow~</h1>
+      <h1>Dis {productName[0].toUpperCase() + productName.substring(1,productName.length - 1).toLowerCase()}, So Beautiful, wow~</h1>
       <div className='headline-items'>
         { productName === 'slides' ?
           ( <HeadLineItem title="Clone" iconUrl={window.productIconUrl} iconIndex={3}>
               <p>
-                One little bug took me the whole night... Is it me or the database is slow??? Good person please extend the deadline T_T
+                Dis DoggIe Slide is made by <a style={{display: "inline"}} href="https://www.linkedin.com/in/wenchong-lai-4296424b/">one human</a> in two weeks, from scratch.
+                He wishes he has more time. Blep.
               </p>
               <Link className='splash button-anchor' to={`/presentation/`} >Go to DoggIe Slides</Link>
             </HeadLineItem>

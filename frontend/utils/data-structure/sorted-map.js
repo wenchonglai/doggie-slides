@@ -2,68 +2,87 @@ import { bisectLeft, bisectRight } from './bisect';
 
 export default class SortedMap extends Map{
   constructor(...args){ super(...args) }
-  getLeftKey(key){
-    const keys = this.keys;
-    const leftKey = keys[Math.max(bisectRight(keys, key) - 1, 0)];
 
-    return leftKey;
+  getLeftIndex(key){
+    const keys = this.keys;
+    return Math.max(bisectRight(keys, key) - 1, 0);
+  }
+
+  getRightIndex(key){
+    const keys = this.keys;
+    return Math.min(bisectLeft(keys, key), this.size - 1);
+  }
+
+  getLeftKey(key){  // the greatest index less than or equal to key
+    const keys = this.keys;
+    return keys[Math.max(bisectRight(keys, key) - 1, 0)];
+  }
+
+  getRightKey(key){ // the smallest index greater than or equal to key
+    const keys = this.keys;
+    return keys[Math.min(bisectLeft(keys, key), this.size - 1)];
   }
 
   getLeftValue(key){
-   const leftKey = this.getLeftKey(key);
-
-    return Map.prototype.get.call(this, leftKey);
+    return Map.prototype.get.call(this, this.getLeftKey(key));
   }
-
 
   getLeftEntry(key){
     const leftKey = this.getLeftKey(key);
-
     return [leftKey, Map.prototype.get.call(this, leftKey)];
   }
 
-  setLeft(key, val){
-    const keys = this.keys;
-    const leftKey = keys[Math.max(bisectRight(keys, key) - 1, 0)];
-
-    return Map.prototype.set.call(this, leftKey, val);
+  getRightEntry(key){
+    const rightKey = this.getRightKey(key);
+    return [rightKey, Map.prototype.get.call(this, rightKey)];
   }
+
+  setLeftValue(key, val){
+    const keys = this.keys;
+
+    return Map.prototype.set.call(this, this.getLeftKey(key), val);
+  }
+
+  get lastKey(){
+    return this.keys.at(-1)
+  }
+
   get last(){
     return Map.prototype.get.call(this, this.keys.at(-1));
   }
 
-  splice(index, removeLength = 0, insertLength = 0){
+  splice(offsetLeft, removeLength = 0, insertLength = 0){
     //remove
-    let keys = this.keys;
-    
+    let offsets = this.keys.sort((a, b) => a - b);
+
     if (removeLength > 0){
-      const index2 = index + removeLength;
-      const key2 = bisectLeft(keys, index + removeLength);
-      const lastStyle = this.get(key2);
+      const offsetRight = offsetLeft + removeLength;
+      let lastElem;
 
-      for (let key of keys)
-        if (key >= index){
-          if (key >= index2)
-            this._styleMap.set(key - (index2 - index1), this._styleMap.get(key));
+      for (let offset of offsets)
+        if (offset >= offsetLeft){
 
-          if (key <= index2)
-            lastStyle = this.get(key)
-
-          this._styleMap.delete(key);
+          if (offset <= offsetRight)
+            lastElem = this.get(offset);
+          if (offset > offsetRight)
+            this.set(offset - removeLength, this.get(offset));
+          this.delete(offset);
         }
-      
-        lastStyle && this.set(index, lastStyle);
+
+      lastElem && this.set(offsetLeft, lastElem);
     }
 
-    keys = this.keys;
+    offsets = this.keys.sort((a, b) => a - b);
 
-    //insert
-    for (let len = keys.length, i = len - 1; keys[i] >= index; key --){
-      let key = keys[i];
+    if (insertLength > 0)
+      for (let len = offsets.length, i = len - 1; offsets[i] > offsetLeft; i --){
 
-      this.set(i + insertLength, this.get(i));
-      this.delete(i);
-    }
+        let key = offsets[i];
+
+        this.set(key + insertLength, this.get(key));
+        this.delete(key);
+
+      }
   }
   get keys(){ return Array.from(Map.prototype.keys.call(this)).sort((a, b) => a - b); }
   get values(){ return this.keys.map(key => this.get(key)); }

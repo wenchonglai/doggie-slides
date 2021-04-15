@@ -3,3 +3,4 @@
     json.partial! "slide", slide: slide
   end
 end
+

@@ -26,9 +26,4 @@ Object.defineProperties(Object.prototype, {
   }
 });
 
-// console.log({}.isEmpty);
-// console.log(![1,2,3,4].shallowEquals({0:1,1:2,2:3,3:4}));
-// console.log([1,2,3,4].shallowEquals([1,2,3,4]));
-// console.log({0:1,1:2,2:3,3:4}.shallowEquals({0:1,1:2,2:3,3:4}));
-
 export default {};

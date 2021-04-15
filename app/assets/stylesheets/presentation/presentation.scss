@@ -3,6 +3,7 @@ section.page.presentation{
   box-sizing: border-box;
   position: relative;
   display: flex;
+  width: 100vw;
   height: 100vh;
   flex-direction: column;
 
@@ -13,6 +14,7 @@ section.page.presentation{
     height: 64px;
     top: 0px;
     width: 100%;
+    user-select: none;
 
     div.icon-wrapper {
       margin: 4px 4px 4px 8px;
@@ -80,17 +82,20 @@ section.page.presentation{
     height: calc(100% - 64px);
     border-top: 1px solid #dadce0;
     box-sizing: border-box;
+    width: 100vw;
 
     > section {
       display: flex;
       flex: 1 0 auto;
       flex-direction: column;
+      width: calc(100vw - 56px);
 
       > section.toolbar{
         height: 40px;
         display: flex;
         align-items: center;
         z-index: 1;
+        user-select: none;
       }
 
       > section.two-panel-layout {
@@ -121,11 +126,8 @@ section.page.presentation{
       flex: 0 1 auto;
       border-left: 1px solid #dadce0;
       z-index: 1;
+      overflow: hidden;
+      user-select: none;
     }
   }
-}
-
-div.menu-item {
-  display: flex;
-  flex-direction: row;
 }

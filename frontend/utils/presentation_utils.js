@@ -31,3 +31,31 @@ export const asyncMoveSlide = (data) => $.ajax({
   url: `/api/slides/move`,
   data: {slide: data}
 });
+
+export const asyncUpdateWrapper = (wrapper) => $.ajax({ // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
+  method: 'PATCH',
+  url: `/api/wrappers/${wrapper.id}`,
+  data: { wrapper }
+});
+
+export const asyncCreateText = (textData) => $.ajax({ // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+  method: 'POST',
+  url: `/api/texts`,
+  data: {
+    textbox: textData
+  }
+});
+
+export const asyncUpdateText = (textboxId, textData) => $.ajax({ // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+  method: 'PATCH',
+  url: `/api/texts/${textboxId}`,
+  data: {
+    textbox: textData
+  }
+});
+
+export const asyncDeleteWrappers = (slideId, slideData) => $.ajax({ // params: { textbox: { text, textstylesParams: {styleString, offset, _destroy} } }
+  method: 'PATCH',
+  url: `/api/slides/${slideId}`,
+  data: {slide: slideData}
+});

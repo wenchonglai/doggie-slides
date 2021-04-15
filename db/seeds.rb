@@ -5,14 +5,29 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+Textbox.destroy_all
 User.destroy_all
 Doc.destroy_all
 Slide.destroy_all
 
-User.create({email: 'demo@dmail.com', password: '123456', firstname: "Demo", lastname: "User"});
+nyan = User.create({email: 'nyanCat@nyan.nyan', password: "nyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyannyan", firstname: "Nyan", lastname: "Cat"});
+nyan_doc = nyan.docs[0]
 
-(2..10).each do |i|
-  Slide.create({doc_id: 1, page: i, skipped: false})
+(1..10).each do |i|
+  slide = Slide.create({doc_id: nyan_doc.id, page: i, skipped: false})
+  
+  Textbox.create!(
+    text: (["Nyan"] * i).join(' '),
+    wrapper_attributes: {slide_id: slide.id, z_index: 1, width: 800, height: 100},
+    textstyles_attributes: [{style_string: "font: 60px Helvetica; fill: black", offset: 0}]
+  )
 end
+  
+doge = User.create({email: 'demo@dmail.com', password: '123456', firstname: "Demo", lastname: "Doge"});
+doge_slide = doge.slides[0];
 
-User.create({email: 'bunny@dmail.com', password: 'carrots', firstname: "Judy", lastname: "Hopps"});
+Textbox.create!(
+    text: "01234567890123456789",
+    wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 600, height: 100, translate_x: 100, translate_y: 200},
+    textstyles_attributes: [{style_string: "font: 48px comic sans ms; fill: green", offset: 0}]
+  );

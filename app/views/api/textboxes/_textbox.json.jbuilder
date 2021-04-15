@@ -1,0 +1,1 @@
+json.extract! textbox, :id, :text, :textstyle_ids
