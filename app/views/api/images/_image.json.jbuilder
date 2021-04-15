@@ -1,2 +1,2 @@
-json.extract! image, :id, :width, :height, :translate_x, :translate_y, :rotate, :scale_x, :scale_y, :style_string
-json.file url_for(image.file)
+json.extract! image, :id, :width, :height, :x, :y, :rotate, :scale_x, :scale_y, :style_string
+json.href url_for(image.file)

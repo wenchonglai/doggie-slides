@@ -4,9 +4,9 @@ import { updateWrapperSelection, deleteWrapperSelection } from '../../actions/ui
 
 import SVGWrapper from './svg-wrapper';
 
-const mapSTPCreator = editable => ({entities, ui}, {wrapperId, svgDOM}) => ({
-  editable,
-  svgDOM: editable ? svgDOM : undefined,
+const mapSTPCreator = isPreview => ({entities, ui}, {wrapperId, svgDOM}) => ({
+  isPreview,
+  svgDOM: isPreview ? undefined : svgDOM,
   pageWidth: ui.pageSettings.pageWidth,
   paggHeight: ui.pageSettings.pageHeight,
   selectedWrapperIds: ui.selections.wrapperIds,
@@ -14,7 +14,7 @@ const mapSTPCreator = editable => ({entities, ui}, {wrapperId, svgDOM}) => ({
 });
 
 export const SVGWrapperContainer = connect(
-  mapSTPCreator(true),
+  mapSTPCreator(false),
   (dispatch) => ({
     updateWrapperHandler: (formData) => dispatch(updateWrapper(formData)),
     updateWrapperSelection: (wrapperIds) => dispatch(updateWrapperSelection(wrapperIds)),
@@ -23,6 +23,6 @@ export const SVGWrapperContainer = connect(
 )(SVGWrapper);
 
 export const SVGNoWrapperContainer = connect(
-  mapSTPCreator(false),
+  mapSTPCreator(true),
   null
 )(SVGWrapper);

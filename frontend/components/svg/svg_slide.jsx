@@ -30,8 +30,12 @@ const ReactSVG = React.forwardRef(({
         zIndex: 1,
         width: 400,
         height: 50,
-        translateX: x * scale,
-        translateY: y * scale,
+        x: x * scale,
+        y: y * scale,
+        crop_x: 0,
+        crop_y: 0,
+        crop_width: 400,
+        crop_height: 50
       },
       textstylesAttributes: [{
         styleString: "font: 20px Arial; fill: black",

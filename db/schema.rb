@@ -51,8 +51,8 @@ ActiveRecord::Schema.define(version: 2021_04_13_222411) do
   create_table "images", force: :cascade do |t|
     t.integer "width", default: 0, null: false
     t.integer "height", default: 0, null: false
-    t.float "translate_x", default: 0.0, null: false
-    t.float "translate_y", default: 0.0, null: false
+    t.float "x", default: 0.0, null: false
+    t.float "y", default: 0.0, null: false
     t.float "rotate", default: 0.0, null: false
     t.float "scale_x", default: 0.0, null: false
     t.float "scale_y", default: 0.0, null: false
@@ -103,12 +103,16 @@ ActiveRecord::Schema.define(version: 2021_04_13_222411) do
     t.integer "slide_id", null: false
     t.string "slide_object_type"
     t.bigint "slide_object_id"
-    t.integer "z_index", null: false
+    t.integer "z_index", default: 0, null: false
     t.float "width", default: 300.0, null: false
     t.float "height", default: 200.0, null: false
-    t.float "translate_x", default: 0.0, null: false
-    t.float "translate_y", default: 0.0, null: false
+    t.float "x", default: 0.0, null: false
+    t.float "y", default: 0.0, null: false
     t.float "rotate", default: 0.0, null: false
+    t.float "crop_width", default: 0.0, null: false
+    t.float "crop_height", default: 0.0, null: false
+    t.float "crop_x", default: 0.0, null: false
+    t.float "crop_y", default: 0.0, null: false
     t.string "fill"
     t.string "stroke"
     t.float "stroke_width", default: 0.0

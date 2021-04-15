@@ -58,7 +58,7 @@ class Api::ImagesController < ApplicationController
       .require(:image)
       .permit(
         :width, :height,
-        :translate_x, :translate_y,
+        :x, :y,
         :scale_x, :scale_y,
         :rotate
         :style_string
@@ -66,7 +66,7 @@ class Api::ImagesController < ApplicationController
           :id, :slide_id, :group_id,
           :slide_object_id, :slide_object_type,
           :z_index, :width, :height,
-          :translate_x, :translate_y, :rotate,
+          :x, :y, :rotate,
           :fill, :stroke, :stroke_width, :stroke_dasharray,
           '_destroy'
         ]

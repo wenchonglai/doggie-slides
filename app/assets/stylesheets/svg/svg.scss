@@ -1,16 +1,15 @@
 svg {
   g {
-    &.svg-edit-frame {
+    &.svg-edit-frame, &.svg-crop-frame {
       .control-box, .control-line {
-        stroke: #1a73e8;
         stroke-width: 1;
         pointer-events: stroke;
+        cursor: move;
       }
-  
+
       .control-point {
         transform-origin: center;
         pointer-events: all;
-        fill: #1a73e8;
         stroke: #fff;
         cursor: crosshair;
   
@@ -19,6 +18,18 @@ svg {
         &.ns-resize { cursor: ns-resize; }
         &.ew-resize { cursor: ew-resize; }
       }
+    }
+    &.svg-edit-frame {
+      .control-box, .control-line { stroke: #1a73e8; }
+      .control-point { fill: #1a73e8; }
+    }
+
+    &.svg-crop-frame {
+      .control-box {
+        stroke: #3f3f3f;
+        stroke-width: 3px;
+      }
+      .control-point { fill: #000000; }
     }
     
     &.active .control-background {

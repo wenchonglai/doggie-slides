@@ -4,6 +4,7 @@ json.slides ({})
 json.wrappers({})
 json.textboxes({})
 json.textstyles({})
+json.images({})
 
 if @user
   json.users do 

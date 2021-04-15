@@ -1,48 +1,39 @@
 import React, {useState, useEffect, useRef} from 'react';
-
-import SVGTextAreaContainer from './svg_textarea_container';
-import SVGEditFrame from './svg_edit_frame'
+import { asyncUpdateDoc } from '../../utils/presentation_utils';
+import SVGEditable from './svg_editable'
 
 function throttle(e, timeoutRef, func, ...args){
   switch (e.type){
     case 'mouseup': {
+      clearTimeout(timeoutRef.current)
       timeoutRef.current = setTimeout(
         () => func(...args),
         500
       );
     }; break;
     default: {
-
       clearTimeout(timeoutRef.current)
     }
   }
 }
 
 export default function SVGWrapper({
-  wrapperId, wrapper, editable, svgDOM, pageWidth, pageHeight,
+  wrapperId, wrapper, isPreview, svgDOM, pageWidth, pageHeight,
   updateWrapperHandler, updateWrapperSelection, deleteWrapperSelection,
   handleContextMenu, selectedWrapperIds,
   ...props
 }){
   const { 
     slideObjectId, slideObjectType,
-    translateX=0, translateY=0, rotate=0, width = 300, height = 200,
-    fill="none", stroke="none", strokeWidth="0", strokeDasharray=""
+    x = 0, y = 0, rotate = 0, width = 300, height = 200,
+    cropX = 0, cropY = 0, cropWidth = 300, cropHeight = 200,
+    fill = "none", stroke = "none", strokeWidth = "0", strokeDasharray = ""
   } = wrapper;
 
-  
-  const blurTimeoutRef = useRef();
-  const timeoutRef = useRef();
-  const eventListenerRef = useRef(
-    function handleBlur(e){
-      blurTimeoutRef.current = setTimeout(() => _setActive(false), 0)
-    }
-  );
-    
-  const [_size, _setSize] = useState({width, height});
-  const [_translate, _setTranslate] = useState({x: translateX, y: translateY});
-  const [_rotate, _setRotate] = useState(rotate); 
-  const [_active, _setActive] = useState(selectedWrapperIds.includes(wrapperId));
+  function requestTransformAnimation(args){
+    cancelAnimationFrame(animationFrameRef.current);
+    animationFrameRef.current = _setTransform(args);
+  }
 
   function onFocus(e){
     clearTimeout(blurTimeoutRef.current)
@@ -50,155 +41,223 @@ export default function SVGWrapper({
   }
   
   function handleMove(e){
+    // x, y: change;
+    // width, height: contant
+    // rotate: constant
+    // cropX/cropY: constant
+    // cropWidth/cropHeight: constant
     const clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    const scale = pageWidth / clientRect.width;
+    const screenScale = pageWidth / clientRect.width;
     const {dx, dy} = e;
-    const translateX = _translate.x + dx * scale;
-    const translateY = _translate.y + dy * scale;
+    const x = _transform.x + dx * screenScale;
+    const y = _transform.y + dy * screenScale;
     
-    _setTranslate({
-      x: translateX,
-      y: translateY
-    });
-    throttle(e, timeoutRef, updateWrapperHandler, {...wrapper, translateX, translateY, width: _size.width, height: _size.height, rotate: _rotate});
+    requestTransformAnimation({rotate, x, y, width, height, cropX, cropY, cropWidth, cropHeight});
+    throttle(e, timeoutRef, updateWrapperHandler, {...wrapper, x, y});
+  }
+
+  function handleCropMove(e){
+    // x, y: change;
+    // width, height: contant
+    // rotate: constant
+    // cropX/cropY: constant
+    // cropWidth/cropHeight: constant
+    const clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    const screenScale = pageWidth / clientRect.width;
+    const angle = rotate * Math.PI / 180;
+    const COS = Math.cos(angle);
+    const SIN = Math.sin(angle);
+    const dx = e.dx * screenScale, dy = e.dy * screenScale;
+    
+    const cropX = _transform.cropX + dx * COS + dy * SIN;
+    const cropY = _transform.cropY - dx * SIN + dy * COS;
+
+    requestTransformAnimation({rotate, x, y, width, height, cropX, cropY, cropWidth, cropHeight});
+    throttle(e, timeoutRef, updateWrapperHandler, {...wrapper, cropX, cropY});
+  }
+
+  function handleCropResize(e, horiz = 0, vert = 0){
+    const clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    const screenScale = pageWidth / clientRect.width;
+    const {x, y, width, height, cropX, cropY, cropWidth, cropHeight, rotate} = _transform;
+    const angle = rotate * Math.PI / 180;
+    const COS = Math.cos(angle);
+    const SIN = Math.sin(angle);
+    const dx = e.dx * screenScale, dy = e.dy * screenScale;
+
+    const dCropWidth = horiz * (dx * COS + dy * SIN);
+    const dCropHeight = vert * (dy * COS - dx * SIN);
+
+    let cropWidth1 = cropWidth + dCropWidth;
+    let cropHeight1 = cropHeight + dCropHeight;
+    let cropX1 = cropX - (horiz === -1 ? dCropWidth : 0);
+    let cropY1 = cropY - (vert === -1 ? dCropHeight : 0);
+
+    let newTransform = {
+      ..._transform, 
+      x, y, width, height,
+      cropX: cropX1, cropY: cropY1, cropWidth: cropWidth1, cropHeight: cropHeight1
+    };
+
+    requestTransformAnimation(newTransform);
+    throttle(e, timeoutRef, updateWrapperHandler, {...wrapper, ...newTransform});
   }
   
   function handleRotate(e){
+    // x, y: change based on rotate and cropX/cropY;
+    // width, height: contant
+    // rotate: change
+    // cropX/cropY: constant
+    // cropWidth/cropHeight: constant
     const clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    const scale = pageWidth / clientRect.width;
-    const centerX = (_size.width / 2 + _translate.x) / scale + clientRect.x;
-    const centerY = (_size.height / 2 + _translate.y) / scale + clientRect.y;
-    let dx = e.clientX - centerX;
-    let dy = e.clientY - centerY;
+    const screenScale = pageWidth / clientRect.width;
+    const {x, y, width, height, cropX, cropY, cropWidth, cropHeight, rotate} = _transform;
+    const angle = rotate * Math.PI / 180;
+    const COS = Math.cos(angle);
+    const SIN = Math.sin(angle);
+
+    const cropCenterX = cropX + cropWidth / 2;
+    const cropCenterY = cropY + cropHeight / 2;
+    const centerX = x + COS * cropCenterX - SIN * cropCenterY;
+    const centerY = y + COS * cropCenterY + SIN * cropCenterX;
+
+    let dx = (e.clientX - clientRect.left) * screenScale - centerX;
+    let dy = (e.clientY - clientRect.top) * screenScale - centerY;
     let tan = dx / dy
     
     if (Math.abs(tan) < 0.125) dx = 0;
     else if (Math.abs(tan) > 8) dy = 0;
     
     if (Math.abs(tan) > 0.8 && Math.abs(tan) < 1.25)
-    dx = dy * tan / Math.abs(tan);
+      dx = dy * tan / Math.abs(tan);
     
-    const rotate = (Math.atan2(dx, -dy) * 180 / Math.PI) | 0;
-    
-    _setRotate(rotate);
-    throttle(e, timeoutRef, updateWrapperHandler, {...wrapper, translateX: _translate.x, translateY: _translate.y, width: _size.width, height: _size.height, rotate});
+    const rotate1 = (Math.atan2(dx, -dy) * 180 / Math.PI) | 0;
+    const angle1 = rotate1 * Math.PI / 180;
+    const COS1 = Math.cos(angle1);
+    const SIN1 = Math.sin(angle1);
+    const x1 = x - cropCenterX * (COS1 - COS) + cropCenterY * (SIN1 - SIN);
+    const y1 = y - cropCenterY * (COS1 - COS) - cropCenterX * (SIN1 - SIN);
+    const newTransform = {x: x1, y: y1, rotate: rotate1, width, height, cropX, cropY, cropWidth, cropHeight}
+
+    requestTransformAnimation(newTransform);
+    throttle(e, timeoutRef, updateWrapperHandler, {...wrapper, x: x1, y: y1, rotate: rotate1});
   }
   
   function handleResize(e, horiz = 0, vert = 0){
+    // x, y: change
+    // width, height: change
+    // rotate: constant
+    // cropX/cropY: change
+    // cropWidth/cropHeight: change
     const clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    const scale = pageWidth / clientRect.width;
-    const angle = _rotate * Math.PI / 180;
+    const screenScale = pageWidth / clientRect.width;
+    const {x, y, width, height, cropX, cropY, cropWidth, cropHeight, rotate} = _transform;
+    const angle = rotate * Math.PI / 180;
     const COS = Math.cos(angle);
     const SIN = Math.sin(angle);
-    
-    const {dx, dy} = e;
-    let {width, height} = _size;
-    let {x, y} = _translate;
-    let dW = 0, dH = 0;
-    
-    if (horiz !== 0){
-      dW += (dx * COS + dy * SIN) * scale;
-      width += dW * horiz;
-      
-      if (width < 10){
-        dW += (10 - width)* horiz
-        width = 10;
-      }
-      
-      x += dW * (COS - horiz)/ 2;
-      y += dW * SIN / 2;
-    } 
-    
-    if (vert != 0){
-      dH += (-dx * SIN + dy * COS) * scale;
-      height += dH * vert;
-      
-      if (height < 10){
-        dH += (10 - height)* vert
-        height = 10;
-      }
-      
-      x -= dH * SIN / 2;
-      y += dH * (COS - vert)/ 2;
-    }
-    
-    _setSize({width, height});
-    _setTranslate({x, y});
-    
-    throttle(e, timeoutRef, updateWrapperHandler, {...wrapper, width, height, translateX: x, translateY: y, rotate: _rotate});
+    const dx = e.dx * screenScale, dy = e.dy * screenScale;
+
+    const dCropWidth = horiz * (dx * COS + dy * SIN);
+    const dCropHeight = vert * (dy * COS - dx * SIN);
+
+    let cropWidth1 = cropWidth + dCropWidth;
+    let cropHeight1 = cropHeight + dCropHeight;
+    let cropX1 = cropX * cropWidth1 / cropWidth;
+    let cropY1 = cropY * cropHeight1 / cropHeight;
+    let width1 = width * cropWidth1 / cropWidth;
+    let height1 = height * cropHeight1 / cropHeight;
+    let x1 = x - 
+      (cropX + (horiz === -1 ? cropWidth : 0)) * (COS * dCropWidth / cropWidth) + 
+      (cropY + (vert === -1 ? cropHeight : 0)) * (SIN * dCropHeight / cropHeight)
+
+    let y1 = y - 
+      (cropX + (horiz === -1 ? cropWidth : 0)) * (SIN * dCropWidth / cropWidth) -
+      (cropY + (vert === -1 ? cropHeight : 0)) * (COS * dCropHeight / cropHeight); 
+
+    let newTransform = {
+      ..._transform, 
+      x: x1, y: y1, width: width1, height: height1,
+      cropX: cropX1, cropY: cropY1, cropWidth: cropWidth1, cropHeight: cropHeight1
+    };
+
+    requestTransformAnimation(newTransform);
+    throttle(e, timeoutRef, updateWrapperHandler, {...wrapper, ...newTransform});
   }
-  
-  function getComponent(){
-    switch (slideObjectType){
-      case 'Textbox': 
-      return (
-        <SVGTextAreaContainer
-          textboxId={slideObjectId}
-          width={_size.width} height={_size.height}
-          active={_active}
-        />);
-        // case 'image': return <SVGImage id={id} editable={editable}/>;
-        // case 'diagram': return <SVGShape id={id} editable={editable}/>;
-      }
+
+  const blurTimeoutRef = useRef();
+  const timeoutRef = useRef();
+  const animationFrameRef = useRef();
+  const eventListenerRef = useRef(
+    function handleBlur(e){
+      blurTimeoutRef.current = setTimeout(() => _setActive(false), 0)
     }
+  );
+  
+  const [_transform, _setTransform] = useState({
+    x, y, width, height, rotate, cropX, cropY, cropWidth, cropHeight
+  });
+  const [_active, _setActive] = useState(selectedWrapperIds.includes(wrapperId));
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutRef.current);
+    }
+  }, []);
     
-    const component = getComponent();
-
-    useEffect(() => {
-      return () => {
-        clearTimeout(timeoutRef.current);
-      }
-    }, []);
+  useEffect(() => {
+    const {x=0, y=0, rotate=0, width = 300, height = 200, cropX, cropY, cropWidth, cropHeight} = wrapper;
     
-    useEffect(() => {
-      const {translateX=0, translateY=0, rotate=0, width = 300, height = 200} = wrapper;
+    _setTransform({x, y, width, height, rotate, cropX, cropY, cropWidth, cropHeight});
+  }, [wrapper]);
 
-      _setTranslate({x: translateX, y: translateY});
-      _setRotate(rotate);
-      _setSize({width, height});
-    }, [wrapper]);
+  isPreview || useEffect(() => {
+    if (_active){
+      svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
+      updateWrapperSelection([wrapper.id]);
+    } else {
+      
+      svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+      deleteWrapperSelection([wrapper.id]);
+    }
+  }, [_active])
+  
+  useEffect(() => {
+    return () => {
+      svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+      clearTimeout(timeoutRef.current);
+    }
+  }, [svgDOM]);
 
-    editable && useEffect(() => {
-      if (_active){
-        svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
-        updateWrapperSelection([wrapper.id]);
-      } else {
-        
-        svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
-        deleteWrapperSelection([wrapper.id]);
-      }
-    }, [_active])
-    
-    useEffect(() => {
-      return () => {
-        svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
-        clearTimeout(timeoutRef.current);
-      }
-    }, [svgDOM]);
+  const COS = Math.cos(_transform.rotate * Math.PI / 180);
+  const SIN = Math.sin(_transform.rotate * Math.PI / 180);
+  const transformX = _transform.x + _transform.cropX * COS - _transform.cropY * SIN;
+  const transformY = _transform.y + _transform.cropY * COS + _transform.cropX * SIN;
 
-    return ( wrapper ?
+  return ( wrapper ?
     <g className='SVGWrapper'
-      transform={`rotate(${_rotate}) translate(${_translate.x}, ${_translate.y})`}
-      transform-origin={`${_translate.x + _size.width / 2} ${_translate.y +_size.height / 2}`}
-      onMouseDown={editable && svgDOM ? onFocus : null}
-      onContextMenu={editable ? e => handleContextMenu(e, wrapper) : null}
+      transform={`translate(${transformX}, ${transformY}) rotate(${_transform.rotate})`}
+      // transform-origin={`${_transform.x + _transform.width / 2} ${_transform.y +_transform.height / 2}`}
+      onMouseDown={!isPreview && svgDOM ? onFocus : null}
+      onContextMenu={isPreview ? null : e => handleContextMenu(e, wrapper)}
     > 
+
       <rect 
-        width={width} height={height}
+        width={_transform.cropWidth} height={_transform.cropHeight}
         {...{fill, stroke}}
         strokeWidth={strokeWidth || stroke && 1}
         strokeDasharray={strokeDasharray && strokeDasharray.split(" ").map(x => x * strokeWidth).join(" ")}
       />
-        { editable ?  
-            <SVGEditFrame
-              active={_active}
-              {...{svgDOM, handleMove, handleRotate, handleResize}}
-              width={_size.width} height={_size.height}
-            >
-              {component}
-            </SVGEditFrame> : 
-            component
-        }
+
+      { <SVGEditable
+          active={_active}
+          {...{svgDOM, 
+            handleMove, handleRotate, handleResize, handleCropMove, handleCropResize,
+            slideObjectId, slideObjectType, isPreview
+          }}
+          transform={_transform}
+          width={_transform.cropWidth} height={_transform.cropHeight}
+        />
+      }
     </g> : null
   )
 }

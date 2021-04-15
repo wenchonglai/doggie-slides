@@ -4221,10 +4221,15 @@ var FULL_SCREEN = {
   actionName: undefined
 };
 var IMAGE = {
-  name: "Image",
+  name: "Insert Image",
   icon: [0, 3],
   shortCut: undefined,
-  actionName: undefined
+  children: [{
+    name: "Upload from computer",
+    icon: [1, 3],
+    type: 'image-upload',
+    actionName: "uploadFromComputer"
+  }]
 };
 var TEXTBOX = {
   name: "Text Box",
@@ -4297,21 +4302,21 @@ var BORDER_WEIGHT = {
     actionName: "borderWeight",
     value: 2
   }, {
-    name: "3px",
-    actionName: "borderWeight",
-    value: 3
-  }, {
     name: "4px",
     actionName: "borderWeight",
     value: 4
   }, {
-    name: "6px",
-    actionName: "borderWeight",
-    value: 6
-  }, {
     name: "8px",
     actionName: "borderWeight",
     value: 8
+  }, {
+    name: "16px",
+    actionName: "borderWeight",
+    value: 16
+  }, {
+    name: "24px",
+    actionName: "borderWeight",
+    value: 24
   }]
 };
 var BORDER_DASH = {
@@ -4885,22 +4890,88 @@ function filterInput(value) {
   }
 }
 
-function MenuItem(_ref2) {
-  var _ref2$className = _ref2.className,
-      className = _ref2$className === void 0 ? "" : _ref2$className,
-      item = _ref2.item,
-      dispatch = _ref2.dispatch,
-      onClick = _ref2.onClick,
-      onMouseMove = _ref2.onMouseMove,
-      parentData = _ref2.parentData,
-      parentHandleChange = _ref2.parentHandleChange;
+function ImageUpload(_ref2) {
+  var item = _ref2.item;
 
-  function handleClick(e) {
+  var handleChange = function handleChange(e) {
+    var reader = new FileReader();
+    var formData = new FormData(e.currentTarget);
+    var file = formData.get("image[href]");
+
+    reader.onloadend = function (e) {
+      console.log(e);
+      var image = new Image();
+      image.src = e.target.result;
+
+      image.onload = function () {
+        var height = this.height;
+        var width = this.width;
+        console.log(this, width, height);
+      };
+    };
+
+    if (reader) reader.readAsDataURL(file);
+  };
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", {
+    onChange: function onChange(e) {
+      return handleChange(e);
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", {
+    onClick: function onClick(e) {
+      e.stopPropagation();
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_2__.default, {
+    className: "menu-item-icon",
+    icon: item.icon
+  }), item.name, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+    style: {
+      opacity: 0,
+      zIndex: -1,
+      position: "absolute"
+    },
+    type: "file",
+    name: "image[href]",
+    accept: "image/*"
+  })));
+}
+
+function MenuItem(_ref3) {
+  var _ref3$className = _ref3.className,
+      className = _ref3$className === void 0 ? "" : _ref3$className,
+      item = _ref3.item,
+      dispatch = _ref3.dispatch,
+      onClick = _ref3.onClick,
+      onMouseMove = _ref3.onMouseMove,
+      parentData = _ref3.parentData,
+      parentHandleChange = _ref3.parentHandleChange;
+
+  function handleChange(e) {
     var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
-    console.log(_actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName], value, item.value);
+    var func;
+
+    switch (item.actionName) {
+      case 'string':
+        func = _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName];
+        break;
+
+      default:
+        func = item.actionName;
+        break;
+    }
+
+    switch (item.type) {
+      case 'boolean':
+        value = parentData !== item.trueValue ? item.trueValue : undefined;
+        break;
+
+      default:
+        value = value === undefined ? item.value : value;
+        break;
+    }
 
     if (!item.children) {
-      dispatch((typeof item.actionName == 'string' ? _actions_item_thunk_actions__WEBPACK_IMPORTED_MODULE_1__[item.actionName] : item.actionName)(item.type === 'boolean' ? parentData !== item.trueValue ? item.trueValue : undefined : value === undefined ? item.value : value));
+      dispatch(func(value));
     }
 
     onClick(e);
@@ -4944,8 +5015,10 @@ function MenuItem(_ref2) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "menu-item ".concat(className, " ").concat(item.type || '', " ").concat(item.actionName ? '' : 'no-action'),
     onMouseMove: onMouseMove,
-    onClick: handleClick
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    onClick: handleChange
+  }, item.type === 'image-upload' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(ImageUpload, {
+    item: item
+  }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "icon-box"
   }, getMenuIcon(item.type), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "color-box",
@@ -4954,7 +5027,7 @@ function MenuItem(_ref2) {
     }
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", _extends({
     className: "menu-item-name"
-  }, style), item.name), item.children ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, style), item.name)), item.children ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "submenu-indicator"
   }) : null);
 }
@@ -5073,6 +5146,9 @@ function PresentationPage(_ref) {
     switch (uiSelections.slideObjectType) {
       case "Textbox":
         return _menu_items__WEBPACK_IMPORTED_MODULE_4__.TEXTBOX_TOOLBAR_ITEMS;
+
+      case "Image":
+        return _menu_items__WEBPACK_IMPORTED_MODULE_4__.IMAGE_TOOLBAR_ITEMS;
 
       default:
         return _menu_items__WEBPACK_IMPORTED_MODULE_4__.BASE_TOOLBAR_ITEMS;
@@ -6191,14 +6267,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ SVGWrapper)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _svg_textarea_container__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_textarea_container */ "./frontend/components/svg/svg_textarea_container.js");
-/* harmony import */ var _svg_edit_frame__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_edit_frame */ "./frontend/components/svg/svg_edit_frame.jsx");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
+/* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
+/* harmony import */ var _svg_editable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_editable */ "./frontend/components/svg/svg_editable.jsx");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -6210,6 +6280,12 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
@@ -6227,6 +6303,7 @@ function throttle(e, timeoutRef, func) {
   switch (e.type) {
     case 'mouseup':
       {
+        clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(function () {
           return func.apply(void 0, args);
         }, 500);
@@ -6244,7 +6321,7 @@ function throttle(e, timeoutRef, func) {
 function SVGWrapper(_ref) {
   var wrapperId = _ref.wrapperId,
       wrapper = _ref.wrapper,
-      editable = _ref.editable,
+      isPreview = _ref.isPreview,
       svgDOM = _ref.svgDOM,
       pageWidth = _ref.pageWidth,
       pageHeight = _ref.pageHeight,
@@ -6253,20 +6330,28 @@ function SVGWrapper(_ref) {
       deleteWrapperSelection = _ref.deleteWrapperSelection,
       handleContextMenu = _ref.handleContextMenu,
       selectedWrapperIds = _ref.selectedWrapperIds,
-      props = _objectWithoutProperties(_ref, ["wrapperId", "wrapper", "editable", "svgDOM", "pageWidth", "pageHeight", "updateWrapperHandler", "updateWrapperSelection", "deleteWrapperSelection", "handleContextMenu", "selectedWrapperIds"]);
+      props = _objectWithoutProperties(_ref, ["wrapperId", "wrapper", "isPreview", "svgDOM", "pageWidth", "pageHeight", "updateWrapperHandler", "updateWrapperSelection", "deleteWrapperSelection", "handleContextMenu", "selectedWrapperIds"]);
 
   var slideObjectId = wrapper.slideObjectId,
       slideObjectType = wrapper.slideObjectType,
-      _wrapper$translateX = wrapper.translateX,
-      translateX = _wrapper$translateX === void 0 ? 0 : _wrapper$translateX,
-      _wrapper$translateY = wrapper.translateY,
-      translateY = _wrapper$translateY === void 0 ? 0 : _wrapper$translateY,
+      _wrapper$x = wrapper.x,
+      x = _wrapper$x === void 0 ? 0 : _wrapper$x,
+      _wrapper$y = wrapper.y,
+      y = _wrapper$y === void 0 ? 0 : _wrapper$y,
       _wrapper$rotate = wrapper.rotate,
       rotate = _wrapper$rotate === void 0 ? 0 : _wrapper$rotate,
       _wrapper$width = wrapper.width,
       width = _wrapper$width === void 0 ? 300 : _wrapper$width,
       _wrapper$height = wrapper.height,
       height = _wrapper$height === void 0 ? 200 : _wrapper$height,
+      _wrapper$cropX = wrapper.cropX,
+      cropX = _wrapper$cropX === void 0 ? 0 : _wrapper$cropX,
+      _wrapper$cropY = wrapper.cropY,
+      cropY = _wrapper$cropY === void 0 ? 0 : _wrapper$cropY,
+      _wrapper$cropWidth = wrapper.cropWidth,
+      cropWidth = _wrapper$cropWidth === void 0 ? 300 : _wrapper$cropWidth,
+      _wrapper$cropHeight = wrapper.cropHeight,
+      cropHeight = _wrapper$cropHeight === void 0 ? 200 : _wrapper$cropHeight,
       _wrapper$fill = wrapper.fill,
       fill = _wrapper$fill === void 0 ? "none" : _wrapper$fill,
       _wrapper$stroke = wrapper.stroke,
@@ -6275,39 +6360,11 @@ function SVGWrapper(_ref) {
       strokeWidth = _wrapper$strokeWidth === void 0 ? "0" : _wrapper$strokeWidth,
       _wrapper$strokeDashar = wrapper.strokeDasharray,
       strokeDasharray = _wrapper$strokeDashar === void 0 ? "" : _wrapper$strokeDashar;
-  var blurTimeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
-  var timeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
-  var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(function handleBlur(e) {
-    blurTimeoutRef.current = setTimeout(function () {
-      return _setActive(false);
-    }, 0);
-  });
 
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    width: width,
-    height: height
-  }),
-      _useState2 = _slicedToArray(_useState, 2),
-      _size = _useState2[0],
-      _setSize = _useState2[1];
-
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    x: translateX,
-    y: translateY
-  }),
-      _useState4 = _slicedToArray(_useState3, 2),
-      _translate = _useState4[0],
-      _setTranslate = _useState4[1];
-
-  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(rotate),
-      _useState6 = _slicedToArray(_useState5, 2),
-      _rotate = _useState6[0],
-      _setRotate = _useState6[1];
-
-  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(selectedWrapperIds.includes(wrapperId)),
-      _useState8 = _slicedToArray(_useState7, 2),
-      _active = _useState8[0],
-      _setActive = _useState8[1];
+  function requestTransformAnimation(args) {
+    cancelAnimationFrame(animationFrameRef.current);
+    animationFrameRef.current = _setTransform(args);
+  }
 
   function onFocus(e) {
     clearTimeout(blurTimeoutRef.current);
@@ -6316,157 +6373,274 @@ function SVGWrapper(_ref) {
   }
 
   function handleMove(e) {
+    // x, y: change;
+    // width, height: contant
+    // rotate: constant
+    // cropX/cropY: constant
+    // cropWidth/cropHeight: constant
     var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    var scale = pageWidth / clientRect.width;
+    var screenScale = pageWidth / clientRect.width;
     var dx = e.dx,
         dy = e.dy;
-    var translateX = _translate.x + dx * scale;
-    var translateY = _translate.y + dy * scale;
-
-    _setTranslate({
-      x: translateX,
-      y: translateY
+    var x = _transform.x + dx * screenScale;
+    var y = _transform.y + dy * screenScale;
+    requestTransformAnimation({
+      rotate: rotate,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      cropX: cropX,
+      cropY: cropY,
+      cropWidth: cropWidth,
+      cropHeight: cropHeight
     });
-
     throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), {}, {
-      translateX: translateX,
-      translateY: translateY,
-      width: _size.width,
-      height: _size.height,
-      rotate: _rotate
+      x: x,
+      y: y
     }));
   }
 
-  function handleRotate(e) {
+  function handleCropMove(e) {
+    // x, y: change;
+    // width, height: contant
+    // rotate: constant
+    // cropX/cropY: constant
+    // cropWidth/cropHeight: constant
     var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    var scale = pageWidth / clientRect.width;
-    var centerX = (_size.width / 2 + _translate.x) / scale + clientRect.x;
-    var centerY = (_size.height / 2 + _translate.y) / scale + clientRect.y;
-    var dx = e.clientX - centerX;
-    var dy = e.clientY - centerY;
+    var screenScale = pageWidth / clientRect.width;
+    var angle = rotate * Math.PI / 180;
+    var COS = Math.cos(angle);
+    var SIN = Math.sin(angle);
+    var dx = e.dx * screenScale,
+        dy = e.dy * screenScale;
+    var cropX = _transform.cropX + dx * COS + dy * SIN;
+    var cropY = _transform.cropY - dx * SIN + dy * COS;
+    requestTransformAnimation({
+      rotate: rotate,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      cropX: cropX,
+      cropY: cropY,
+      cropWidth: cropWidth,
+      cropHeight: cropHeight
+    });
+    throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), {}, {
+      cropX: cropX,
+      cropY: cropY
+    }));
+  }
+
+  function handleCropResize(e) {
+    var horiz = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var vert = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    var screenScale = pageWidth / clientRect.width;
+    var x = _transform.x,
+        y = _transform.y,
+        width = _transform.width,
+        height = _transform.height,
+        cropX = _transform.cropX,
+        cropY = _transform.cropY,
+        cropWidth = _transform.cropWidth,
+        cropHeight = _transform.cropHeight,
+        rotate = _transform.rotate;
+    var angle = rotate * Math.PI / 180;
+    var COS = Math.cos(angle);
+    var SIN = Math.sin(angle);
+    var dx = e.dx * screenScale,
+        dy = e.dy * screenScale;
+    var dCropWidth = horiz * (dx * COS + dy * SIN);
+    var dCropHeight = vert * (dy * COS - dx * SIN);
+    var cropWidth1 = cropWidth + dCropWidth;
+    var cropHeight1 = cropHeight + dCropHeight;
+    var cropX1 = cropX - (horiz === -1 ? dCropWidth : 0);
+    var cropY1 = cropY - (vert === -1 ? dCropHeight : 0);
+
+    var newTransform = _objectSpread(_objectSpread({}, _transform), {}, {
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      cropX: cropX1,
+      cropY: cropY1,
+      cropWidth: cropWidth1,
+      cropHeight: cropHeight1
+    });
+
+    requestTransformAnimation(newTransform);
+    throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), newTransform));
+  }
+
+  function handleRotate(e) {
+    // x, y: change based on rotate and cropX/cropY;
+    // width, height: contant
+    // rotate: change
+    // cropX/cropY: constant
+    // cropWidth/cropHeight: constant
+    var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
+    var screenScale = pageWidth / clientRect.width;
+    var x = _transform.x,
+        y = _transform.y,
+        width = _transform.width,
+        height = _transform.height,
+        cropX = _transform.cropX,
+        cropY = _transform.cropY,
+        cropWidth = _transform.cropWidth,
+        cropHeight = _transform.cropHeight,
+        rotate = _transform.rotate;
+    var angle = rotate * Math.PI / 180;
+    var COS = Math.cos(angle);
+    var SIN = Math.sin(angle);
+    var cropCenterX = cropX + cropWidth / 2;
+    var cropCenterY = cropY + cropHeight / 2;
+    var centerX = x + COS * cropCenterX - SIN * cropCenterY;
+    var centerY = y + COS * cropCenterY + SIN * cropCenterX;
+    var dx = (e.clientX - clientRect.left) * screenScale - centerX;
+    var dy = (e.clientY - clientRect.top) * screenScale - centerY;
     var tan = dx / dy;
     if (Math.abs(tan) < 0.125) dx = 0;else if (Math.abs(tan) > 8) dy = 0;
     if (Math.abs(tan) > 0.8 && Math.abs(tan) < 1.25) dx = dy * tan / Math.abs(tan);
-    var rotate = Math.atan2(dx, -dy) * 180 / Math.PI | 0;
-
-    _setRotate(rotate);
-
+    var rotate1 = Math.atan2(dx, -dy) * 180 / Math.PI | 0;
+    var angle1 = rotate1 * Math.PI / 180;
+    var COS1 = Math.cos(angle1);
+    var SIN1 = Math.sin(angle1);
+    var x1 = x - cropCenterX * (COS1 - COS) + cropCenterY * (SIN1 - SIN);
+    var y1 = y - cropCenterY * (COS1 - COS) - cropCenterX * (SIN1 - SIN);
+    var newTransform = {
+      x: x1,
+      y: y1,
+      rotate: rotate1,
+      width: width,
+      height: height,
+      cropX: cropX,
+      cropY: cropY,
+      cropWidth: cropWidth,
+      cropHeight: cropHeight
+    };
+    requestTransformAnimation(newTransform);
     throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), {}, {
-      translateX: _translate.x,
-      translateY: _translate.y,
-      width: _size.width,
-      height: _size.height,
-      rotate: rotate
+      x: x1,
+      y: y1,
+      rotate: rotate1
     }));
   }
 
   function handleResize(e) {
     var horiz = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
     var vert = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    // x, y: change
+    // width, height: change
+    // rotate: constant
+    // cropX/cropY: change
+    // cropWidth/cropHeight: change
     var clientRect = svgDOM.children[0].children[0].children[0].getBoundingClientRect();
-    var scale = pageWidth / clientRect.width;
-    var angle = _rotate * Math.PI / 180;
+    var screenScale = pageWidth / clientRect.width;
+    var x = _transform.x,
+        y = _transform.y,
+        width = _transform.width,
+        height = _transform.height,
+        cropX = _transform.cropX,
+        cropY = _transform.cropY,
+        cropWidth = _transform.cropWidth,
+        cropHeight = _transform.cropHeight,
+        rotate = _transform.rotate;
+    var angle = rotate * Math.PI / 180;
     var COS = Math.cos(angle);
     var SIN = Math.sin(angle);
-    var dx = e.dx,
-        dy = e.dy;
-    var width = _size.width,
-        height = _size.height;
-    var x = _translate.x,
-        y = _translate.y;
-    var dW = 0,
-        dH = 0;
+    var dx = e.dx * screenScale,
+        dy = e.dy * screenScale;
+    var dCropWidth = horiz * (dx * COS + dy * SIN);
+    var dCropHeight = vert * (dy * COS - dx * SIN);
+    var cropWidth1 = cropWidth + dCropWidth;
+    var cropHeight1 = cropHeight + dCropHeight;
+    var cropX1 = cropX * cropWidth1 / cropWidth;
+    var cropY1 = cropY * cropHeight1 / cropHeight;
+    var width1 = width * cropWidth1 / cropWidth;
+    var height1 = height * cropHeight1 / cropHeight;
+    var x1 = x - (cropX + (horiz === -1 ? cropWidth : 0)) * (COS * dCropWidth / cropWidth) + (cropY + (vert === -1 ? cropHeight : 0)) * (SIN * dCropHeight / cropHeight);
+    var y1 = y - (cropX + (horiz === -1 ? cropWidth : 0)) * (SIN * dCropWidth / cropWidth) - (cropY + (vert === -1 ? cropHeight : 0)) * (COS * dCropHeight / cropHeight);
 
-    if (horiz !== 0) {
-      dW += (dx * COS + dy * SIN) * scale;
-      width += dW * horiz;
-
-      if (width < 10) {
-        dW += (10 - width) * horiz;
-        width = 10;
-      }
-
-      x += dW * (COS - horiz) / 2;
-      y += dW * SIN / 2;
-    }
-
-    if (vert != 0) {
-      dH += (-dx * SIN + dy * COS) * scale;
-      height += dH * vert;
-
-      if (height < 10) {
-        dH += (10 - height) * vert;
-        height = 10;
-      }
-
-      x -= dH * SIN / 2;
-      y += dH * (COS - vert) / 2;
-    }
-
-    _setSize({
-      width: width,
-      height: height
+    var newTransform = _objectSpread(_objectSpread({}, _transform), {}, {
+      x: x1,
+      y: y1,
+      width: width1,
+      height: height1,
+      cropX: cropX1,
+      cropY: cropY1,
+      cropWidth: cropWidth1,
+      cropHeight: cropHeight1
     });
 
-    _setTranslate({
-      x: x,
-      y: y
-    });
-
-    throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), {}, {
-      width: width,
-      height: height,
-      translateX: x,
-      translateY: y,
-      rotate: _rotate
-    }));
+    requestTransformAnimation(newTransform);
+    throttle(e, timeoutRef, updateWrapperHandler, _objectSpread(_objectSpread({}, wrapper), newTransform));
   }
 
-  function getComponent() {
-    switch (slideObjectType) {
-      case 'Textbox':
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea_container__WEBPACK_IMPORTED_MODULE_1__.default, {
-          textboxId: slideObjectId,
-          width: _size.width,
-          height: _size.height,
-          active: _active
-        });
-      // case 'image': return <SVGImage id={id} editable={editable}/>;
-      // case 'diagram': return <SVGShape id={id} editable={editable}/>;
-    }
-  }
+  var blurTimeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var timeoutRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var animationFrameRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(function handleBlur(e) {
+    blurTimeoutRef.current = setTimeout(function () {
+      return _setActive(false);
+    }, 0);
+  });
 
-  var component = getComponent();
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    x: x,
+    y: y,
+    width: width,
+    height: height,
+    rotate: rotate,
+    cropX: cropX,
+    cropY: cropY,
+    cropWidth: cropWidth,
+    cropHeight: cropHeight
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      _transform = _useState2[0],
+      _setTransform = _useState2[1];
+
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(selectedWrapperIds.includes(wrapperId)),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _active = _useState4[0],
+      _setActive = _useState4[1];
+
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     return function () {
       clearTimeout(timeoutRef.current);
     };
   }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    var _wrapper$translateX2 = wrapper.translateX,
-        translateX = _wrapper$translateX2 === void 0 ? 0 : _wrapper$translateX2,
-        _wrapper$translateY2 = wrapper.translateY,
-        translateY = _wrapper$translateY2 === void 0 ? 0 : _wrapper$translateY2,
+    var _wrapper$x2 = wrapper.x,
+        x = _wrapper$x2 === void 0 ? 0 : _wrapper$x2,
+        _wrapper$y2 = wrapper.y,
+        y = _wrapper$y2 === void 0 ? 0 : _wrapper$y2,
         _wrapper$rotate2 = wrapper.rotate,
         rotate = _wrapper$rotate2 === void 0 ? 0 : _wrapper$rotate2,
         _wrapper$width2 = wrapper.width,
         width = _wrapper$width2 === void 0 ? 300 : _wrapper$width2,
         _wrapper$height2 = wrapper.height,
-        height = _wrapper$height2 === void 0 ? 200 : _wrapper$height2;
+        height = _wrapper$height2 === void 0 ? 200 : _wrapper$height2,
+        cropX = wrapper.cropX,
+        cropY = wrapper.cropY,
+        cropWidth = wrapper.cropWidth,
+        cropHeight = wrapper.cropHeight;
 
-    _setTranslate({
-      x: translateX,
-      y: translateY
-    });
-
-    _setRotate(rotate);
-
-    _setSize({
+    _setTransform({
+      x: x,
+      y: y,
       width: width,
-      height: height
+      height: height,
+      rotate: rotate,
+      cropX: cropX,
+      cropY: cropY,
+      cropWidth: cropWidth,
+      cropHeight: cropHeight
     });
   }, [wrapper]);
-  editable && (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+  isPreview || (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     if (_active) {
       svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
       updateWrapperSelection([wrapper.id]);
@@ -6481,32 +6655,42 @@ function SVGWrapper(_ref) {
       clearTimeout(timeoutRef.current);
     };
   }, [svgDOM]);
+  var COS = Math.cos(_transform.rotate * Math.PI / 180);
+  var SIN = Math.sin(_transform.rotate * Math.PI / 180);
+  var transformX = _transform.x + _transform.cropX * COS - _transform.cropY * SIN;
+  var transformY = _transform.y + _transform.cropY * COS + _transform.cropX * SIN;
   return wrapper ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     className: "SVGWrapper",
-    transform: "rotate(".concat(_rotate, ") translate(").concat(_translate.x, ", ").concat(_translate.y, ")"),
-    "transform-origin": "".concat(_translate.x + _size.width / 2, " ").concat(_translate.y + _size.height / 2),
-    onMouseDown: editable && svgDOM ? onFocus : null,
-    onContextMenu: editable ? function (e) {
+    transform: "translate(".concat(transformX, ", ").concat(transformY, ") rotate(").concat(_transform.rotate, ")") // transform-origin={`${_transform.x + _transform.width / 2} ${_transform.y +_transform.height / 2}`}
+    ,
+    onMouseDown: !isPreview && svgDOM ? onFocus : null,
+    onContextMenu: isPreview ? null : function (e) {
       return handleContextMenu(e, wrapper);
-    } : null
+    }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-    width: width,
-    height: height,
+    width: _transform.cropWidth,
+    height: _transform.cropHeight,
     fill: fill,
     stroke: stroke,
     strokeWidth: strokeWidth || stroke && 1,
     strokeDasharray: strokeDasharray && strokeDasharray.split(" ").map(function (x) {
       return x * strokeWidth;
     }).join(" ")
-  }), editable ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_edit_frame__WEBPACK_IMPORTED_MODULE_2__.default, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_editable__WEBPACK_IMPORTED_MODULE_2__.default, {
     active: _active,
     svgDOM: svgDOM,
     handleMove: handleMove,
     handleRotate: handleRotate,
     handleResize: handleResize,
-    width: _size.width,
-    height: _size.height
-  }, component) : component) : null;
+    handleCropMove: handleCropMove,
+    handleCropResize: handleCropResize,
+    slideObjectId: slideObjectId,
+    slideObjectType: slideObjectType,
+    isPreview: isPreview,
+    transform: _transform,
+    width: _transform.cropWidth,
+    height: _transform.cropHeight
+  })) : null;
 }
 
 /***/ }),
@@ -6630,10 +6814,10 @@ var SVGDraggable = function SVGDraggable(_ref) {
 
 /***/ }),
 
-/***/ "./frontend/components/svg/svg_edit_frame.jsx":
-/*!****************************************************!*\
-  !*** ./frontend/components/svg/svg_edit_frame.jsx ***!
-  \****************************************************/
+/***/ "./frontend/components/svg/svg_editable.jsx":
+/*!**************************************************!*\
+  !*** ./frontend/components/svg/svg_editable.jsx ***!
+  \**************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -6644,11 +6828,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _svg_focusable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg-focusable */ "./frontend/components/svg/svg-focusable.jsx");
 /* harmony import */ var _svg_draggable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_draggable */ "./frontend/components/svg/svg_draggable.jsx");
+/* harmony import */ var _svg_textarea_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./svg_textarea_container */ "./frontend/components/svg/svg_textarea_container.js");
+/* harmony import */ var _svg_image_container__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./svg_image_container */ "./frontend/components/svg/svg_image_container.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+
 
 
 
@@ -6679,12 +6879,42 @@ var SVGControlPoint = function SVGControlPoint(_ref) {
   }));
 };
 
-var SVGMoveControl = function SVGMoveControl(_ref2) {
-  var svgDOM = _ref2.svgDOM,
-      width = _ref2.width,
+function getComponent(_ref2) {
+  var width = _ref2.width,
       height = _ref2.height,
-      onDrag = _ref2.onDrag,
-      props = _objectWithoutProperties(_ref2, ["svgDOM", "width", "height", "onDrag"]);
+      transform = _ref2.transform,
+      slideObjectId = _ref2.slideObjectId,
+      slideObjectType = _ref2.slideObjectType,
+      active = _ref2.active;
+
+  switch (slideObjectType) {
+    case 'Textbox':
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_textarea_container__WEBPACK_IMPORTED_MODULE_3__.default, {
+        width: width,
+        height: height,
+        slideObjectId: slideObjectId,
+        active: active
+      });
+
+    case 'Image':
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_image_container__WEBPACK_IMPORTED_MODULE_4__.default, {
+        width: width,
+        height: height,
+        slideObjectId: slideObjectId,
+        active: active,
+        cropX: transform.cropX,
+        cropY: transform.cropY
+      });
+  }
+}
+
+var SVGMoveControl = function SVGMoveControl(_ref3) {
+  var svgDOM = _ref3.svgDOM,
+      width = _ref3.width,
+      height = _ref3.height,
+      onDrag = _ref3.onDrag,
+      editMode = _ref3.editMode,
+      props = _objectWithoutProperties(_ref3, ["svgDOM", "width", "height", "onDrag", "editMode"]);
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_draggable__WEBPACK_IMPORTED_MODULE_2__.default, _extends({
     svgDOM: svgDOM,
@@ -6698,16 +6928,13 @@ var SVGMoveControl = function SVGMoveControl(_ref2) {
   }));
 };
 
-var SVGEditFrame = function SVGEditFrame(_ref3) {
-  var width = _ref3.width,
-      height = _ref3.height,
-      handleMove = _ref3.handleMove,
-      handleRotate = _ref3.handleRotate,
-      handleResize = _ref3.handleResize,
-      svgDOM = _ref3.svgDOM,
-      children = _ref3.children,
-      active = _ref3.active,
-      scale = _ref3.scale;
+var SVGEditFrame = function SVGEditFrame(_ref4) {
+  var svgDOM = _ref4.svgDOM,
+      width = _ref4.width,
+      height = _ref4.height,
+      handleRotate = _ref4.handleRotate,
+      handleResize = _ref4.handleResize,
+      handleMove = _ref4.handleMove;
   var halfWidth = width / 2;
   var halfHeight = height / 2;
   var controlPoints = [/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
@@ -6784,16 +7011,6 @@ var SVGEditFrame = function SVGEditFrame(_ref3) {
     transform: "translate(".concat(width, " ").concat(height, ")")
   })];
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-    className: "edit-frame ".concat(active ? 'active' : '')
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGMoveControl, {
-    className: "control-background",
-    svgDOM: svgDOM,
-    width: width,
-    height: height,
-    onDrag: function onDrag(e) {
-      return handleMove(e);
-    }
-  }), children, active ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     className: "svg-edit-frame"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGMoveControl, {
     svgDOM: svgDOM,
@@ -6801,15 +7018,282 @@ var SVGEditFrame = function SVGEditFrame(_ref3) {
     height: height,
     onDrag: function onDrag(e) {
       return handleMove(e);
-    } // pointerEvents="stroke"
-
+    }
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
     className: "control-line",
     d: "M".concat(halfWidth, " 0 l 0 -30")
-  }), controlPoints) : null);
+  }), controlPoints);
 };
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SVGEditFrame);
+var SVGCropFrame = function SVGCropFrame(_ref5) {
+  var svgDOM = _ref5.svgDOM,
+      width = _ref5.width,
+      height = _ref5.height,
+      handleCropResize = _ref5.handleCropResize,
+      handleCropMove = _ref5.handleCropMove,
+      handleClick = _ref5.handleClick;
+  var halfWidth = width / 2;
+  var halfHeight = height / 2;
+  var controlPoints = [/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 0,
+    type: "nwse-resize",
+    onDrag: function onDrag(e) {
+      return handleCropResize(e, -1, -1);
+    },
+    transform: "translate(0 0)"
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 1,
+    type: "ns-resize",
+    onDrag: function onDrag(e) {
+      return handleCropResize(e, 0, -1);
+    },
+    transform: "translate(".concat(halfWidth, " 0)")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 2,
+    type: "nesw-resize",
+    onDrag: function onDrag(e) {
+      return handleCropResize(e, 1, -1);
+    },
+    transform: "translate(".concat(width, " 0)")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 3,
+    type: "ew-resize",
+    onDrag: function onDrag(e) {
+      return handleCropResize(e, -1, 0);
+    },
+    transform: "translate(0 ".concat(halfHeight, ")")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 5,
+    type: "ew-resize",
+    onDrag: function onDrag(e) {
+      return handleCropResize(e, 1, 0);
+    },
+    transform: "translate(".concat(width, " ").concat(halfHeight, ")")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 6,
+    type: "nesw-resize",
+    onDrag: function onDrag(e) {
+      return handleCropResize(e, -1, 1);
+    },
+    transform: "translate(0 ".concat(height, ")")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 7,
+    type: "ns-resize",
+    onDrag: function onDrag(e) {
+      return handleCropResize(e, 0, 1);
+    },
+    transform: "translate(".concat(halfWidth, " ").concat(height, ")")
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
+    svgDOM: svgDOM,
+    key: 8,
+    type: "nwse-resize",
+    onDrag: function onDrag(e) {
+      return handleCropResize(e, 1, 1);
+    },
+    transform: "translate(".concat(width, " ").concat(height, ")")
+  })];
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: "svg-crop-frame"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGMoveControl, {
+    svgDOM: svgDOM,
+    width: width,
+    height: height,
+    onDrag: function onDrag(e) {
+      return handleCropMove(e);
+    } // pointerEvents="stroke"
+
+  }), controlPoints);
+};
+
+var SVGEditable = function SVGEditable(_ref6) {
+  var transform = _ref6.transform,
+      handleMove = _ref6.handleMove,
+      handleRotate = _ref6.handleRotate,
+      handleResize = _ref6.handleResize,
+      svgDOM = _ref6.svgDOM,
+      active = _ref6.active,
+      slideObjectId = _ref6.slideObjectId,
+      slideObjectType = _ref6.slideObjectType,
+      isPreview = _ref6.isPreview,
+      handleCropResize = _ref6.handleCropResize,
+      handleCropMove = _ref6.handleCropMove;
+
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      _editMode = _useState2[0],
+      _setEditMode = _useState2[1];
+
+  var svgMoveControl = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGMoveControl, {
+    className: "control-background",
+    svgDOM: svgDOM,
+    width: transform.cropWidth,
+    height: transform.cropHeight,
+    onDoubleClick: function onDoubleClick(e) {
+      return _setEditMode(true);
+    },
+    onDrag: function onDrag(e) {
+      handleMove(e);
+      if (e.type === 'mouseup' && e.dx && e.dy) _setEditMode(false);
+    }
+  });
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    if (!active) _setEditMode(false);
+  }, [active]);
+  var clipId = "".concat(slideObjectType, "-").concat(slideObjectId, "-clip").concat(isPreview ? '-preview' : '');
+  var component = getComponent({
+    clipId: clipId,
+    transform: transform,
+    width: transform.width,
+    height: transform.height,
+    slideObjectId: slideObjectId,
+    slideObjectType: slideObjectType,
+    active: active
+  });
+  return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    clipPath: "url(#".concat(clipId, ")")
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("clipPath", {
+    id: clipId
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    width: transform.cropWidth,
+    height: transform.cropHeight
+  })), component)) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    className: "edit-frame ".concat(active ? 'active' : '')
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("clipPath", {
+    id: clipId
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+    width: transform.cropWidth,
+    height: transform.cropHeight
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+    clipPath: _editMode || slideObjectType === 'Textbox' ? null : "url(#".concat(clipId, ")")
+  }, component), _editMode || svgMoveControl, active ? _editMode && slideObjectType !== 'Textbox' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGCropFrame, {
+    svgDOM: svgDOM,
+    handleCropResize: handleCropResize,
+    handleCropMove: handleCropMove,
+    width: transform.cropWidth,
+    height: transform.cropHeight
+  }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGEditFrame, {
+    svgDOM: svgDOM,
+    handleRotate: handleRotate,
+    handleResize: handleResize,
+    handleMove: handleMove,
+    width: transform.cropWidth,
+    height: transform.cropHeight
+  }) : null);
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SVGEditable);
+
+/***/ }),
+
+/***/ "./frontend/components/svg/svg_image.jsx":
+/*!***********************************************!*\
+  !*** ./frontend/components/svg/svg_image.jsx ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ SVGImage)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+function SVGImage(_ref) {
+  var id = _ref.id,
+      width = _ref.width,
+      height = _ref.height,
+      cropX = _ref.cropX,
+      cropY = _ref.cropY,
+      image = _ref.image,
+      clipPath = _ref.clipPath;
+
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    x: image.x,
+    y: image.y
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      _translate = _useState2[0],
+      _setTranslate = _useState2[1];
+
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    x: width / image.width,
+    y: height / image.height
+  }),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _scale = _useState4[0],
+      _setScale = _useState4[1];
+
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(image.rotate),
+      _useState6 = _slicedToArray(_useState5, 2),
+      _rotate = _useState6[0],
+      _setRotate = _useState6[1];
+
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    _setScale({
+      x: width / image.width,
+      y: height / image.height
+    });
+  }, [width, height]);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("image", {
+    href: image.href,
+    width: image.width,
+    height: image.height,
+    transform: "translate(".concat(_translate.x - cropX, " ").concat(_translate.y - cropY, ") rotate(").concat(_rotate, ") scale(").concat(_scale.x, " ").concat(_scale.y, ")")
+  });
+}
+
+/***/ }),
+
+/***/ "./frontend/components/svg/svg_image_container.js":
+/*!********************************************************!*\
+  !*** ./frontend/components/svg/svg_image_container.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _svg_image__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./svg_image */ "./frontend/components/svg/svg_image.jsx");
+/* harmony import */ var _svg_textarea__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_textarea */ "./frontend/components/svg/svg_textarea.jsx");
+
+ // import { updateImage } from "../../actions/presentation_actions";
+// import { updateUIImageSelection } from "../../actions/ui_actions";
+// import { getImagestylesByImagebox } from "../../selectors/selectors";
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, _ref2) {
+  var entities = _ref.entities,
+      ui = _ref.ui;
+  var slideObjectId = _ref2.slideObjectId;
+  return {
+    image: entities.images[slideObjectId]
+  };
+}, function (dispatch) {
+  return {// updateImageHandler: (id, data) => dispatch(updateImage(id, data))
+  };
+})(_svg_image__WEBPACK_IMPORTED_MODULE_1__.default));
 
 /***/ }),
 
@@ -6887,8 +7371,12 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
         zIndex: 1,
         width: 400,
         height: 50,
-        translateX: x * scale,
-        translateY: y * scale
+        x: x * scale,
+        y: y * scale,
+        crop_x: 0,
+        crop_y: 0,
+        crop_width: 400,
+        crop_height: 50
       },
       textstylesAttributes: [{
         styleString: "font: 20px Arial; fill: black",
@@ -7150,7 +7638,7 @@ function SVGTextAreaSelect(_ref) {
 
 function SVGTextArea(_ref2) {
   var active = _ref2.active,
-      textboxId = _ref2.textboxId,
+      slideObjectId = _ref2.slideObjectId,
       width = _ref2.width,
       height = _ref2.height,
       _ref2$className = _ref2.className,
@@ -7160,12 +7648,12 @@ function SVGTextArea(_ref2) {
       styleStrings = _ref2.styleStrings,
       updateTextHandler = _ref2.updateTextHandler,
       updateUITextSelection = _ref2.updateUITextSelection,
-      props = _objectWithoutProperties(_ref2, ["active", "textboxId", "width", "height", "className", "defaultFont", "text", "styleStrings", "updateTextHandler", "updateUITextSelection"]);
+      props = _objectWithoutProperties(_ref2, ["active", "slideObjectId", "width", "height", "className", "defaultFont", "text", "styleStrings", "updateTextHandler", "updateUITextSelection"]);
 
   function handleUpdate() {
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
-      updateTextHandler(textboxId, textRef.current.toReduxState());
+      updateTextHandler(slideObjectId, textRef.current.toReduxState());
     }, 2000);
   }
 
@@ -7264,7 +7752,7 @@ function SVGTextArea(_ref2) {
       inputCacheRef.current = '';
       componentsRef.current = textRef.current.toReactComponents(width);
       updateUITextSelection({
-        textboxId: textboxId,
+        textboxId: slideObjectId,
         uiTextData: textRef.current.toReduxState(),
         cursorOffset: cursorOffsetRef.current,
         selectOffset: selectOffsetRef.current
@@ -7283,7 +7771,7 @@ function SVGTextArea(_ref2) {
   //   e.preventDefault();
   //   clearTimeout(_timeout.current);
   //   _timeout.current = setTimeout(() => {
-  //     updateTextHandler(textboxId, textRef.current.toReduxState());
+  //     updateTextHandler(slideObjectId, textRef.current.toReduxState());
   //   }, 0);
   //   _setActive(false);
   // }
@@ -7390,20 +7878,16 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(function (_ref, _ref2) {
-  var entities = _ref.entities,
-      ui = _ref.ui;
-  var textboxId = _ref2.textboxId,
-      width = _ref2.width;
-  var textbox = entities.textboxes[textboxId];
+  var entities = _ref.entities;
+  var slideObjectId = _ref2.slideObjectId;
+  var textbox = entities.textboxes[slideObjectId];
   return {
-    ui: ui,
-    entities: entities,
     text: textbox.text,
     styleStrings: (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_3__.getTextstylesByTextbox)({
       entities: entities
     }, textbox)
   };
-}, function (dispatch, ownProps) {
+}, function (dispatch) {
   return {
     updateTextHandler: function updateTextHandler(id, data) {
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.updateText)(id, data));
@@ -7437,15 +7921,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var mapSTPCreator = function mapSTPCreator(editable) {
+var mapSTPCreator = function mapSTPCreator(isPreview) {
   return function (_ref, _ref2) {
     var entities = _ref.entities,
         ui = _ref.ui;
     var wrapperId = _ref2.wrapperId,
         svgDOM = _ref2.svgDOM;
     return {
-      editable: editable,
-      svgDOM: editable ? svgDOM : undefined,
+      isPreview: isPreview,
+      svgDOM: isPreview ? undefined : svgDOM,
       pageWidth: ui.pageSettings.pageWidth,
       paggHeight: ui.pageSettings.pageHeight,
       selectedWrapperIds: ui.selections.wrapperIds,
@@ -7454,7 +7938,7 @@ var mapSTPCreator = function mapSTPCreator(editable) {
   };
 };
 
-var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTPCreator(true), function (dispatch) {
+var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTPCreator(false), function (dispatch) {
   return {
     updateWrapperHandler: function updateWrapperHandler(formData) {
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.updateWrapper)(formData));
@@ -7467,7 +7951,7 @@ var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(m
     }
   };
 })(_svg_wrapper__WEBPACK_IMPORTED_MODULE_3__.default);
-var SVGNoWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTPCreator(false), null)(_svg_wrapper__WEBPACK_IMPORTED_MODULE_3__.default);
+var SVGNoWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTPCreator(true), null)(_svg_wrapper__WEBPACK_IMPORTED_MODULE_3__.default);
 
 /***/ }),
 
@@ -7928,6 +8412,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+var ImagesReducer = function ImagesReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
+      return action.entities.images;
+
+    default:
+      return state;
+  }
+};
+
 var TextStyleReducer = function TextStyleReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var action = arguments.length > 1 ? arguments[1] : undefined;
@@ -7942,14 +8439,14 @@ var TextStyleReducer = function TextStyleReducer() {
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
       return _objectSpread(_objectSpread({}, state), action.textData.textstylesAttributes);
 
-    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
-      return action.entities.textstyles;
-
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXTSTYLES:
       return action.textstyles;
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXTSTYLE:
       return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.textstyle.id, action.textstyle));
+
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
+      return action.entities.textstyles;
 
     default:
       return state;
@@ -8079,7 +8576,8 @@ var DocsReducer = function DocsReducer() {
   slides: SlidesReducer,
   wrappers: WrapperReducer,
   textboxes: TextboxReducer,
-  textstyles: TextStyleReducer
+  textstyles: TextStyleReducer,
+  images: ImagesReducer
 }));
 
 /***/ }),
@@ -9528,7 +10026,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "asyncUpdateWrapper": () => (/* binding */ asyncUpdateWrapper),
 /* harmony export */   "asyncCreateText": () => (/* binding */ asyncCreateText),
 /* harmony export */   "asyncUpdateText": () => (/* binding */ asyncUpdateText),
-/* harmony export */   "asyncDeleteWrappers": () => (/* binding */ asyncDeleteWrappers)
+/* harmony export */   "asyncDeleteWrappers": () => (/* binding */ asyncDeleteWrappers),
+/* harmony export */   "asyncUploadImage": () => (/* binding */ asyncUploadImage)
 /* harmony export */ });
 var asyncFetchPresentation = function asyncFetchPresentation() {
   return $.ajax({
@@ -9580,7 +10079,7 @@ var asyncMoveSlide = function asyncMoveSlide(data) {
 };
 var asyncUpdateWrapper = function asyncUpdateWrapper(wrapper) {
   return $.ajax({
-    // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
+    // params: { wrapper: { ...wrapper, width, height, x, y, rotate } }
     method: 'PATCH',
     url: "/api/wrappers/".concat(wrapper.id),
     data: {
@@ -9616,6 +10115,15 @@ var asyncDeleteWrappers = function asyncDeleteWrappers(slideId, slideData) {
     data: {
       slide: slideData
     }
+  });
+};
+var asyncUploadImage = function asyncUploadImage(formData) {
+  return $.ajax({
+    url: '/api/images',
+    method: 'post',
+    data: formData,
+    contentType: false,
+    processData: false
   });
 };
 

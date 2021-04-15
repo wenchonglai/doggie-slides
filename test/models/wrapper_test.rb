@@ -10,8 +10,8 @@
 #  z_index           :integer          not null
 #  width             :float            default(300.0), not null
 #  height            :float            default(200.0), not null
-#  translate_x       :float            default(0.0), not null
-#  translate_y       :float            default(0.0), not null
+#  x       :float            default(0.0), not null
+#  y       :float            default(0.0), not null
 #  rotate            :float            default(0.0), not null
 #  fill              :string
 #  stroke            :string

@@ -25,6 +25,7 @@ export default function PresentationPage({
   const chooseToolbar = function(){
     switch (uiSelections.slideObjectType){
       case "Textbox": return TEXTBOX_TOOLBAR_ITEMS;
+      case "Image": return IMAGE_TOOLBAR_ITEMS;
       default: return BASE_TOOLBAR_ITEMS;
     }
   }

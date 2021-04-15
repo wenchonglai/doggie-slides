@@ -25,7 +25,9 @@ const ZOOM = { name: "Zoom", icon: [5, 8], children: [
 ]};
 const SPEAKER_NOTES = { name: "speaker notes", icon: undefined, shortCut: undefined, actionName: undefined};
 const FULL_SCREEN = { name: "Full Screen", icon: undefined, shortCut: undefined, actionName: undefined};
-const IMAGE = { name: "Image", icon: [0, 3], shortCut: undefined, actionName: undefined};
+const IMAGE = { name: "Insert Image", icon: [0, 3], shortCut: undefined, children: [
+  { name: "Upload from computer", icon: [1, 3], type: 'image-upload', actionName: "uploadFromComputer"}
+]};
 const TEXTBOX = { name: "Text Box", icon: [7, 3], shortCut: undefined, actionName: 'textbox'};
 const SHAPE = { name: "Shape", icon: [10, 3], shortCut: undefined, actionName: undefined};
 const DUPLICATE_SLIDE = { name: "Duplicate Slide", icon: undefined, shortCut: undefined, actionName: undefined};
@@ -39,10 +41,10 @@ const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined
   undefined,
   { name: "1px", actionName: "borderWeight", value: 1},
   { name: "2px", actionName: "borderWeight", value: 2},
-  { name: "3px", actionName: "borderWeight", value: 3},
   { name: "4px", actionName: "borderWeight", value: 4},
-  { name: "6px", actionName: "borderWeight", value: 6},
   { name: "8px", actionName: "borderWeight", value: 8},
+  { name: "16px", actionName: "borderWeight", value: 16},
+  { name: "24px", actionName: "borderWeight", value: 24},
 ]};
 const BORDER_DASH = { name: "Border dash", icon: [3, 9], shortCut: undefined, children: [
   { name: "none", actionName: "borderDash", value: ""},

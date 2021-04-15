@@ -36,14 +36,17 @@ doge_slide = doge.slides[0];
 doge_image_file = OpenURI.open_uri('https://jka-lab-seeds.s3-us-west-1.amazonaws.com/doge-original.jpg');
 doge_image_file.rewind
 
-Textbox.create!(
-    text: "01234567890123456789",
-    wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 600, height: 100, translate_x: 100, translate_y: 25},
-    textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: green", offset: 0}]
-  );
-
 doge_image = Image.create(
-  wrapper_attributes: {slide_id: doge_slide.id, z_index: 1, width: 0, height: 0, translate_x: 100, translate_y: 200},
+  wrapper_attributes: {
+    slide_id: doge_slide.id
+  },
+);
+
+Textbox.create!(
+  text: "01234567890123456789",
+  wrapper_attributes: {
+    slide_id: doge_slide.id, z_index: 0, x: 100, y: 25, width: 600, height: 100},
+  textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: green", offset: 0}]
 );
 
 doge_image.file.attach(io: doge_image_file, filename: 'doge.jpg');

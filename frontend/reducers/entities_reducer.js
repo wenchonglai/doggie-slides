@@ -4,6 +4,14 @@ import * as PresentationActions from '../actions/presentation_actions';
 import * as UIActions from '../actions/ui_actions'
 import { getTextstylesByTextboxId } from '../selectors/selectors';
 
+const ImagesReducer = (state = {}, action) => {
+  switch (action.type){
+    case PresentationActions.RECEIVE_ENTITIES:
+      return action.entities.images; 
+    default: return state;
+  }
+}
+
 const TextStyleReducer = (state = {}, action) => {
   Object.freeze(state);
 
@@ -13,12 +21,12 @@ const TextStyleReducer = (state = {}, action) => {
     }
     case PresentationActions.RECEIVE_TEXT: 
       return {...state, ...action.textData.textstylesAttributes}
-    case PresentationActions.RECEIVE_ENTITIES:
-      return action.entities.textstyles; 
     case PresentationActions.RECEIVE_TEXTSTYLES: 
       return action.textstyles;
     case PresentationActions.RECEIVE_TEXTSTYLE: 
       return {...state, [action.textstyle.id]: action.textstyle};
+    case PresentationActions.RECEIVE_ENTITIES:
+      return action.entities.textstyles; 
     default:
       return state;
   }
@@ -113,5 +121,6 @@ export default combineReducers({
   slides: SlidesReducer,
   wrappers: WrapperReducer,
   textboxes: TextboxReducer,
-  textstyles: TextStyleReducer
+  textstyles: TextStyleReducer,
+  images: ImagesReducer
 });

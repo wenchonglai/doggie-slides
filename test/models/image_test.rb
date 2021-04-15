@@ -5,8 +5,8 @@
 #  id           :bigint           not null, primary key
 #  width        :integer          default(0), not null
 #  height       :integer          default(0), not null
-#  translate_x  :float            default(0.0), not null
-#  translate_y  :float            default(0.0), not null
+#  x  :float            default(0.0), not null
+#  y  :float            default(0.0), not null
 #  rotate       :float            default(0.0), not null
 #  scale_x      :float            default(0.0), not null
 #  scale_y      :float            default(0.0), not null

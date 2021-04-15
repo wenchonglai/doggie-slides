@@ -84,12 +84,14 @@ export const addSlide = (formSlide) => (dispatch) =>
 
 // wrappers
 
-export const updateWrapper = (formWrapper) => (dispatch) => 
-  PresentationUtils.asyncUpdateWrapper(formWrapper)
+export const updateWrapper = (formWrapper) => (dispatch) => {
+  return PresentationUtils.asyncUpdateWrapper(formWrapper)
     .then((resData) => {
       dispatch(receiveWrapper(resData));
       return resData;
     });
+}
+
 
 // texts
 export const createText = (textData) => (dispatch) =>

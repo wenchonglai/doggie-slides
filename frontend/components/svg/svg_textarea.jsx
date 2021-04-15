@@ -45,7 +45,7 @@ function SVGTextAreaSelect({className, text, start, end}){
 }
 
 export default function SVGTextArea({
-  active, textboxId,
+  active, slideObjectId,
   width, height,
   className='', defaultFont, text, styleStrings, 
   updateTextHandler, updateUITextSelection, 
@@ -55,7 +55,7 @@ export default function SVGTextArea({
     clearTimeout(_timeout.current);
 
     _timeout.current = setTimeout(() => {
-      updateTextHandler(textboxId, textRef.current.toReduxState());
+      updateTextHandler(slideObjectId, textRef.current.toReduxState());
     }, 2000);
   }
 
@@ -163,7 +163,7 @@ export default function SVGTextArea({
       componentsRef.current = textRef.current.toReactComponents(width);
 
       updateUITextSelection({
-        textboxId, 
+        textboxId: slideObjectId, 
         uiTextData: textRef.current.toReduxState(),
         cursorOffset: cursorOffsetRef.current,
         selectOffset: selectOffsetRef.current
@@ -185,7 +185,7 @@ export default function SVGTextArea({
   //   clearTimeout(_timeout.current);
 
   //   _timeout.current = setTimeout(() => {
-  //     updateTextHandler(textboxId, textRef.current.toReduxState());
+  //     updateTextHandler(slideObjectId, textRef.current.toReduxState());
   //   }, 0);
 
   //   _setActive(false);

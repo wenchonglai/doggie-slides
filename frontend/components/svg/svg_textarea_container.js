@@ -5,16 +5,15 @@ import { getTextstylesByTextbox } from "../../selectors/selectors";
 import SVGTextArea from "./svg_textarea";
 
 export default connect(
-  ({entities, ui}, {textboxId, width}) => {
-    const textbox = entities.textboxes[textboxId];
+  ({entities}, {slideObjectId}) => {
+    const textbox = entities.textboxes[slideObjectId];
 
     return ({
-      ui, entities,
       text: textbox.text,
       styleStrings: getTextstylesByTextbox({entities}, textbox)
     })
   },
-  (dispatch, ownProps) => ({
+  (dispatch) => ({
     updateTextHandler: (id, data) => dispatch(updateText(id, data)),
     updateUITextSelection: 
       (args) => dispatch(updateUITextSelection(args))
