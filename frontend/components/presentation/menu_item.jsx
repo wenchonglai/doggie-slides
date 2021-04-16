@@ -22,23 +22,55 @@ function filterInput(value, {min = 1, max = 100} = {}){
   }
 }
 
+function ImageUpload({item, handleChange}){
+  const handleSubmit = (e) => {
+    const reader = new FileReader();
+    const formData = new FormData(e.currentTarget);
+    const file = formData.get("image[file]");
+
+    reader.onloadend = (e) => {
+
+      handleChange(e, formData);
+    }
+
+    
+    if (file)
+      reader.readAsDataURL(file);
+  }
+  return (
+    <form onChange={e => handleSubmit(e)}>
+      <label onClick={e => {e.stopPropagation()}}> 
+        <MenuIcon className='menu-item-icon' icon={item.icon}/>
+        {item.name}
+        <input style={
+          {opacity: 0, zIndex: -1, position: "absolute"}}
+          type="file" name="image[file]" accept="image/*"
+        />
+      </label>
+    </form>
+  );
+}
+
 export default function MenuItem({
   className="", item, dispatch, onClick, onMouseMove,
   parentData, parentHandleChange
 }){
 
-  function handleClick(e, value = undefined){
-    console.log(ItemThunkActions[item.actionName], value, item.value);
+  function handleChange(e, value = undefined){
+    let func;
+
+    switch (typeof item.actionName){
+      case 'string': func = ItemThunkActions[item.actionName]; break;
+      default: func = item.actionName; break;
+    }
+
+    switch (item.type){
+      case 'boolean': value = (parentData !== item.trueValue ? item.trueValue : undefined); break;
+      default: value = value === undefined ? item.value : value; break;
+    }
+
     if (!item.children){
-      dispatch(
-        ( typeof item.actionName == 'string' ? 
-          ItemThunkActions[item.actionName] :
-          item.actionName
-        )( item.type === 'boolean' ? 
-          (parentData !== item.trueValue ? item.trueValue : undefined) :
-          value === undefined ? item.value : value
-        )
-      );
+      dispatch(func(value) );
     }
 
     onClick(e);
@@ -84,15 +116,21 @@ export default function MenuItem({
         `menu-item ${className} ${item.type || ''} ${item.actionName ? '' : 'no-action'}`
       }
       onMouseMove={onMouseMove}
-      onClick={handleClick}
+      onClick={handleChange}
     >
-      <div className='icon-box'>
-        {getMenuIcon(item.type)}
-        <div className='color-box' style={{backgroundColor: parentData || ''}}/>
-      </div>
-      <div className='menu-item-name' {...style}>
-        {item.name}
-      </div>
+      { item.type === 'image-upload' ? 
+        <ImageUpload item={item} handleChange={handleChange}/> :
+        ( <>
+            <div className='icon-box'>
+              {getMenuIcon(item.type)}
+              <div className='color-box' style={{backgroundColor: parentData || ''}}/>
+            </div>
+            <div className='menu-item-name' {...style}>
+              {item.name}
+            </div>
+          </>
+        )
+      }
       {(item.children ? 
           <div className='submenu-indicator' />
           : null

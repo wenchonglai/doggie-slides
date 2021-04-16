@@ -32,7 +32,7 @@ export const asyncMoveSlide = (data) => $.ajax({
   data: {slide: data}
 });
 
-export const asyncUpdateWrapper = (wrapper) => $.ajax({ // params: { wrapper: { ...wrapper, width, height, translateX, translateY, rotate } }
+export const asyncUpdateWrapper = (wrapper) => $.ajax({ // params: { wrapper: { ...wrapper, width, height, x, y, rotate } }
   method: 'PATCH',
   url: `/api/wrappers/${wrapper.id}`,
   data: { wrapper }
@@ -59,3 +59,17 @@ export const asyncDeleteWrappers = (slideId, slideData) => $.ajax({ // params: {
   url: `/api/slides/${slideId}`,
   data: {slide: slideData}
 });
+
+export const asyncUploadImage = (formData) => $.ajax({
+  url: '/api/images',
+  method: 'post',
+  data: formData, 
+  contentType: false,
+  processData: false
+});
+
+export const asyncMoveWrapper = (data) => $.ajax({
+  method: 'patch',
+  url: 'api/wrappers/move',
+  data
+})

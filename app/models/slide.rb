@@ -22,6 +22,7 @@ class Slide < ApplicationRecord
   
   has_many :wrappers, dependent: :destroy, inverse_of: :slide
   has_many :textboxes, through: :wrappers, source: :slide_object, source_type: 'Textbox'
+  has_many :images, through: :wrappers, source: :slide_object, source_type: 'Image'
   has_many :textstyles, through: :textboxes
   
   accepts_nested_attributes_for :wrappers, allow_destroy: true

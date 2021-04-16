@@ -109,7 +109,7 @@ section.page.presentation{
         > section.filmstrip {
           overflow-y: auto;
           flex: 0 1 auto;
-          width: 220px;
+          min-width: 220px;
           z-index: 1;
         }
 

@@ -4,6 +4,16 @@ import * as PresentationActions from '../actions/presentation_actions';
 import * as UIActions from '../actions/ui_actions'
 import { getTextstylesByTextboxId } from '../selectors/selectors';
 
+const ImagesReducer = (state = {}, action) => {
+  switch (action.type){
+    case PresentationActions.RECEIVE_IMAGE:
+      return {...state, [action.imageData.id]: action.imageData};
+    case PresentationActions.RECEIVE_ENTITIES:
+      return action.entities.images; 
+    default: return state;
+  }
+}
+
 const TextStyleReducer = (state = {}, action) => {
   Object.freeze(state);
 
@@ -13,12 +23,12 @@ const TextStyleReducer = (state = {}, action) => {
     }
     case PresentationActions.RECEIVE_TEXT: 
       return {...state, ...action.textData.textstylesAttributes}
-    case PresentationActions.RECEIVE_ENTITIES:
-      return action.entities.textstyles; 
     case PresentationActions.RECEIVE_TEXTSTYLES: 
       return action.textstyles;
     case PresentationActions.RECEIVE_TEXTSTYLE: 
       return {...state, [action.textstyle.id]: action.textstyle};
+    case PresentationActions.RECEIVE_ENTITIES:
+      return action.entities.textstyles; 
     default:
       return state;
   }
@@ -47,11 +57,11 @@ const TextboxReducer = (state = {}, action) => {
 
 const WrapperReducer = (state = {}, action) => {
   Object.freeze(state);
-
+  
   switch (action.type){
-    case PresentationActions.RECEIVE_TEXT: {
+    case PresentationActions.RECEIVE_IMAGE:;
+    case PresentationActions.RECEIVE_TEXT:
       return {...state, [action.wrapperData.id]: action.wrapperData};
-    }
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.wrappers;
     case PresentationActions.RECEIVE_WRAPPERS: 
@@ -70,11 +80,11 @@ const SlidesReducer = (state = {}, action) => {
     case PresentationActions.RECEIVE_WRAPPERS: {
       return {...state}
     }
+    case PresentationActions.RECEIVE_IMAGE: ;
     case PresentationActions.RECEIVE_TEXT: {
-      const wrapperAttributes = action.textData.wrapperAttributes;
-      const wrapperData = Object.values(wrapperAttributes)[0];
-      const wrapperId = action.wrapperData.id;
-      const slideId = wrapperData.slideId;
+      const wrapper = action.wrapperData;
+      const wrapperId = wrapper.id;
+      const slideId = wrapper.slideId;
       const slideData = state[slideId];
       const wrapperIds = Array.from(
         new Set([...slideData.wrapperIds, wrapperId])
@@ -113,5 +123,6 @@ export default combineReducers({
   slides: SlidesReducer,
   wrappers: WrapperReducer,
   textboxes: TextboxReducer,
-  textstyles: TextStyleReducer
+  textstyles: TextStyleReducer,
+  images: ImagesReducer
 });

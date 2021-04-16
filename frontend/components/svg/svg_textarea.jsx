@@ -45,24 +45,27 @@ function SVGTextAreaSelect({className, text, start, end}){
 }
 
 export default function SVGTextArea({
-  active, textboxId,
+  active, slideObjectId,
   width, height,
   className='', defaultFont, text, styleStrings, 
   updateTextHandler, updateUITextSelection, 
+  svgDOM, isPreview,
   ...props
 }){
   function handleUpdate(){
     clearTimeout(_timeout.current);
 
     _timeout.current = setTimeout(() => {
-      updateTextHandler(textboxId, textRef.current.toReduxState());
-    }, 2000);
+      updateTextHandler(slideObjectId, textRef.current.toReduxState());
+    }, 1000);
   }
 
-  function handleKeyDown(e){
+  function keyDownListener(e){
+    console.log(e.key);
     cancelAnimationFrame(animationFrameRef.current);
 
     if (!active){ return; }
+
     const altKey = e.altKey;
     const shiftKey = e.shiftKey;
 
@@ -163,7 +166,7 @@ export default function SVGTextArea({
       componentsRef.current = textRef.current.toReactComponents(width);
 
       updateUITextSelection({
-        textboxId, 
+        textboxId: slideObjectId, 
         uiTextData: textRef.current.toReduxState(),
         cursorOffset: cursorOffsetRef.current,
         selectOffset: selectOffsetRef.current
@@ -185,7 +188,7 @@ export default function SVGTextArea({
   //   clearTimeout(_timeout.current);
 
   //   _timeout.current = setTimeout(() => {
-  //     updateTextHandler(textboxId, textRef.current.toReduxState());
+  //     updateTextHandler(slideObjectId, textRef.current.toReduxState());
   //   }, 0);
 
   //   _setActive(false);
@@ -203,6 +206,7 @@ export default function SVGTextArea({
   const inputCacheRef = useRef('');
   const componentsRef = useRef();
   const animationFrameRef = useRef();
+  const eventListenerRef = useRef();
   
   const cursorOffsetRef = useRef(0);
   const [_cursorOffset, _setCursorOffset] = useState(0); 
@@ -220,31 +224,40 @@ export default function SVGTextArea({
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
   }, [styleStrings])
+  
+  if (!isPreview){
+    useEffect(() => {
+      document.removeEventListener('keydown', eventListenerRef.current);
 
-  const actualHeight = Math.max(textRef.current._segmentMap.last[1] + 60, 60);
-
+      if (active){
+        eventListenerRef.current = keyDownListener;
+        document.addEventListener('keydown', eventListenerRef.current);
+      }
+    }, [active]);
+  
+    useEffect(() => {
+      eventListenerRef.current = keyDownListener;
+      
+      return () => {
+        document.removeEventListener('keydown', eventListenerRef.current);
+        eventListenerRef.current = undefined;
+      }
+    }, []);
+  }
+  
   return (
-    <g 
-      {...props}
+    <g {...props}
       className={`svg-textarea ${className} ${active ? 'active' : ''}`}
-      onKeyDown={active ? (e) => handleKeyDown(e) : null}
       fill="none"
     > 
-      <a xlinkHref="#" 
-        onClick={e => e.preventDefault()}
-        // onBlur={e => blurHandler(e)}
-        height={actualHeight}
-        width={width}
-      >
-        <rect height={height} width={width} pointerEvents="all"></rect>
-        <SVGTextAreaSelect
-          className='svg-textarea-select'
-          text={textRef.current}
-          start={cursorOffsetRef.current}
-          end={selectOffsetRef.current}
-        />
-        { componentsRef.current }
-      </a>
+      <rect height={height} width={width} pointerEvents="all"></rect>
+      <SVGTextAreaSelect
+        className='svg-textarea-select'
+        text={textRef.current}
+        start={cursorOffsetRef.current}
+        end={selectOffsetRef.current}
+      />
+      { componentsRef.current }
       <rect className="cursor"
         width="2"
         height={lineHeight}

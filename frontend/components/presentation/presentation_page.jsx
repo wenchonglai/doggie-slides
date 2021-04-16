@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import UserInfoContainer from '../session/user_info_container';
 import ProductIcon from '../utils/product_icon';
 import MenuContainer from './menu_container'
-import {MENU_ITEMS, BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS, WRAPPER_CONTEXT_MENU_ITEMS} from './menu-items';
+import {MENU_ITEMS, BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS, SLIDE_CONTEXT_MENU_ITEMS, WRAPPER_CONTEXT_MENU_ITEMS} from './menu-items';
 import AutosaveInputContainer from '../utils/autosave_input_container';
 import LastUpdate from '../utils/last_update';
 import FilmStripContainer from './filmstrip_container';
@@ -10,7 +10,6 @@ import WorkspaceContainer from './workspace_container';
 import { ColorPalette } from '../utils/color_palette';
 
 const handleContextMenu = e => {e.preventDefault()};
-
 
 export default function PresentationPage({
   currentSlideId, doc, uiSelections, 
@@ -25,15 +24,17 @@ export default function PresentationPage({
   const chooseToolbar = function(){
     switch (uiSelections.slideObjectType){
       case "Textbox": return TEXTBOX_TOOLBAR_ITEMS;
+      case "Image": return IMAGE_TOOLBAR_ITEMS;
       default: return BASE_TOOLBAR_ITEMS;
     }
   }
 
-  const onContextMenu = function(e){
-    _setRightClick({x: e.clientX, y: e.clientY});
+  const onContextMenu = function(e, wrapper){
+
+    _setRightClick({x: e.clientX, y: e.clientY, type: wrapper && wrapper.slideObjectType ? wrapper.slideObjectType : wrapper});
   }
 
-  const handleContextMenuBlur = e => {
+  const handleContextMenuBlur = (e) => {
     _setRightClick(false);
   }
 
@@ -43,7 +44,9 @@ export default function PresentationPage({
   }, []);
 
   useEffect(() => {
-    if (_rightClick){ contextMenuRef.current.focus(); }
+    if (_rightClick){
+      contextMenuRef.current.focus();
+    }
   }, [_rightClick]);
 
 
@@ -103,7 +106,7 @@ export default function PresentationPage({
           </section>
           <section className='two-panel-layout'>
             <section className='filmstrip'>
-              <FilmStripContainer/>
+              <FilmStripContainer handleContextMenu={onContextMenu}/>
             </section>
 
             <WorkspaceContainer handleContextMenu={onContextMenu} slideId={currentSlideId}/>
@@ -125,7 +128,11 @@ export default function PresentationPage({
       >
         <MenuContainer
           className="context-menu"
-          items={WRAPPER_CONTEXT_MENU_ITEMS}
+          items={
+            _rightClick.type === 'slide' ? 
+              SLIDE_CONTEXT_MENU_ITEMS:
+              WRAPPER_CONTEXT_MENU_ITEMS
+          }
           respondToMouseOut={false}
           parentHandleBlur={handleContextMenuBlur}
         />

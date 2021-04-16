@@ -3,13 +3,10 @@ class Api::WrappersController < ApplicationController
 
   def create
     @wrapper = Wrapper.new(wrapper_params)
+    wrappers = @wrappers.where(slide_id: @wrapper.slide_id)
+    wrapper.z_index = wrappers ? wrappers.order(z_index: :desc).limit(1).first.z_index : 0
 
-    if (@wrapper.save)
-
-      @wrappers
-        .where("z_index >= ? and slide_id == ? id <> ?", @wrapper.z_index, @wrapper.slide_id, @wrapper.id)
-        .in_batches.update_all("z_index = z_index + 1");
-
+    if @wrapper.save
       redirect_to api_wrappers_url, status: 303
     else
       render json: @wrapper.errors.full_messages, status: 422
@@ -64,32 +61,84 @@ class Api::WrappersController < ApplicationController
     end
   end
 
+  def sort_wrapper(slide_id)
+    query = <<-SQL
+      with ranks as (
+        select id, row_number()
+        over (order by z_index) as rank
+        from wrappers
+        where wrappers.slide_id = #{slide_id}
+      ) 
+      update wrappers
+      set z_index = rank - 1
+      from ranks
+      where wrappers.id = ranks.id
+    SQL
+
+    ActiveRecord::Base.connection.execute(query);
+  end
+
   def move
-    wrappers = @wrapper.where(slide_id: slide_id)
-    count = wrappers.count
-    start_z = wrapper_move_params[:start].to_i
-    end_z = wrapper_move_params[:end].to_i
-    length = end_z - start_z + 1
-    offset = wrapper_move_params[:offset].to_i
+    slide_id = params[:wrapper][:slide_id].to_i
+    wrapper_ids = params[:wrapper][:wrapper_ids]
+    offset = params[:wrapper][:offset].to_i
 
-    if length < 1 || start_z <= 0 || start_z + offset <= 0 || end_z > count || end_z + offset > count
-      render json: ["Invalid wrapper move parameter {start_z: #{start_z}), end_z: #{end_z}, offset: #{offset}"], status: 422
-    else
-      wrappers.where("z_index >= ? and z_index <= ?", start_z, end_z)
-        .in_batches.update_all("z_index = -z_index - #{offset}")
-        
-      if (offset < 0)
-        wrappers.where("z_index >= ? and z_index < ?", start_z + offset, start_z)
-          .in_batches.update_all("z_index = z_index + #{length}")
-      elsif (offset > 0)
-        wrappers.where("z_index > ? and z_index <= ?", end_z, end_z + offset)
-          .in_batches.update_all("z_index = z_index - #{length}")
+    if wrapper_ids.length == 0
+      render json: {}
+    elsif sort_wrapper(slide_id)
+      @slide_wrappers = @wrappers.where(slide_id: slide_id).order(:z_index)
+      selected_wrappers = @slide_wrappers.where(id: wrapper_ids)
+      selected_count = selected_wrappers.count
+
+      if selected_count < wrapper_ids.length
+        render json: ['wrappers forbidden or not found'], errors: 403
+      else
+        min_z = [selected_wrappers.first.z_index + (offset < 0 ? offset : 0), 0].max
+        max_z = selected_wrappers.last.z_index + (offset > 0 ? offset : 0)
+
+        affected_wrappers = @slide_wrappers.where("z_index >= ? and z_index <= ?", min_z, max_z)
+        affected_count = affected_wrappers.count
+
+        query1 = <<-SQL
+          with ranks as (
+            select id, row_number()
+            over (order by z_index) as rank
+            from wrappers
+            where wrappers.slide_id = #{slide_id}
+              and wrappers.z_index >= #{min_z}
+              and wrappers.z_index <= #{max_z}
+              and wrappers.id not in (#{wrapper_ids.join(', ')})
+          ) 
+          update wrappers
+          set z_index = #{min_z + (offset < 0 ? selected_count : 0) } + rank - 1
+          from ranks
+          where wrappers.id = ranks.id;
+        SQL
+
+        query2 = <<-SQL
+          with ranks as (
+            select id, row_number()
+            over (order by z_index) as rank
+            from wrappers
+            where wrappers.slide_id = #{slide_id}
+              and wrappers.z_index >= #{min_z}
+              and wrappers.z_index <= #{max_z}
+              and wrappers.id in (#{wrapper_ids.join(', ')})
+          ) 
+          update wrappers
+          set z_index = #{min_z + (offset > 0 ? (affected_count - selected_count) : 0)} + rank - 1
+          from ranks
+          where wrappers.id = ranks.id;
+        SQL
+
+        if ActiveRecord::Base.connection.execute(query1 + query2)
+          render :move_index
+        else
+          render ['unprocessable entities'], errors: 422
+        end
       end
-
-      wrappers.where("z_index < 0")
-        .in_batches.update_all("z_index = -z_index")
-
-      redirect_to api_wrappers_url, status: 303
+    else
+      render json: ['unprocessable entities'], errors: 422
     end
   end
   
@@ -119,8 +168,9 @@ class Api::WrappersController < ApplicationController
   def wrapper_params
     params.require(:wrapper).permit(
       :id, :slide_id, :group_id,
-      :z_index, :width, :height, :translate_x, :translate_y,
-      :rotate, :slide_object_id, :slide_object_type,
+      :x, :y, :width, :height, :rotate,
+      :crop_x, :crop_y, :crop_width, :crop_height,
+      :slide_object_id, :slide_object_type,
       :fill, :stroke, :stroke_width, :stroke_dasharray
     )
   end

@@ -41,6 +41,13 @@ export const receiveText = (textData, wrapperData) => ({
   wrapperData
 });
 
+export const RECEIVE_IMAGE = "RECEIVE_IMAGE";
+export const receiveImage = (imageData, wrapperData) => ({
+  type: RECEIVE_IMAGE, 
+  imageData,
+  wrapperData
+})
+
 // thunk action creators below
 
 export const fetchPresentation = () => (dispatch, getState) =>
@@ -84,12 +91,14 @@ export const addSlide = (formSlide) => (dispatch) =>
 
 // wrappers
 
-export const updateWrapper = (formWrapper) => (dispatch) => 
-  PresentationUtils.asyncUpdateWrapper(formWrapper)
+export const updateWrapper = (formWrapper) => (dispatch) => {
+  return PresentationUtils.asyncUpdateWrapper(formWrapper)
     .then((resData) => {
       dispatch(receiveWrapper(resData));
       return resData;
     });
+}
+
 
 // texts
 export const createText = (textData) => (dispatch) =>
@@ -132,4 +141,26 @@ export const updateText = (textboxId, textData) => (dispatch, getState) => {
       dispatch(receiveText(resData, wrapperData));
       return resData;
     });
+}
+
+export const uploadImage = (formData) => (dispatch, getState) => {
+  return PresentationUtils.asyncUploadImage(formData)
+    .then((resData) => {
+      const {wrapperAttributes} = resData;
+      delete resData.wrapperAttributes;
+      dispatch(receiveImage(resData, Object.values(wrapperAttributes)[0]));
+    })
+}
+
+export const moveWrapper = (offset) => (dispatch, getState) => {
+  const {ui} = getState();
+  const slide_id = ui.slideSettings.slideId;
+  const wrapperIds = ui.selections.wrapperIds;
+  return PresentationUtils.asyncMoveWrapper({
+    wrapper: {
+      slide_id, 
+      wrapperIds,
+      offset
+    }
+  }).then((resData) => dispatch(receiveWrappers(resData)))
 }

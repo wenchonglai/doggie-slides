@@ -299,7 +299,7 @@ export default class DynamicText{
     } else { size = CTX.measureText(substring); }
     
     if (!height){
-      height = (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * 1.5
+      height = (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * 1.2
     }
 
     return {width: size.width, height: height};

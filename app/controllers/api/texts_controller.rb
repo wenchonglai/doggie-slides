@@ -2,7 +2,9 @@ class Api::TextsController < ApplicationController
   before_action :ensure_current_user
 
   def create
-    @text = Textbox.create(text_params);
+    @text = Textbox.new(text_params);
+    # wrappers = current_user.wrappers.where(text_params[slide_id: @text.wrapper.slide_id])
+    # @text.wrapper.z_index = (wrapper.order(z_index: :desc).pluck(:z_index).first || -1) + 1
 
     if @text.save!
       redirect_to api_text_url(@text), status: 303
@@ -13,12 +15,9 @@ class Api::TextsController < ApplicationController
 
   def update
     @textbox = @textboxes.find_by(id: params[:id].to_i);
-    p params
     if !@textbox
       render json: ["Textbox not found"], status: 404
     elsif @textbox.update(text_params)
-      p @textbox
-      p @textbox.textstyles
       redirect_to api_text_url(@textbox), status: 303
     else
       render json: @textbox.errors.full_messages, status: 422
@@ -63,8 +62,8 @@ class Api::TextsController < ApplicationController
         wrapper_attributes: [
           :id, :slide_id, :group_id,
           :slide_object_id, :slide_object_type,
-          :z_index, :width, :height,
-          :translate_x, :translate_y, :rotate,
+          :x, :y, :width, :height, :rotate,
+          :crop_x, :crop_y, :crop_width, :crop_height,
           :fill, :stroke, :stroke_width, :stroke_dasharray,
           '_destroy'
         ],

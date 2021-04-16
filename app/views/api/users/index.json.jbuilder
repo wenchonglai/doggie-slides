@@ -4,6 +4,7 @@ json.slides ({})
 json.wrappers({})
 json.textboxes({})
 json.textstyles({})
+json.images({})
 
 if @user
   json.users do 
@@ -51,6 +52,14 @@ if @user
     (@user.textstyles).map do |textstyle|
       json.set! textstyle.id do
         json.partial! "api/textstyles/textstyle", textstyle: textstyle
+      end
+    end
+  end
+
+  json.images do
+    (@user.images).map do |image|
+      json.set! image.id do
+        json.partial! "api/images/image", image: image
       end
     end
   end

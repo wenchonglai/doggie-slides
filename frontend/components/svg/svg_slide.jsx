@@ -5,7 +5,7 @@ import {SVGWrapperContainer, SVGNoWrapperContainer} from './svg_wrapper_containe
 
 const ReactSVG = React.forwardRef(({
   children, isPreview, containerWidth, width, height, slide, slideId,
-  menuAction, updateMenuAction, createText, handleContextMenu,
+  menuAction, updateMenuAction, createText, handleContextMenu, wrappers,
   ...props
 }, ref) => {
 
@@ -23,15 +23,18 @@ const ReactSVG = React.forwardRef(({
     const x = e.clientX - rect.x;
     const y = e.clientY - rect.y;
     const textData = {
-      text: "aaa", 
+      text: "wow", 
       wrapperAttributes: {
         slideId,
         groupId: null,
-        zIndex: 1,
         width: 400,
         height: 50,
-        translateX: x * scale,
-        translateY: y * scale,
+        x: x * scale,
+        y: y * scale,
+        crop_x: 0,
+        crop_y: 0,
+        crop_width: 400,
+        crop_height: 50
       },
       textstylesAttributes: [{
         styleString: "font: 20px Arial; fill: black",
@@ -47,7 +50,7 @@ const ReactSVG = React.forwardRef(({
       default: return updateMenuAction('Select');
     };
   }
-
+  
 	return (
 		<svg
       version="1.1" 
@@ -64,16 +67,16 @@ const ReactSVG = React.forwardRef(({
       onMouseDownCapture={isPreview ? undefined : (e) => handleMouseDownCapture(e)}
       onClick={isPreview ? undefined : (e) => handleClick(e)}
     >
-      
 			<g transform="translate(1000 1000)">
         <g className={'svg-background'}>
           <rect width={width} height={height} fill="#FFFFFF"></rect>
         </g>
-        { (slide ? slide.wrapperIds : []).map(wrapperId => (
+        { wrappers
+            .map(({id}) => (
             isPreview ?
-              <SVGNoWrapperContainer key={wrapperId} wrapperId = {wrapperId}/> :
+              <SVGNoWrapperContainer key={id} wrapperId={id}/> :
               <SVGWrapperContainer 
-                key={wrapperId} slideId={slideId} wrapperId = {wrapperId} svgDOM={ref.current}
+                key={id} slideId={slideId} wrapperId = {id} svgDOM={ref.current}
                 handleContextMenu={handleContextMenu}
               />
           ))

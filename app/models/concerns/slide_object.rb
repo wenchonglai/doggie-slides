@@ -9,7 +9,7 @@ module SlideObject
 
   # instance methods here
 
-
+  
   # class methods here
   module ClassMethods
 
