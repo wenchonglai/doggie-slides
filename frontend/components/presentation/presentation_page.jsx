@@ -30,7 +30,7 @@ export default function PresentationPage({
   }
 
   const onContextMenu = function(e, wrapper){
-    console.log(wrapper);
+
     _setRightClick({x: e.clientX, y: e.clientY, type: wrapper && wrapper.slideObjectType ? wrapper.slideObjectType : wrapper});
   }
 

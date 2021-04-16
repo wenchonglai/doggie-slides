@@ -5245,8 +5245,6 @@ function PresentationPage(_ref) {
   };
 
   var onContextMenu = function onContextMenu(e, wrapper) {
-    console.log(wrapper);
-
     _setRightClick({
       x: e.clientX,
       y: e.clientY,
@@ -6734,15 +6732,24 @@ function SVGWrapper(_ref) {
       cropHeight: cropHeight
     });
   }, [wrapper]);
-  isPreview || (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    if (_active) {
-      svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
-      updateWrapperSelection([wrapper.id]);
-    } else {
-      svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
-      deleteWrapperSelection([wrapper.id]);
-    }
-  }, [_active]);
+
+  if (!isPreview) {
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+      if (_active) {
+        svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
+        updateWrapperSelection([wrapper.id]);
+      } else {
+        svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+        deleteWrapperSelection([wrapper.id]);
+      }
+    }, [_active]);
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+      console.log(selectedWrapperIds);
+
+      _setActive(selectedWrapperIds.includes(wrapperId));
+    }, [selectedWrapperIds]);
+  }
+
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     return function () {
       svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
@@ -6979,7 +6986,9 @@ function getComponent(_ref2) {
       transform = _ref2.transform,
       slideObjectId = _ref2.slideObjectId,
       slideObjectType = _ref2.slideObjectType,
-      active = _ref2.active;
+      active = _ref2.active,
+      svgDOM = _ref2.svgDOM,
+      isPreview = _ref2.isPreview;
 
   switch (slideObjectType) {
     case 'Textbox':
@@ -6987,7 +6996,9 @@ function getComponent(_ref2) {
         width: width,
         height: height,
         slideObjectId: slideObjectId,
-        active: active
+        active: active,
+        svgDOM: svgDOM,
+        isPreview: isPreview
       });
 
     case 'Image':
@@ -7248,7 +7259,9 @@ var SVGEditable = function SVGEditable(_ref6) {
     height: transform.height,
     slideObjectId: slideObjectId,
     slideObjectType: slideObjectType,
-    active: active
+    active: active,
+    svgDOM: svgDOM,
+    isPreview: isPreview
   });
   return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     clipPath: "url(#".concat(clipId, ")")
@@ -7494,7 +7507,6 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     ;
   }
 
-  console.log(wrappers);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", _extends({
     version: "1.1",
     className: "react-svg svg-slide",
@@ -7735,16 +7747,19 @@ function SVGTextArea(_ref2) {
       styleStrings = _ref2.styleStrings,
       updateTextHandler = _ref2.updateTextHandler,
       updateUITextSelection = _ref2.updateUITextSelection,
-      props = _objectWithoutProperties(_ref2, ["active", "slideObjectId", "width", "height", "className", "defaultFont", "text", "styleStrings", "updateTextHandler", "updateUITextSelection"]);
+      svgDOM = _ref2.svgDOM,
+      isPreview = _ref2.isPreview,
+      props = _objectWithoutProperties(_ref2, ["active", "slideObjectId", "width", "height", "className", "defaultFont", "text", "styleStrings", "updateTextHandler", "updateUITextSelection", "svgDOM", "isPreview"]);
 
   function handleUpdate() {
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
       updateTextHandler(slideObjectId, textRef.current.toReduxState());
-    }, 2000);
+    }, 1000);
   }
 
-  function handleKeyDown(e) {
+  function keyDownListener(e) {
+    console.log(e.key);
     cancelAnimationFrame(animationFrameRef.current);
 
     if (!active) {
@@ -7880,6 +7895,7 @@ function SVGTextArea(_ref2) {
   var inputCacheRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   var componentsRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   var animationFrameRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   var cursorOffsetRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(0);
 
   var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0),
@@ -7908,22 +7924,29 @@ function SVGTextArea(_ref2) {
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
   }, [styleStrings]);
-  var actualHeight = Math.max(textRef.current._segmentMap.last[1] + 60, 60);
+
+  if (!isPreview) {
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+      document.removeEventListener('keydown', eventListenerRef.current);
+
+      if (active) {
+        eventListenerRef.current = keyDownListener;
+        document.addEventListener('keydown', eventListenerRef.current);
+      }
+    }, [active]);
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+      eventListenerRef.current = keyDownListener;
+      return function () {
+        document.removeEventListener('keydown', eventListenerRef.current);
+        eventListenerRef.current = undefined;
+      };
+    }, []);
+  }
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", _extends({}, props, {
     className: "svg-textarea ".concat(className, " ").concat(active ? 'active' : ''),
-    onKeyDown: active ? function (e) {
-      return handleKeyDown(e);
-    } : null,
     fill: "none"
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
-    xlinkHref: "#",
-    onClick: function onClick(e) {
-      return e.preventDefault();
-    } // onBlur={e => blurHandler(e)}
-    ,
-    height: actualHeight,
-    width: width
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     height: height,
     width: width,
     pointerEvents: "all"
@@ -7932,7 +7955,7 @@ function SVGTextArea(_ref2) {
     text: textRef.current,
     start: cursorOffsetRef.current,
     end: selectOffsetRef.current
-  }), componentsRef.current), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+  }), componentsRef.current, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     className: "cursor",
     width: "2",
     height: lineHeight,
@@ -8857,9 +8880,7 @@ function SelectionReducer() {
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
       {
-        return _objectSpread(_objectSpread({}, state), {}, {
-          wrapperIds: [action.wrapperData.id]
-        });
+        return _objectSpread({}, state);
       }
       ;
 
@@ -8876,7 +8897,9 @@ function SelectionReducer() {
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_SELECTED_WRAPPERS:
       return action.wrapperIds.length ? _objectSpread(_objectSpread({}, state), {}, {
         wrapperIds: _toConsumableArray(action.wrapperIds)
-      }, action.sharedAttributes) : nullState;
+      }, action.sharedAttributes) : _objectSpread(_objectSpread({}, nullState), {}, {
+        nextMenuAction: state.nextMenuAction
+      });
 
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_MENU_ACTION:
       return _objectSpread(_objectSpread({}, nullState), {}, {
@@ -9479,7 +9502,7 @@ var DynamicText = /*#__PURE__*/function () {
       }
 
       if (!height) {
-        height = (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * 1.5;
+        height = (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * 1.2;
       }
 
       return {

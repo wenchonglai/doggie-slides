@@ -19,12 +19,12 @@ const SVGControlPoint = function({svgDOM, type, x, y, transform, onDrag}){
   );
 }
 
-function getComponent({width, height, transform, slideObjectId, slideObjectType, active}){
+function getComponent({width, height, transform, slideObjectId, slideObjectType, active, svgDOM, isPreview}){
   switch (slideObjectType){
     case 'Textbox': 
       return (
         <SVGTextAreaContainer {
-          ...{width, height, slideObjectId, active,}
+          ...{width, height, slideObjectId, active, svgDOM, isPreview}
         } />
       );
     case 'Image':
@@ -117,6 +117,7 @@ const SVGEditable = function({
   slideObjectId, slideObjectType, isPreview,
   handleCropResize, handleCropMove
 }){
+
   const [_editMode, _setEditMode] = useState(false);
   const svgMoveControl = (
     <SVGMoveControl className='control-background' 
@@ -141,7 +142,8 @@ const SVGEditable = function({
     clipId, 
     transform: transform,
     width: transform.width, height: transform.height, 
-    slideObjectId, slideObjectType, active
+    slideObjectId, slideObjectType, active, 
+    svgDOM, isPreview
   });
 
   return ( isPreview ? 

@@ -232,6 +232,13 @@ div.color-palette{
   }
 }
 
+ul.context-menu {
+  div.dropdown-body {
+    top: 0;
+    left: 234px;
+  }
+}
+
 ul.docs-menu {
   display: flex;
   flex-direction: row;

@@ -210,16 +210,23 @@ export default function SVGWrapper({
     _setTransform({x, y, width, height, rotate, cropX, cropY, cropWidth, cropHeight});
   }, [wrapper]);
 
-  isPreview || useEffect(() => {
-    if (_active){
-      svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
-      updateWrapperSelection([wrapper.id]);
-    } else {
-      
-      svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
-      deleteWrapperSelection([wrapper.id]);
-    }
-  }, [_active])
+  if (!isPreview){
+    useEffect(() => {
+      if (_active){
+        svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
+        updateWrapperSelection([wrapper.id]);
+      } else {
+        
+        svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
+        deleteWrapperSelection([wrapper.id]);
+      }
+    }, [_active]);
+
+    useEffect(() => {
+      console.log(selectedWrapperIds);
+      _setActive(selectedWrapperIds.includes(wrapperId));
+    }, [selectedWrapperIds])
+  }
   
   useEffect(() => {
     return () => {

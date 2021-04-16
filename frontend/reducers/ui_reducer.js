@@ -16,7 +16,7 @@ function SelectionReducer(state = nullState, action){
       case PresentationActions.RECEIVE_TEXT: {
         return {
           ...state,
-          wrapperIds: [action.wrapperData.id]
+          // wrapperIds: [action.wrapperData.id]
         }
       };
     case PresentationActions.RECEIVE_WRAPPERS: {
@@ -30,7 +30,7 @@ function SelectionReducer(state = nullState, action){
         ...state,
         wrapperIds: [...action.wrapperIds],
         ...action.sharedAttributes
-      } : nullState
+      } : {...nullState, nextMenuAction: state.nextMenuAction}
     case UIActions.RECEIVE_MENU_ACTION:
       return {...nullState, nextMenuAction: action.nextMenuAction};
     case PresentationActions.RECEIVE_SLIDE:;

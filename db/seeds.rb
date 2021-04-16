@@ -33,47 +33,48 @@ end
 doge = User.create({email: 'demo@dmail.com', password: '123456', firstname: "Demo", lastname: "Doge"});
 doge_slide = doge.slides[0];
 
-# doge_image_file = OpenURI.open_uri('https://jka-lab-seeds.s3-us-west-1.amazonaws.com/doge-original.jpg');
-# doge_image_file.rewind
+doge_image_file = OpenURI.open_uri('https://jka-lab-seeds.s3-us-west-1.amazonaws.com/doge-original.jpg');
+doge_image_file.rewind
 
-# doge_image = Image.create(
-#   wrapper_attributes: {
-#     slide_id: doge_slide.id
-#   },
-# );
-
-# doge_image.file.attach(io: doge_image_file, filename: 'doge.jpg');
-
-Textbox.create!(
-  text: "000",
+doge_image = Image.create(
   wrapper_attributes: {
-    slide_id: doge_slide.id, x: 25, y: 25, width: 600, height: 100,
+    z_index: 0,
+    slide_id: doge_slide.id
   },
-  textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: #ff0000", offset: 0}]
 );
 
-Textbox.create!(
-  text: "111",
+doge_image.file.attach(io: doge_image_file, filename: 'doge.jpg');
+
+Textbox.create(
+  text: "wow",
   wrapper_attributes: {
-    slide_id: doge_slide.id, x: 50, y: 50, width: 600, height: 100,
+    slide_id: doge_slide.id, x: 25, y: 25, width: 100, height: 50, fill: '#ff7f00', stroke: '#7f3f00', stroke_width: 8,
   },
-  textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: #cfcf00", offset: 0}]
+  textstyles_attributes: [{style_string: "font: bold 40px comic sans ms; fill: #ff0000", offset: 0}]
 );
 
-Textbox.create!(
-  text: "222",
+Textbox.create(
+  text: "wow",
   wrapper_attributes: {
-    slide_id: doge_slide.id, x: 75, y: 75, width: 600, height: 200,
+    slide_id: doge_slide.id, x: 50, y: 50, width: 100, height: 50,
   },
-  textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: #00cf00", offset: 0}]
+  textstyles_attributes: [{style_string: "font: italic 40px comic sans ms; fill: #cfcf00", offset: 0}]
 );
 
-Textbox.create!(
-  text: "333",
+Textbox.create(
+  text: "wow",
   wrapper_attributes: {
-    slide_id: doge_slide.id, x: 100, y: 100, width: 600, height: 200,
+    slide_id: doge_slide.id, x: 75, y: 75, width: 100, height: 50,
   },
-  textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: #0000ff", offset: 0}]
+  textstyles_attributes: [{style_string: "font: 40px comic sans ms; fill: #00cf00; textDecoration: underline", offset: 0}]
+);
+
+Textbox.create(
+  text: "wow",
+  wrapper_attributes: {
+    slide_id: doge_slide.id, x: 100, y: 100, width: 100, height: 50,
+  },
+  textstyles_attributes: [{style_string: "font: 40px Helvetica ms; fill: #0000ff", offset: 0}]
 );
 
 

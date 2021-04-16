@@ -24,7 +24,7 @@ class Wrapper < ApplicationRecord
   attr_accessor :skip_set_dimensions
 
   before_validation :set_default_values, exception: :destroy
-  before_save :ensure_unique_order
+  before_create :ensure_unique_order
 
   validates(
     :slide_id, :z_index, 

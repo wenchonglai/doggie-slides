@@ -19,11 +19,12 @@ const SVGControlPoint = function({svgDOM, type, x, y, transform, onDrag}){
   );
 }
 
-function getComponent({clipId, width, height, slideObjectId, slideObjectType, active}){
+function getComponent({clipId, width, height, slideObjectId, slideObjectType, active, svgDOM}){
+
   switch (slideObjectType){
     case 'Textbox': 
       return (
-        <SVGTextAreaContainer {...{width, height, slideObjectId, active, clipPath: `url(#${clipId})`}} />
+        <SVGTextAreaContainer {...{width, height, slideObjectId, active, svgDOM, clipPath: `url(#${clipId})`}} />
       );
     case 'Image':
       return (
@@ -48,6 +49,7 @@ const SVGEditable = function({
   width, height, handleMove, handleRotate, handleResize, svgDOM, active,
   slideObjectId, slideObjectType, isPreview
 }){
+  console.log(svgDOM);
   const halfWidth = width / 2;
   const halfHeight = height / 2;
   const controlPoints = [
@@ -83,7 +85,7 @@ const SVGEditable = function({
   }, [active]);
 
   const clipId = `${slideObjectType}${slideObjectId}clip`;
-  const component = getComponent({clipId, width, height, slideObjectId, slideObjectType, active});
+  const component = getComponent({clipId, width, height, slideObjectId, slideObjectType, active, svgDOM});
 
   return ( isPreview ? 
     ( <g>
