@@ -15,6 +15,7 @@ section.page.presentation > section.context-menu-wrapper {
     display: block;
   }
 }
+
 .menu-icon{
   width: 18px;
   height: 18px;
@@ -27,6 +28,14 @@ section.page.presentation > section.context-menu-wrapper {
 .menu-item {
   display: flex;
   flex-direction: row;
+
+  > form > label {
+    display: flex;
+  }
+
+  > .menu-item-name {
+    flex: 1 0 auto;
+  }
 }
 
 section.dropdown-menu, section.dropdown {
