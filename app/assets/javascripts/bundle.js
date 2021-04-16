@@ -2995,7 +2995,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "updateFontSizeCreator": () => (/* binding */ updateFontSizeCreator),
 /* harmony export */   "increaseFontSize": () => (/* binding */ increaseFontSize),
 /* harmony export */   "decreaseFontSize": () => (/* binding */ decreaseFontSize),
-/* harmony export */   "uploadFromComputer": () => (/* binding */ uploadFromComputer)
+/* harmony export */   "uploadFromComputer": () => (/* binding */ uploadFromComputer),
+/* harmony export */   "bringToFront": () => (/* binding */ bringToFront),
+/* harmony export */   "bringForward": () => (/* binding */ bringForward),
+/* harmony export */   "sendBackward": () => (/* binding */ sendBackward),
+/* harmony export */   "sendToBack": () => (/* binding */ sendToBack)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3076,7 +3080,7 @@ var skipSlide = function skipSlide() {
     var reqSlide = _objectSpread({}, entities.slides[ui.slideSettings.slideId]);
 
     reqSlide.skipped = !reqSlide.skipped;
-    return dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(resSlide));
+    return dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.receiveSlide(reqSlide));
   };
 };
 var textbox = function textbox() {
@@ -3206,6 +3210,19 @@ var uploadFromComputer = function uploadFromComputer(formData) {
   };
 };
 
+var moveWrapperCreator = function moveWrapperCreator(offset) {
+  return function () {
+    return function (dispatch, getState) {
+      return dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.moveWrapper(offset));
+    };
+  };
+};
+
+var bringToFront = moveWrapperCreator(65535);
+var bringForward = moveWrapperCreator(1);
+var sendBackward = moveWrapperCreator(-1);
+var sendToBack = moveWrapperCreator(-65535);
+
 /***/ }),
 
 /***/ "./frontend/actions/presentation_actions.js":
@@ -3233,6 +3250,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "receiveWrapper": () => (/* binding */ receiveWrapper),
 /* harmony export */   "RECEIVE_TEXT": () => (/* binding */ RECEIVE_TEXT),
 /* harmony export */   "receiveText": () => (/* binding */ receiveText),
+/* harmony export */   "RECEIVE_IMAGE": () => (/* binding */ RECEIVE_IMAGE),
+/* harmony export */   "receiveImage": () => (/* binding */ receiveImage),
 /* harmony export */   "fetchPresentation": () => (/* binding */ fetchPresentation),
 /* harmony export */   "updateDoc": () => (/* binding */ updateDoc),
 /* harmony export */   "moveSlide": () => (/* binding */ moveSlide),
@@ -3240,7 +3259,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "updateWrapper": () => (/* binding */ updateWrapper),
 /* harmony export */   "createText": () => (/* binding */ createText),
 /* harmony export */   "updateText": () => (/* binding */ updateText),
-/* harmony export */   "uploadImage": () => (/* binding */ uploadImage)
+/* harmony export */   "uploadImage": () => (/* binding */ uploadImage),
+/* harmony export */   "moveWrapper": () => (/* binding */ moveWrapper)
 /* harmony export */ });
 /* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selectors/selectors */ "./frontend/selectors/selectors.js");
 /* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
@@ -3320,6 +3340,14 @@ var receiveText = function receiveText(textData, wrapperData) {
   return {
     type: RECEIVE_TEXT,
     textData: textData,
+    wrapperData: wrapperData
+  };
+};
+var RECEIVE_IMAGE = "RECEIVE_IMAGE";
+var receiveImage = function receiveImage(imageData, wrapperData) {
+  return {
+    type: RECEIVE_IMAGE,
+    imageData: imageData,
     wrapperData: wrapperData
   };
 }; // thunk action creators below
@@ -3426,7 +3454,27 @@ var updateText = function updateText(textboxId, textData) {
 var uploadImage = function uploadImage(formData) {
   return function (dispatch, getState) {
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncUploadImage(formData).then(function (resData) {
-      console.log(resData);
+      var wrapperAttributes = resData.wrapperAttributes;
+      delete resData.wrapperAttributes;
+      dispatch(receiveImage(resData, Object.values(wrapperAttributes)[0]));
+    });
+  };
+};
+var moveWrapper = function moveWrapper(offset) {
+  return function (dispatch, getState) {
+    var _getState = getState(),
+        ui = _getState.ui;
+
+    var slide_id = ui.slideSettings.slideId;
+    var wrapperIds = ui.selections.wrapperIds;
+    return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncMoveWrapper({
+      wrapper: {
+        slide_id: slide_id,
+        wrapperIds: wrapperIds,
+        offset: offset
+      }
+    }).then(function (resData) {
+      return dispatch(receiveWrappers(resData));
     });
   };
 };
@@ -3966,12 +4014,13 @@ function FilmStrip(_ref2) {
       slides = _ref2.slides,
       history = _ref2.history,
       moveSlideHandler = _ref2.moveSlideHandler,
-      updateCurrentSlideHandler = _ref2.updateCurrentSlideHandler;
+      updateCurrentSlideHandler = _ref2.updateCurrentSlideHandler,
+      handleContextMenu = _ref2.handleContextMenu;
 
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(-1),
       _useState2 = _slicedToArray(_useState, 2),
-      moveToPage = _useState2[0],
-      setMoveToPage = _useState2[1];
+      _moveToPage = _useState2[0],
+      _setMoveToPage = _useState2[1];
 
   var animationFrameRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
@@ -3996,9 +4045,10 @@ function FilmStrip(_ref2) {
       var y = e.nativeEvent.offsetY;
       var halfHeight = pageHeight / pageWidth * 75 + 8;
       if (y > halfHeight) page += 1;
+      console.log(page);
 
-      if (page && page !== moveToPage) {
-        setMoveToPage(page);
+      if (page && page !== _moveToPage) {
+        _setMoveToPage(page);
       }
     });
   }
@@ -4011,9 +4061,10 @@ function FilmStrip(_ref2) {
     moveSlideHandler({
       start: page,
       end: page,
-      offset: moveToPage - page - (moveToPage - page > 0 ? 1 : 0)
+      offset: _moveToPage - page - (_moveToPage - page > 0 ? 1 : 0)
     });
-    setMoveToPage(-1);
+
+    _setMoveToPage(-1);
   }
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {// history.replace(`/presentation/${currentSlideId}`);
@@ -4038,13 +4089,16 @@ function FilmStrip(_ref2) {
 
   for (var i = 0; i <= 2 * length; i += 1) {
     children.push((i & 1) == 0 ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("hr", {
-      className: moveToPage - 1 == i >> 1 ? 'active' : '',
+      className: _moveToPage - 1 == i >> 1 ? 'active' : '',
       key: (i >> 1) - 0.5
     }) : slidesComponents[i >> 1]);
   }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
-    className: "filmstrip"
+    className: "filmstrip",
+    onContextMenu: function onContextMenu(e) {
+      return handleContextMenu(e, 'slide');
+    }
   }, children);
 }
 ;
@@ -4618,6 +4672,28 @@ var DELETE_WRAPPER = {
   shortCut: undefined,
   actionName: "deleteWrappers"
 };
+var ORDER = {
+  name: "Order",
+  shortCut: undefined,
+  actionName: undefined,
+  children: [{
+    name: "Bring to front",
+    shortCut: undefined,
+    actionName: "bringToFront"
+  }, {
+    name: "Bring forward",
+    shortCut: undefined,
+    actionName: "bringForward"
+  }, {
+    name: "Send backward",
+    shortCut: undefined,
+    actionName: "sendBackward"
+  }, {
+    name: "Send to back",
+    shortCut: undefined,
+    actionName: "sendToBack"
+  }]
+};
 var MENU_ITEMS = [{
   name: "Edit",
   icon: undefined,
@@ -4640,8 +4716,8 @@ var TEXTBOX_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, FILL_COLOR
 //undefined, ALIGN
 ]);
 var IMAGE_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, CROP_IMAGE, RESET_IMAGE]);
-var SLIDE_CONTEXT_MENU_ITEMS = [DELETE_SLIDE];
-var WRAPPER_CONTEXT_MENU_ITEMS = [DELETE_WRAPPER];
+var SLIDE_CONTEXT_MENU_ITEMS = [NEW_SLIDE, DELETE_SLIDE, SKIP_SLIDE];
+var WRAPPER_CONTEXT_MENU_ITEMS = [DELETE_WRAPPER, undefined, ORDER];
 
 /***/ }),
 
@@ -5168,10 +5244,13 @@ function PresentationPage(_ref) {
     }
   };
 
-  var onContextMenu = function onContextMenu(e) {
+  var onContextMenu = function onContextMenu(e, wrapper) {
+    console.log(wrapper);
+
     _setRightClick({
       x: e.clientX,
-      y: e.clientY
+      y: e.clientY,
+      type: wrapper && wrapper.slideObjectType ? wrapper.slideObjectType : wrapper
     });
   };
 
@@ -5237,7 +5316,9 @@ function PresentationPage(_ref) {
     className: "two-panel-layout"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "filmstrip"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_filmstrip_container__WEBPACK_IMPORTED_MODULE_7__.default, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_workspace_container__WEBPACK_IMPORTED_MODULE_8__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_filmstrip_container__WEBPACK_IMPORTED_MODULE_7__.default, {
+    handleContextMenu: onContextMenu
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_workspace_container__WEBPACK_IMPORTED_MODULE_8__.default, {
     handleContextMenu: onContextMenu,
     slideId: currentSlideId
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
@@ -5255,7 +5336,7 @@ function PresentationPage(_ref) {
     ref: contextMenuRef
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_3__.default, {
     className: "context-menu",
-    items: _menu_items__WEBPACK_IMPORTED_MODULE_4__.WRAPPER_CONTEXT_MENU_ITEMS,
+    items: _rightClick.type === 'slide' ? _menu_items__WEBPACK_IMPORTED_MODULE_4__.SLIDE_CONTEXT_MENU_ITEMS : _menu_items__WEBPACK_IMPORTED_MODULE_4__.WRAPPER_CONTEXT_MENU_ITEMS,
     respondToMouseOut: false,
     parentHandleBlur: handleContextMenuBlur
   })));
@@ -7357,7 +7438,8 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
       updateMenuAction = _ref.updateMenuAction,
       createText = _ref.createText,
       handleContextMenu = _ref.handleContextMenu,
-      props = _objectWithoutProperties(_ref, ["children", "isPreview", "containerWidth", "width", "height", "slide", "slideId", "menuAction", "updateMenuAction", "createText", "handleContextMenu"]);
+      wrappers = _ref.wrappers,
+      props = _objectWithoutProperties(_ref, ["children", "isPreview", "containerWidth", "width", "height", "slide", "slideId", "menuAction", "updateMenuAction", "createText", "handleContextMenu", "wrappers"]);
 
   var widthAttr = {};
 
@@ -7381,7 +7463,6 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
       wrapperAttributes: {
         slideId: slideId,
         groupId: null,
-        zIndex: 1,
         width: 400,
         height: 50,
         x: x * scale,
@@ -7413,6 +7494,7 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     ;
   }
 
+  console.log(wrappers);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", _extends({
     version: "1.1",
     className: "react-svg svg-slide",
@@ -7438,14 +7520,15 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     width: width,
     height: height,
     fill: "#FFFFFF"
-  })), (slide ? slide.wrapperIds : []).map(function (wrapperId) {
+  })), wrappers.map(function (_ref2) {
+    var id = _ref2.id;
     return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_2__.SVGNoWrapperContainer, {
-      key: wrapperId,
-      wrapperId: wrapperId
+      key: id,
+      wrapperId: id
     }) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_2__.SVGWrapperContainer, {
-      key: wrapperId,
+      key: id,
       slideId: slideId,
-      wrapperId: wrapperId,
+      wrapperId: id,
       svgDOM: ref.current,
       handleContextMenu: handleContextMenu
     });
@@ -7499,24 +7582,15 @@ var generateSTP = function generateSTP(isPreview) {
   return function (_ref, ownProps) {
     var entities = _ref.entities,
         ui = _ref.ui;
-    // const slide = entities.slides[ownProps.slideId];
-    // const wrappers = slide.wrapperIds.map(id => {
-    //   const wrapper = entities.wrappers[id];
-    //   let slideObject = undefined;
-    //   switch (wrapper.slideObjectType){
-    //     case 'Textbox': {
-    //       slideObject = entities.textboxes[wrapper.slideObjectId];
-    //       const textStyles = slideObject.textstyleIds
-    //         .map(id => entities.textstyles[id]);
-    //       return {...wrapper, slideObject: {...slideObject, textStyles}};
-    //     };
-    //     default: return wrapper;
-    //   }
-    // });
+    var slide = entities.slides[ownProps.slideId];
     return {
       isPreview: isPreview,
-      slide: entities.slides[ownProps.slideId],
-      // wrapperIds: entities.slides[ownProps.slideId].wrapperIds,
+      slide: slide,
+      wrappers: slide.wrapperIds.map(function (id) {
+        return entities.wrappers[id];
+      }).sort(function (a, b) {
+        return a.zIndex - b.zIndex;
+      }),
       width: ui.pageSettings.pageWidth || 0,
       height: ui.pageSettings.pageHeight || 0,
       menuAction: ui.selections.nextMenuAction
@@ -8430,6 +8504,9 @@ var ImagesReducer = function ImagesReducer() {
   var action = arguments.length > 1 ? arguments[1] : undefined;
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_IMAGE:
+      return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.imageData.id, action.imageData));
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
       return action.entities.images;
 
@@ -8507,10 +8584,11 @@ var WrapperReducer = function WrapperReducer() {
   Object.freeze(state);
 
   switch (action.type) {
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_IMAGE:
+      ;
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
-      {
-        return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.wrapperData.id, action.wrapperData));
-      }
+      return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, action.wrapperData.id, action.wrapperData));
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
       return action.entities.wrappers;
@@ -8537,12 +8615,14 @@ var SlidesReducer = function SlidesReducer() {
         return _objectSpread({}, state);
       }
 
+    case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_IMAGE:
+      ;
+
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
       {
-        var wrapperAttributes = action.textData.wrapperAttributes;
-        var wrapperData = Object.values(wrapperAttributes)[0];
-        var wrapperId = action.wrapperData.id;
-        var slideId = wrapperData.slideId;
+        var wrapper = action.wrapperData;
+        var wrapperId = wrapper.id;
+        var slideId = wrapper.slideId;
         var slideData = state[slideId];
         var wrapperIds = Array.from(new Set([].concat(_toConsumableArray(slideData.wrapperIds), [wrapperId])));
         return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, slideId, _objectSpread(_objectSpread({}, slideData), {}, {
@@ -10040,7 +10120,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "asyncCreateText": () => (/* binding */ asyncCreateText),
 /* harmony export */   "asyncUpdateText": () => (/* binding */ asyncUpdateText),
 /* harmony export */   "asyncDeleteWrappers": () => (/* binding */ asyncDeleteWrappers),
-/* harmony export */   "asyncUploadImage": () => (/* binding */ asyncUploadImage)
+/* harmony export */   "asyncUploadImage": () => (/* binding */ asyncUploadImage),
+/* harmony export */   "asyncMoveWrapper": () => (/* binding */ asyncMoveWrapper)
 /* harmony export */ });
 var asyncFetchPresentation = function asyncFetchPresentation() {
   return $.ajax({
@@ -10137,6 +10218,13 @@ var asyncUploadImage = function asyncUploadImage(formData) {
     data: formData,
     contentType: false,
     processData: false
+  });
+};
+var asyncMoveWrapper = function asyncMoveWrapper(data) {
+  return $.ajax({
+    method: 'patch',
+    url: 'api/wrappers/move',
+    data: data
   });
 };
 

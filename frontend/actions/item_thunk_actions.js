@@ -43,7 +43,7 @@ export const skipSlide = () => (dispatch, getState) => {
   const reqSlide = {...entities.slides[ui.slideSettings.slideId]};
   reqSlide.skipped = !reqSlide.skipped
 
-  return dispatch(PresentationActions.receiveSlide(resSlide));
+  return dispatch(PresentationActions.receiveSlide(reqSlide));
 }
 
 export const textbox = () => (dispatch, getState) => {
@@ -149,3 +149,12 @@ export const uploadFromComputer = (formData) => (dispatch, getState) => {
   formData.append("image[wrapper_attributes[slide_id]]", slideId);
   return dispatch(PresentationActions.uploadImage(formData));
 }
+
+const moveWrapperCreator = (offset) => () => (dispatch, getState) => {
+  return dispatch(PresentationActions.moveWrapper(offset));
+}
+
+export const bringToFront = moveWrapperCreator(65535);
+export const bringForward = moveWrapperCreator(1);
+export const sendBackward = moveWrapperCreator(-1);
+export const sendToBack = moveWrapperCreator(-65535);

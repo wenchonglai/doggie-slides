@@ -112,10 +112,14 @@ section.user-info {
   color: #3c4043;
   font: 14px/16px "Google Sans","Roboto",Helvetica,Arial,sans-serif;
 
+  > .button { border-radius: 50%; }
+  &:not(.hidden) > .button { background-color: #dadce0; }
+
   div.profile-image {
     width: 32px;
     height: 32px;
-    margin: 12px;
+    margin: 4px;
+    border-radius: 50%;
     position: relative;
     background-color: rgb(240, 100, 160);
     border-radius: 50%;

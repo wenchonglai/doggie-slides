@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {SVGSlidePreviewContainer} from '../svg/svg_slide_containers';
 
-function SlidePreviewListItem({pageWidth, pageHeight, className, slide, clickHandler, dragStartHandler, dragOverHandler, dragEndHandler}){
+function SlidePreviewListItem({
+  pageWidth, pageHeight, className, slide, clickHandler, dragStartHandler, dragOverHandler, dragEndHandler
+}){
   const width = 150;
   const height = 150 * pageHeight / pageWidth | 0;
 
@@ -35,8 +37,8 @@ function SlidePreviewListItem({pageWidth, pageHeight, className, slide, clickHan
   )
 }
 
-export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides, history, moveSlideHandler, updateCurrentSlideHandler}){
-  const [moveToPage, setMoveToPage] = useState(-1);
+export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides, history, moveSlideHandler, updateCurrentSlideHandler, handleContextMenu}){
+  const [_moveToPage, _setMoveToPage] = useState(-1);
   const animationFrameRef = useRef();
 
   function clickHandler(e, slideId){
@@ -53,14 +55,16 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
 
   function dragOverHandler(e, page){
     e.preventDefault();
+
     
     cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = requestAnimationFrame(() => {
       const y = e.nativeEvent.offsetY;
       const halfHeight = pageHeight / pageWidth * 75 + 8;
-
+      
       if (y > halfHeight) page += 1;
-      if (page && page !== moveToPage){ setMoveToPage(page); }
+          console.log(page)
+      if (page && page !== _moveToPage){ _setMoveToPage(page); }
     });
   };
 
@@ -68,8 +72,8 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
     const page = slides[currentSlideId].page;
 
     cancelAnimationFrame(animationFrameRef.current);
-    moveSlideHandler({start: page, end: page, offset: moveToPage - page - (moveToPage - page > 0 ? 1 : 0) });
-    setMoveToPage(-1);
+    moveSlideHandler({start: page, end: page, offset: _moveToPage - page - (_moveToPage - page > 0 ? 1 : 0) });
+    _setMoveToPage(-1);
   }
 
   useEffect(() => {
@@ -90,12 +94,12 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
 
   for (let i = 0; i <= 2 * length; i += 1){
     children.push( (i & 1) == 0 ? 
-      (<hr className={((moveToPage - 1) == i >> 1) ? 'active' : ''} key={(i >> 1) - 0.5}/>) : (slidesComponents[i >> 1])
+      (<hr className={((_moveToPage - 1) == i >> 1) ? 'active' : ''} key={(i >> 1) - 0.5}/>) : (slidesComponents[i >> 1])
     );
   }
   
   return (
-    <ul className='filmstrip'>
+    <ul className='filmstrip' onContextMenu={(e) => handleContextMenu(e, 'slide')}>
       {children}
     </ul>
   )

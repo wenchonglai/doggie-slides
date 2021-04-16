@@ -66,4 +66,10 @@ export const asyncUploadImage = (formData) => $.ajax({
   data: formData, 
   contentType: false,
   processData: false
+});
+
+export const asyncMoveWrapper = (data) => $.ajax({
+  method: 'patch',
+  url: 'api/wrappers/move',
+  data
 })

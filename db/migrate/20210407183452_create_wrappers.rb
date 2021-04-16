@@ -5,8 +5,8 @@ class CreateWrappers < ActiveRecord::Migration[5.2]
       t.integer :slide_id, null: false
       t.references :slide_object, polymorphic: true
       t.integer :z_index, null: false, default: 0
-      t.float :width, null: false, default: 300.0
-      t.float :height, null: false, default: 200.0
+      t.float :width, null: false, default: 0.0
+      t.float :height, null: false, default: 0.0
       t.float :x, null: false, default: 0.0
       t.float :y, null: false, default: 0.0
       t.float :rotate, null: false, default: 0.0
@@ -23,5 +23,6 @@ class CreateWrappers < ActiveRecord::Migration[5.2]
 
     add_index :wrappers, :group_id
     add_index :wrappers, :slide_id
+    add_index :wrappers, [:slide_id, :z_index]
   end
 end

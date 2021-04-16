@@ -5,7 +5,7 @@ import {SVGWrapperContainer, SVGNoWrapperContainer} from './svg_wrapper_containe
 
 const ReactSVG = React.forwardRef(({
   children, isPreview, containerWidth, width, height, slide, slideId,
-  menuAction, updateMenuAction, createText, handleContextMenu,
+  menuAction, updateMenuAction, createText, handleContextMenu, wrappers,
   ...props
 }, ref) => {
 
@@ -27,7 +27,6 @@ const ReactSVG = React.forwardRef(({
       wrapperAttributes: {
         slideId,
         groupId: null,
-        zIndex: 1,
         width: 400,
         height: 50,
         x: x * scale,
@@ -51,7 +50,7 @@ const ReactSVG = React.forwardRef(({
       default: return updateMenuAction('Select');
     };
   }
-
+console.log(wrappers);
 	return (
 		<svg
       version="1.1" 
@@ -68,16 +67,16 @@ const ReactSVG = React.forwardRef(({
       onMouseDownCapture={isPreview ? undefined : (e) => handleMouseDownCapture(e)}
       onClick={isPreview ? undefined : (e) => handleClick(e)}
     >
-      
 			<g transform="translate(1000 1000)">
         <g className={'svg-background'}>
           <rect width={width} height={height} fill="#FFFFFF"></rect>
         </g>
-        { (slide ? slide.wrapperIds : []).map(wrapperId => (
+        { wrappers
+            .map(({id}) => (
             isPreview ?
-              <SVGNoWrapperContainer key={wrapperId} wrapperId = {wrapperId}/> :
+              <SVGNoWrapperContainer key={id} wrapperId={id}/> :
               <SVGWrapperContainer 
-                key={wrapperId} slideId={slideId} wrapperId = {wrapperId} svgDOM={ref.current}
+                key={id} slideId={slideId} wrapperId = {id} svgDOM={ref.current}
                 handleContextMenu={handleContextMenu}
               />
           ))

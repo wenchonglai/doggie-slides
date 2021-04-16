@@ -24,6 +24,7 @@ class Wrapper < ApplicationRecord
   attr_accessor :skip_set_dimensions
 
   before_validation :set_default_values, exception: :destroy
+  before_save :ensure_unique_order
 
   validates(
     :slide_id, :z_index, 
@@ -47,11 +48,15 @@ class Wrapper < ApplicationRecord
     self.y ||= 0.0
     self.crop_x ||= 0
     self.crop_y ||= 0
-    p [self.crop_width, self.width]
     self.crop_width = self.width if self.crop_width == 0
     self.crop_height = self.height if self.crop_height == 0
     self.rotate ||= 0.0
     self.stroke_width ||= 0.0
   end
 
+  def ensure_unique_order
+    wrappers = Wrapper.where(slide_id: self.slide_id)
+
+    self.z_index = (wrappers.order(z_index: :desc).limit(1).pluck(:z_index).first || -1) + 1
+  end
 end

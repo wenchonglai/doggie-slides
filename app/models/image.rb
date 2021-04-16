@@ -38,6 +38,7 @@ class Image < ApplicationRecord
   end
 
   def set_dimensions(image)
+    
     if Image.exists?(image.id)
       wrapper = image.wrapper
 

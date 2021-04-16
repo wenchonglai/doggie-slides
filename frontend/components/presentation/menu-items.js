@@ -120,6 +120,13 @@ const RESET_IMAGE = { name: "Reset image", icon: [6, 10], shortCut: undefined, a
 
 const DELETE_WRAPPER = { name: "delete", icon: undefined, shortCut: undefined, actionName: "deleteWrappers"};
 
+const ORDER = { name: "Order", shortCut: undefined, actionName: undefined, children: [
+  { name: "Bring to front", shortCut: undefined, actionName: "bringToFront"},
+  { name: "Bring forward", shortCut: undefined, actionName: "bringForward"},
+  { name: "Send backward", shortCut: undefined, actionName: "sendBackward"},
+  { name: "Send to back", shortCut: undefined, actionName: "sendToBack"},
+]};
+
 export const MENU_ITEMS = [
   { name: "Edit", icon: undefined, children: [
     CUT, COPY, PASTE, PASTE_WITHOUT_FORMATTING, SELECT_ALL
@@ -157,9 +164,12 @@ export const IMAGE_TOOLBAR_ITEMS = [
 ];
 
 export const SLIDE_CONTEXT_MENU_ITEMS = [
-  DELETE_SLIDE
+  NEW_SLIDE,
+  DELETE_SLIDE,
+  SKIP_SLIDE
 ];
 
 export const WRAPPER_CONTEXT_MENU_ITEMS = [
-  DELETE_WRAPPER
+  DELETE_WRAPPER, undefined,
+  ORDER
 ];

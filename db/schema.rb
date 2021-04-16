@@ -104,8 +104,8 @@ ActiveRecord::Schema.define(version: 2021_04_13_222411) do
     t.string "slide_object_type"
     t.bigint "slide_object_id"
     t.integer "z_index", default: 0, null: false
-    t.float "width", default: 300.0, null: false
-    t.float "height", default: 200.0, null: false
+    t.float "width", default: 0.0, null: false
+    t.float "height", default: 0.0, null: false
     t.float "x", default: 0.0, null: false
     t.float "y", default: 0.0, null: false
     t.float "rotate", default: 0.0, null: false
@@ -120,6 +120,7 @@ ActiveRecord::Schema.define(version: 2021_04_13_222411) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["group_id"], name: "index_wrappers_on_group_id"
+    t.index ["slide_id", "z_index"], name: "index_wrappers_on_slide_id_and_z_index"
     t.index ["slide_id"], name: "index_wrappers_on_slide_id"
     t.index ["slide_object_type", "slide_object_id"], name: "index_wrappers_on_slide_object_type_and_slide_object_id"
   end

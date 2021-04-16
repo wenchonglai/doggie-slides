@@ -3,6 +3,8 @@ class Api::TextsController < ApplicationController
 
   def create
     @text = Textbox.new(text_params);
+    # wrappers = current_user.wrappers.where(text_params[slide_id: @text.wrapper.slide_id])
+    # @text.wrapper.z_index = (wrapper.order(z_index: :desc).pluck(:z_index).first || -1) + 1
 
     if @text.save!
       redirect_to api_text_url(@text), status: 303
@@ -60,7 +62,7 @@ class Api::TextsController < ApplicationController
         wrapper_attributes: [
           :id, :slide_id, :group_id,
           :slide_object_id, :slide_object_type,
-          :z_index, :x, :y, :width, :height, :rotate,
+          :x, :y, :width, :height, :rotate,
           :crop_x, :crop_y, :crop_width, :crop_height,
           :fill, :stroke, :stroke_width, :stroke_dasharray,
           '_destroy'

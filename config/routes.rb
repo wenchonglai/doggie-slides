@@ -18,7 +18,6 @@ Rails.application.routes.draw do
   namespace :api, defaults: {format: :json} do
     resources :images, only: [:create, :update, :destroy, :show, :index]
 
-    resources :wrappers, only: [:create, :destroy, :update]
     resources :texts, only: [:create, :destroy, :update, :show, :index]
     resources :textstyles, only: []
     resources :textboxes, only: [ :show]
