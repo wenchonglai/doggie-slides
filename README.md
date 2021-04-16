@@ -1,23 +1,125 @@
-# README
+![DoggIe Slides Logo](https://doggie-slides.herokuapp.com/assets/icons-f4a13afbe1257f983830da9fdbc84debda2298a19778a05565eb5fbf85f3ac1b.png) #DoggIe Slides
 
-A web application that supports the CRUD and presentation basic PowerPoint-style slides and elements powered by scalable vector graphics (Note: This is a clone of the Google Slides as Wenchong Lai's Full-Stack Project for App Academy).
+**[Click Here to Launch the App](https://doggie-slides.herokuapp.com/)**
 
-Things you may want to cover:
+Welcome to DoggIe Slides! DoggIe Slides, a clone of Google Slides, is a full-stack, single-page editing and presentation application that supports the create, read, update, delete, as well as rendering of basic slides, texts, and graphics. The system design utilizes React Hooks and Redux in the front end, Ruby on Rails in the backend, as well as a PostgresSQL database. A SVGTextArea component, powered by the DynamicText text editing engine developed by the user, was implemented for better multi-line svg text editing.
 
-* Ruby version
+## Technologies
+- Vendor Libraries
+  - React/Redux
+    - with React-Redux and React-Router
+  - SASS/CSS
+  - Webpack
+  - Ruby on Rails
+  - PostgreSQL
+- User Libraries
+  - Dynamic Text
+  - SortedMap
 
-* System dependencies
+## Key Features
 
-* Configuration
+### Textbox Editing
+* The developer designed the SVG-based DynamicText that implements the richtext data structure and serves as a multi-line text editing engine
+* Throttling function, animation frame controls, as well as ad-hoc keyboard event listeners responsive to React component life cycles were implemented to support smooth text insertion, deletion, selection, which were not originally supported by SVG1.1
 
-* Database creation
+```jsx
+// svg_textarea.jsx
+function SVGTextArea({/* ... */}){
+  const textRef = useRef();
+  const inputCacheRef = useRef('');
+  const eventListenerRef = useRef();
 
-* Database initialization
+  function keyDownListener(e){
+    cancelAnimationFrame(animationFrameRef.current);
+    // ...
+    let inputCache = inputCacheRef.current;
 
-* How to run the test suite
+    animationFrameRef.current = requestAnimationFrame( () => {
+      // ...
+      textRef.current.insert(inputCacheRef.current, cursorOffsetRef.current);
+      inputCacheRef.current = '';
 
-* Services (job queues, cache servers, search engines, etc.)
+      updateUITextSelection({
+        // ...
+        uiTextData: textRef.current.toReduxState(),
+        // ...
+      });
+      // ...
+    });
+  }
 
-* Deployment instructions
+  useEffect(() => {
+    document.removeEventListener('keydown', eventListenerRef.current);
 
-* ...
+    if (active){
+      eventListenerRef.current = keyDownListener;
+      document.addEventListener('keydown', eventListenerRef.current);
+    }
+  }, [active]);
+
+  useEffect(() => {
+    eventListenerRef.current = keyDownListener;
+    
+    return () => {
+      document.removeEventListener('keydown', eventListenerRef.current);
+      eventListenerRef.current = undefined;
+    }
+  }, []);
+
+  //...
+
+  return (
+    <g {/*...*/}>
+      {/*...*/}
+    </g>
+  )
+}
+```
+
+```jsx
+// dynamic-text.js
+class DynamicText{
+  static fromCurrentSelection(state){
+    const textData = getSelectedText(state);
+    return new DynamicText(textData[0].text, textData[1].map(({offset, styleString}) => ({offset, styleString})));
+  }
+
+  static fromTexbox(state, textbox){
+    const textstyles = getTextstylesByTextbox(state, textbox);
+    return new DynamicText(textbox.text, textstyles.map(({offset, styleString}) => ({offset, styleString})))
+  }
+
+  constructor(text = '', styleStrings){
+    this._text = '';
+    this._bufferSize = 256;
+    this._indices = {
+      spaces: new SortedArray(),
+      tabs: new SortedArray(),
+      returns: new SortedArray()
+    };
+
+    this._styleMap = new SortedMap(
+      styleStrings
+        .filter(
+          styleString => styleString.offset >= 0 && 
+            styleString.offset <= text.length
+        ).map(
+          styleString => 
+            [styleString.offset, parseStyleString(styleString.styleString)]
+        )
+    );
+
+    this._segmentMap = new SortedMap();
+    
+    /* ... */
+    
+    this.insert(text, 0, true);
+  }
+
+  insert(text, offset = this.length, init = false){/* ... */}
+  remove(index1 = this.length - 1, index2 = index1 + 1){/* ... */}
+  setStyle(offset1 = 0, offset2 = this.length, style){/* ... */}
+  measureSubstringSize(substring, style = {}){/* ... */}
+  toReactComponents(maxWidth = 800, {tabValue = 72} = {}){/* ... */}
+  toReduxState(){/* ... */}
+}

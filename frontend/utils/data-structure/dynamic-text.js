@@ -46,7 +46,6 @@ export default class DynamicText{
     );
 
     this._segmentMap = new SortedMap();
-
     this._defaultFont = CTX.font || style.defaultFont;
     
     if (text[text.length - 1] !== '\0') text = text + '\0';
