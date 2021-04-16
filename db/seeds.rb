@@ -33,7 +33,7 @@ end
 doge = User.create({email: 'demo@dmail.com', password: '123456', firstname: "Demo", lastname: "Doge"});
 doge_slide = doge.slides[0];
 
-doge_image_file = OpenURI.open_uri('https://jka-lab-seeds.s3-us-west-1.amazonaws.com/doge-original.jpg');
+doge_image_file = URI.open('https://jka-lab-seeds.s3-us-west-1.amazonaws.com/doge-original.jpg');
 doge_image_file.rewind
 
 doge_image = Image.create(
