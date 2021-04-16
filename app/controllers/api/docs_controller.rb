@@ -2,7 +2,6 @@ class Api::DocsController < ApplicationController
   before_action :ensure_current_user
 
   def update
-    p params
     @doc = Doc.find_by(id: params[:id])
 
     if @doc

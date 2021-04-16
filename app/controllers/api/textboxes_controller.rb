@@ -6,7 +6,6 @@ class Api::TextboxesController < ApplicationController
   end
 
   def create
-    p params[:textbox][:text]
     @textbox = Textbox.new(text: params[:textbox][:text])
 
     if @textbox.save

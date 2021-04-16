@@ -223,7 +223,6 @@ export default function SVGWrapper({
     }, [_active]);
 
     useEffect(() => {
-      console.log(selectedWrapperIds);
       _setActive(selectedWrapperIds.includes(wrapperId));
     }, [selectedWrapperIds])
   }

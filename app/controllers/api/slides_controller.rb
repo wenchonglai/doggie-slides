@@ -26,7 +26,6 @@ class Api::SlidesController < ApplicationController
       elsif (@slide.page != params[:slide][:page].to_i)
         render json: ["Cannot change page number using this action"], status: 403
       elsif (@slide.update(slide_params))
-        p @slide.wrappers
         new_page = @slide.page
         # if (new_page > old_page)
         #   @slides

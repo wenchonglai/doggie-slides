@@ -49,7 +49,6 @@ const SVGEditable = function({
   width, height, handleMove, handleRotate, handleResize, svgDOM, active,
   slideObjectId, slideObjectType, isPreview
 }){
-  console.log(svgDOM);
   const halfWidth = width / 2;
   const halfHeight = height / 2;
   const controlPoints = [

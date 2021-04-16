@@ -61,7 +61,6 @@ export default function SVGTextArea({
   }
 
   function keyDownListener(e){
-    console.log(e.key);
     cancelAnimationFrame(animationFrameRef.current);
 
     if (!active){ return; }

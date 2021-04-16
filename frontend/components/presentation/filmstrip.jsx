@@ -63,7 +63,6 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
       const halfHeight = pageHeight / pageWidth * 75 + 8;
       
       if (y > halfHeight) page += 1;
-          console.log(page)
       if (page && page !== _moveToPage){ _setMoveToPage(page); }
     });
   };

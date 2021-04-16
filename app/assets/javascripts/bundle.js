@@ -4045,7 +4045,6 @@ function FilmStrip(_ref2) {
       var y = e.nativeEvent.offsetY;
       var halfHeight = pageHeight / pageWidth * 75 + 8;
       if (y > halfHeight) page += 1;
-      console.log(page);
 
       if (page && page !== _moveToPage) {
         _setMoveToPage(page);
@@ -6744,8 +6743,6 @@ function SVGWrapper(_ref) {
       }
     }, [_active]);
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-      console.log(selectedWrapperIds);
-
       _setActive(selectedWrapperIds.includes(wrapperId));
     }, [selectedWrapperIds]);
   }
@@ -7759,7 +7756,6 @@ function SVGTextArea(_ref2) {
   }
 
   function keyDownListener(e) {
-    console.log(e.key);
     cancelAnimationFrame(animationFrameRef.current);
 
     if (!active) {
