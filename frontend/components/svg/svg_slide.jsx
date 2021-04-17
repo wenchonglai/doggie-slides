@@ -50,8 +50,6 @@ const ReactSVG = React.forwardRef(({
       default: return updateMenuAction('Select');
     };
   }
-  
-  console.log(wrappers);
 
 	return (
 		<svg
