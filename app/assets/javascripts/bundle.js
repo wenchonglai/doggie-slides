@@ -3265,6 +3265,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _selectors_selectors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selectors/selectors */ "./frontend/selectors/selectors.js");
 /* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
 /* harmony import */ var _ui_actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ui_actions */ "./frontend/actions/ui_actions.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -3463,6 +3469,7 @@ var uploadImage = function uploadImage(formData) {
 var moveWrapper = function moveWrapper(offset) {
   return function (dispatch, getState) {
     var _getState = getState(),
+        entities = _getState.entities,
         ui = _getState.ui;
 
     var slide_id = ui.slideSettings.slideId;
@@ -3474,7 +3481,15 @@ var moveWrapper = function moveWrapper(offset) {
         offset: offset
       }
     }).then(function (resData) {
-      return dispatch(receiveWrappers(resData));
+      var wrappers = _objectSpread({}, entities.wrappers); // has to do this; otherwise receiveWrappers will destroy all wrappers not in the slide
+
+
+      for (var _i = 0, _Object$values = Object.values(wrappers); _i < _Object$values.length; _i++) {
+        var wrapper = _Object$values[_i];
+        if (wrapper.slide_id === slide_id) delete wrappers[wrapper.id];
+      }
+
+      dispatch(receiveWrappers(_objectSpread(_objectSpread({}, wrappers), resData)));
     });
   };
 };
@@ -9055,7 +9070,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var configureStore = function configureStore() {
   var preloadedState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default, (redux_logger__WEBPACK_IMPORTED_MODULE_0___default())));
+  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default));
 };
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (configureStore);

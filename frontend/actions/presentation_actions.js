@@ -153,14 +153,24 @@ export const uploadImage = (formData) => (dispatch, getState) => {
 }
 
 export const moveWrapper = (offset) => (dispatch, getState) => {
-  const {ui} = getState();
+  const {entities, ui} = getState();
   const slide_id = ui.slideSettings.slideId;
   const wrapperIds = ui.selections.wrapperIds;
+
   return PresentationUtils.asyncMoveWrapper({
     wrapper: {
       slide_id, 
       wrapperIds,
       offset
     }
-  }).then((resData) => dispatch(receiveWrappers(resData)))
+  }).then((resData) => {
+    const wrappers = {...entities.wrappers};
+
+    // has to do this; otherwise receiveWrappers will destroy all wrappers not in the slide
+    for (let wrapper of Object.values(wrappers))
+      if (wrapper.slide_id === slide_id)
+        delete wrappers[wrapper.id];
+
+    dispatch(receiveWrappers({...wrappers, ...resData}));
+  })
 }
