@@ -7504,6 +7504,7 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     ;
   }
 
+  console.log(wrappers);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", _extends({
     version: "1.1",
     className: "react-svg svg-slide",

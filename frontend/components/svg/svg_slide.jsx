@@ -51,6 +51,8 @@ const ReactSVG = React.forwardRef(({
     };
   }
   
+  console.log(wrappers);
+
 	return (
 		<svg
       version="1.1" 
