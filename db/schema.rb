@@ -40,8 +40,8 @@ ActiveRecord::Schema.define(version: 2021_04_13_222411) do
     t.integer "owner_id", null: false
     t.integer "share_id"
     t.string "filename", default: "Untitled presentation", null: false
-    t.integer "width", default: 800, null: false
-    t.integer "height", default: 500, null: false
+    t.integer "width", default: 960, null: false
+    t.integer "height", default: 540, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_id"], name: "index_docs_on_owner_id"

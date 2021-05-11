@@ -19,7 +19,7 @@ export default function SignupPage({history, signupHandler, errors}){
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     signupHandler(user).then(res => {
       localStorage.setItem(
         'doggieSlides',

@@ -5,7 +5,7 @@ import {SVGWrapperContainer, SVGNoWrapperContainer} from './svg_wrapper_containe
 
 const ReactSVG = React.forwardRef(({
   children, isPreview, containerWidth, width, height, slide, slideId,
-  menuAction, updateMenuAction, createText, handleContextMenu, wrappers,
+  menuAction, updateMenuAction, createText, handleContextMenu, wrappers, onClick,
   ...props
 }, ref) => {
 
@@ -65,7 +65,7 @@ const ReactSVG = React.forwardRef(({
       {...widthAttr}
       {...props}
       onMouseDownCapture={isPreview ? undefined : (e) => handleMouseDownCapture(e)}
-      onClick={isPreview ? undefined : (e) => handleClick(e)}
+      onClick={isPreview ? onClick : (e) => handleClick(e)}
     >
 			<g transform="translate(1000 1000)">
         <g className={'svg-background'}>

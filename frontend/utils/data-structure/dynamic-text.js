@@ -304,7 +304,7 @@ export default class DynamicText{
     return {width: size.width, height: height};
   }
 
-  toReactComponents(maxWidth = 800, {tabValue = 72} = {}){
+  toReactComponents(maxWidth = 960, {tabValue = 72} = {}){
     // helper function
     // process the substring starting at l and ending at r, create an React element for this substring, and update offsets
 

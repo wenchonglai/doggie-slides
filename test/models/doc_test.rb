@@ -6,8 +6,8 @@
 #  owner_id   :integer          not null
 #  share_id   :integer
 #  filename   :string           default("Untitled presentation"), not null
-#  width      :integer          default(800), not null
-#  height     :integer          default(500), not null
+#  width      :integer          default(960), not null
+#  height     :integer          default(540), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

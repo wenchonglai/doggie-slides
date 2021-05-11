@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import MenuContainer from './menu_container'
 import {BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS, SLIDE_CONTEXT_MENU_ITEMS, WRAPPER_CONTEXT_MENU_ITEMS} from './menu-items';
@@ -18,9 +19,11 @@ export default function PresentationPage({
   const [_loading, _setLoading] = useState(true);
   const [_rightClick, _setRightClick] = useState(false);
   const contextMenuRef = useRef();
+  const fullScreen = useFullScreenHandle();
+  const {presentingSlideId, slideObjectType} = uiSelections;
 
   const chooseToolbar = function(){
-    switch (uiSelections.slideObjectType){
+    switch (slideObjectType){
       case "Textbox": return TEXTBOX_TOOLBAR_ITEMS;
       case "Image": return IMAGE_TOOLBAR_ITEMS;
       default: return BASE_TOOLBAR_ITEMS;
@@ -57,11 +60,10 @@ export default function PresentationPage({
     _setDoc({..._doc, ...doc});
   }, [doc]);
 
-
   return ( _loading ? null :
     (<section className='page presentation' onContextMenu={handleContextMenu}>
       <PresentationHeader {...{
-        doc, _docHook, saveDocHandler, 
+        doc, _docHook, saveDocHandler, fullScreen,
         handlePresent: () => presentHandler(currentSlideId)}
       }/>
       <section className='body'>
@@ -110,12 +112,20 @@ export default function PresentationPage({
           parentHandleBlur={handleContextMenuBlur}
         />
       </section>
-      { uiSelections.presentingSlideId &&
-        <section className="full-screen-wrapper">{
-          <FullScreenPresentationContainer slideId={674}/>
-        }</section>
-      }
+      <section className={`full-screen-wrapper${presentingSlideId !== undefined ? ' active' : ''}`}>
+        <FullScreen handle={fullScreen} onChange={(e) => {
+          if (!e) presentHandler();
+        }}>{
+          presentingSlideId &&
+            <FullScreenPresentationContainer 
+              slideId={presentingSlideId}
+              presentHandler={(slideId) => { presentHandler(slideId); }}
+              fullScreenHandle={fullScreen}
+            />
+        }</FullScreen>
+      </section>
       
     </section>)
   );
 }
+

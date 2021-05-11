@@ -6,7 +6,7 @@ const nullState = Object.freeze({wrapperIds: [], nextMenuAction: 'Select'});
 
 function SelectionReducer(state = nullState, action){
   Object.freeze(state);
-  
+
   switch (action.type){
     case UIActions.RECEIVE_SELECTED_TEXT: 
       return {

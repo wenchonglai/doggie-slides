@@ -1,6 +1,18 @@
 import { connect } from "react-redux";
 import FullScreenPresentation from "./full_screen_presentation";
 
-const FullScreenPresentationContainer = connect(null, null)(FullScreenPresentation);
+const mapSTP = ({entities, ui}, {slideId}) => ({
+  presentingSlidePage: entities.slides[slideId].page,
+  slides: Object.fromEntries(
+    Object.values(entities.slides)
+      .map(slide => [slide.page, slide])
+  )
+});
+
+const mapDTP = dispatch => ({
+  presentSli
+});
+
+const FullScreenPresentationContainer = connect(mapSTP, null)(FullScreenPresentation);
 
 export default FullScreenPresentationContainer;

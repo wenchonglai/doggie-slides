@@ -23,9 +23,9 @@ function App({errors, history, clearErrorsHandler}){
   
     return () => {
       unListenRef.current && 
-        unListenRef.current.unlisten();
+        unListenRef.current();
     }
-  }, []);
+  }, [errors]);
 
   return (
     <Switch>

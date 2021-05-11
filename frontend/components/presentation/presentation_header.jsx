@@ -7,7 +7,7 @@ import MenuContainer from './menu_container';
 import UserInfoContainer from '../session/user_info_container';
 
 
-export default function PresentationHeader({doc, _docHook, saveDocHandler, handlePresent}){
+export default function PresentationHeader({doc, _docHook, saveDocHandler, handlePresent, fullScreen}){
   return (
     <header>
       <div className='icon-wrapper'>
@@ -35,7 +35,10 @@ export default function PresentationHeader({doc, _docHook, saveDocHandler, handl
           </div>
         </div>
         <section className="titlebar-buttons">
-          <div onClick={handlePresent}>Present</div>
+          <div onClick={() => {
+            fullScreen.enter();
+            handlePresent();
+          }}>Present</div>
           <UserInfoContainer />
         </section>
       </section>

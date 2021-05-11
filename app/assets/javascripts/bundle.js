@@ -3845,7 +3845,7 @@ var updateMenuAction = function updateMenuAction(action) {
     dispatch(receiveMenuAction(action));
   };
 };
-var enterPresentMode = function enterPresentMode(slideId) {
+var enterPresentMode = function enterPresentMode(slideId, handle) {
   return function (dispatch) {
     dispatch(receivePresentingSlide(slideId));
   };
@@ -3901,9 +3901,9 @@ function App(_ref) {
       }
     });
     return function () {
-      unListenRef.current && unListenRef.current.unlisten();
+      unListenRef.current && unListenRef.current();
     };
-  }, []);
+  }, [errors]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_10__.Switch, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_10__.Route, {
     path: "/:productName/about",
     exact: true,
@@ -4217,12 +4217,50 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function FullScreenPresentation(_ref) {
-  var slideId = _ref.slideId;
+  var presentingSlidePage = _ref.presentingSlidePage,
+      slides = _ref.slides,
+      slideId = _ref.slideId,
+      presentHandler = _ref.presentHandler,
+      handle = _ref.handle;
+  var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
-  function handleClick(e) {
-    console.log(e);
+  function handleClick(e) {// console.log(presentingSlidePage, slideId, slides);
   }
 
+  function handleKeyDown(e) {
+    switch (e.key) {
+      case 'Enter':
+        ;
+
+      case 'ArrowDown':
+        ;
+
+      case 'ArrowRight':
+        {
+          if (slides[presentingSlidePage + 1]) presentHandler(presentingSlidePage + 1);
+        }
+        ;
+        break;
+
+      case 'ArrowUp':
+        ;
+
+      case 'ArrowLeft':
+        {
+          if (slides[presentingSlidePage - 1]) presentHandler(presentingSlidePage - 1);
+        }
+        ;
+        break;
+    }
+  }
+
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    eventListenerRef.current = handleKeyDown;
+    document.body.addEventListener('keydown', eventListenerRef.current, true);
+    return function () {
+      document.body.removeEventListener('keydown', eventListenerRef.current, true);
+    };
+  }, [slideId]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlidePreviewContainer, {
     onClick: function onClick(e) {
       return handleClick(e);
@@ -4250,7 +4288,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _full_screen_presentation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./full_screen_presentation */ "./frontend/components/presentation/full_screen_presentation.jsx");
 
 
-var FullScreenPresentationContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(null, null)(_full_screen_presentation__WEBPACK_IMPORTED_MODULE_1__.default);
+
+var mapSTP = function mapSTP(_ref, _ref2) {
+  var entities = _ref.entities,
+      ui = _ref.ui;
+  var slideId = _ref2.slideId;
+  return {
+    presentingSlidePage: entities.slides[slideId].page,
+    slides: Object.fromEntries(Object.values(entities.slides).map(function (slide) {
+      return [slide.page, slide];
+    }))
+  };
+};
+
+var mapDTP = function mapDTP(dispatch) {
+  return {
+    presentSli: presentSli
+  };
+};
+
+var FullScreenPresentationContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTP, null)(_full_screen_presentation__WEBPACK_IMPORTED_MODULE_1__.default);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FullScreenPresentationContainer);
 
 /***/ }),
@@ -5299,7 +5356,8 @@ function PresentationHeader(_ref) {
   var doc = _ref.doc,
       _docHook = _ref._docHook,
       saveDocHandler = _ref.saveDocHandler,
-      handlePresent = _ref.handlePresent;
+      handlePresent = _ref.handlePresent,
+      fullScreen = _ref.fullScreen;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "icon-wrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_product_icon__WEBPACK_IMPORTED_MODULE_1__.default, {
@@ -5322,7 +5380,10 @@ function PresentationHeader(_ref) {
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "titlebar-buttons"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-    onClick: handlePresent
+    onClick: function onClick() {
+      fullScreen.enter();
+      handlePresent();
+    }
   }, "Present"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_session_user_info_container__WEBPACK_IMPORTED_MODULE_6__.default, null))));
 }
 
@@ -5340,12 +5401,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ PresentationPage)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _menu_container__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./menu_container */ "./frontend/components/presentation/menu_container.js");
-/* harmony import */ var _menu_items__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./menu-items */ "./frontend/components/presentation/menu-items.js");
-/* harmony import */ var _filmstrip_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./filmstrip_container */ "./frontend/components/presentation/filmstrip_container.jsx");
-/* harmony import */ var _workspace_container__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./workspace_container */ "./frontend/components/presentation/workspace_container.js");
-/* harmony import */ var _presentation_header__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./presentation_header */ "./frontend/components/presentation/presentation_header.jsx");
-/* harmony import */ var _full_screen_presentation_container__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./full_screen_presentation_container */ "./frontend/components/presentation/full_screen_presentation_container.js");
+/* harmony import */ var react_full_screen__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-full-screen */ "./node_modules/react-full-screen/dist/index.modern.js");
+/* harmony import */ var _menu_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./menu_container */ "./frontend/components/presentation/menu_container.js");
+/* harmony import */ var _menu_items__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./menu-items */ "./frontend/components/presentation/menu-items.js");
+/* harmony import */ var _filmstrip_container__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./filmstrip_container */ "./frontend/components/presentation/filmstrip_container.jsx");
+/* harmony import */ var _workspace_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./workspace_container */ "./frontend/components/presentation/workspace_container.js");
+/* harmony import */ var _presentation_header__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./presentation_header */ "./frontend/components/presentation/presentation_header.jsx");
+/* harmony import */ var _full_screen_presentation_container__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./full_screen_presentation_container */ "./frontend/components/presentation/full_screen_presentation_container.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -5372,6 +5434,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
 var handleContextMenu = function handleContextMenu(e) {
   e.preventDefault();
 };
@@ -5383,7 +5446,7 @@ function PresentationPage(_ref) {
       fetchPresentationHandler = _ref.fetchPresentationHandler,
       updateCurrentSlideHandler = _ref.updateCurrentSlideHandler,
       saveDocHandler = _ref.saveDocHandler,
-      presentHandler = _ref.presentHandler;
+      _presentHandler = _ref.presentHandler;
 
   var _docHook = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
 
@@ -5402,17 +5465,20 @@ function PresentationPage(_ref) {
       _setRightClick = _useState4[1];
 
   var contextMenuRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var fullScreen = (0,react_full_screen__WEBPACK_IMPORTED_MODULE_1__.useFullScreenHandle)();
+  var presentingSlideId = uiSelections.presentingSlideId,
+      slideObjectType = uiSelections.slideObjectType;
 
   var chooseToolbar = function chooseToolbar() {
-    switch (uiSelections.slideObjectType) {
+    switch (slideObjectType) {
       case "Textbox":
-        return _menu_items__WEBPACK_IMPORTED_MODULE_2__.TEXTBOX_TOOLBAR_ITEMS;
+        return _menu_items__WEBPACK_IMPORTED_MODULE_3__.TEXTBOX_TOOLBAR_ITEMS;
 
       case "Image":
-        return _menu_items__WEBPACK_IMPORTED_MODULE_2__.IMAGE_TOOLBAR_ITEMS;
+        return _menu_items__WEBPACK_IMPORTED_MODULE_3__.IMAGE_TOOLBAR_ITEMS;
 
       default:
-        return _menu_items__WEBPACK_IMPORTED_MODULE_2__.BASE_TOOLBAR_ITEMS;
+        return _menu_items__WEBPACK_IMPORTED_MODULE_3__.BASE_TOOLBAR_ITEMS;
     }
   };
 
@@ -5453,18 +5519,19 @@ function PresentationPage(_ref) {
   return _loading ? null : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "page presentation",
     onContextMenu: handleContextMenu
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_presentation_header__WEBPACK_IMPORTED_MODULE_5__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_presentation_header__WEBPACK_IMPORTED_MODULE_6__.default, {
     doc: doc,
     _docHook: _docHook,
     saveDocHandler: saveDocHandler,
+    fullScreen: fullScreen,
     handlePresent: function handlePresent() {
-      return presentHandler(currentSlideId);
+      return _presentHandler(currentSlideId);
     }
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "body"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "toolbar"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_1__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_2__.default, {
     className: "toolbar-menu",
     items: chooseToolbar(),
     respondToMouseOut: false
@@ -5472,9 +5539,9 @@ function PresentationPage(_ref) {
     className: "two-panel-layout"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "filmstrip"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_filmstrip_container__WEBPACK_IMPORTED_MODULE_3__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_filmstrip_container__WEBPACK_IMPORTED_MODULE_4__.default, {
     handleContextMenu: onContextMenu
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_workspace_container__WEBPACK_IMPORTED_MODULE_4__.default, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_workspace_container__WEBPACK_IMPORTED_MODULE_5__.default, {
     handleContextMenu: onContextMenu,
     slideId: currentSlideId
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
@@ -5498,16 +5565,25 @@ function PresentationPage(_ref) {
       transform: "translate(".concat(_rightClick.x, "px, ").concat(_rightClick.y, "px)")
     },
     ref: contextMenuRef
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_1__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_2__.default, {
     className: "context-menu",
-    items: _rightClick.type === 'slide' ? _menu_items__WEBPACK_IMPORTED_MODULE_2__.SLIDE_CONTEXT_MENU_ITEMS : _menu_items__WEBPACK_IMPORTED_MODULE_2__.WRAPPER_CONTEXT_MENU_ITEMS,
+    items: _rightClick.type === 'slide' ? _menu_items__WEBPACK_IMPORTED_MODULE_3__.SLIDE_CONTEXT_MENU_ITEMS : _menu_items__WEBPACK_IMPORTED_MODULE_3__.WRAPPER_CONTEXT_MENU_ITEMS,
     respondToMouseOut: false,
     parentHandleBlur: handleContextMenuBlur
-  })), uiSelections.presentingSlideId && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
-    className: "full-screen-wrapper"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_full_screen_presentation_container__WEBPACK_IMPORTED_MODULE_6__.default, {
-    slideId: 674
-  })));
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
+    className: "full-screen-wrapper".concat(presentingSlideId !== undefined ? ' active' : '')
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_full_screen__WEBPACK_IMPORTED_MODULE_1__.FullScreen, {
+    handle: fullScreen,
+    onChange: function onChange(e) {
+      if (!e) _presentHandler();
+    }
+  }, presentingSlideId && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_full_screen_presentation_container__WEBPACK_IMPORTED_MODULE_7__.default, {
+    slideId: presentingSlideId,
+    presentHandler: function presentHandler(slideId) {
+      _presentHandler(slideId);
+    },
+    fullScreenHandle: fullScreen
+  }))));
 }
 
 /***/ }),
@@ -5559,8 +5635,8 @@ var PresentationPageContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.conn
     saveDocHandler: function saveDocHandler(doc) {
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_2__.updateDoc)(doc));
     },
-    presentHandler: function presentHandler(slideId) {
-      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_3__.enterPresentMode)(slideId));
+    presentHandler: function presentHandler(slideId, handle) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_3__.enterPresentMode)(slideId, handle));
     }
   };
 })(_presentation_page__WEBPACK_IMPORTED_MODULE_1__.default);
@@ -6203,23 +6279,25 @@ function SmartInput() {
       _ref$labelText = _ref.labelText,
       labelText = _ref$labelText === void 0 ? "" : _ref$labelText,
       children = _ref.children,
-      value = _ref.value,
+      _ref$value = _ref.value,
+      value = _ref$value === void 0 ? "" : _ref$value,
       staticContext = _ref.staticContext,
       _ref$errors = _ref.errors,
       errors = _ref$errors === void 0 ? [] : _ref$errors,
+      _onChange = _ref.onChange,
       _ref$note = _ref.note,
       note = _ref$note === void 0 ? "" : _ref$note,
-      props = _objectWithoutProperties(_ref, ["className", "labelText", "children", "value", "staticContext", "errors", "note"]);
+      props = _objectWithoutProperties(_ref, ["className", "labelText", "children", "value", "staticContext", "errors", "onChange", "note"]);
 
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
       _useState2 = _slicedToArray(_useState, 2),
       focus = _useState2[0],
       setFocus = _useState2[1];
 
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(''),
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(value),
       _useState4 = _slicedToArray(_useState3, 2),
-      inputValue = _useState4[0],
-      setInputValue = _useState4[1];
+      _value = _useState4[0],
+      _setValue = _useState4[1];
 
   function handleFocus() {
     setFocus(true);
@@ -6234,7 +6312,7 @@ function SmartInput() {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", {
     className: errors.length > 0 ? "error" : ""
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-    className: "placeholder".concat(focus ? ' focus' : '').concat(value ? ' has_val' : '')
+    className: "placeholder".concat(focus ? ' focus' : '').concat(_value ? ' has_val' : '')
   }, labelText), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", _extends({}, props, {
     onFocus: function onFocus() {
       return handleFocus();
@@ -6242,7 +6320,12 @@ function SmartInput() {
     onBlur: function onBlur() {
       return handleBlur();
     },
-    value: value
+    onChange: function onChange(e) {
+      _setValue(e.target.value);
+
+      _onChange(e);
+    },
+    value: _value
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "errors"
   }, errors[0] || note, "\xA0")), children);
@@ -7436,14 +7519,7 @@ var SVGEditable = function SVGEditable(_ref6) {
     svgDOM: svgDOM,
     isPreview: isPreview
   });
-  return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-    clipPath: "url(#".concat(clipId, ")")
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("clipPath", {
-    id: clipId
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
-    width: transform.cropWidth,
-    height: transform.cropHeight
-  })), component)) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
+  return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", null, component) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     className: "edit-frame ".concat(active ? 'active' : '')
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("clipPath", {
     id: clipId
@@ -7625,7 +7701,8 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
       createText = _ref.createText,
       handleContextMenu = _ref.handleContextMenu,
       wrappers = _ref.wrappers,
-      props = _objectWithoutProperties(_ref, ["children", "isPreview", "containerWidth", "width", "height", "slide", "slideId", "menuAction", "updateMenuAction", "createText", "handleContextMenu", "wrappers"]);
+      onClick = _ref.onClick,
+      props = _objectWithoutProperties(_ref, ["children", "isPreview", "containerWidth", "width", "height", "slide", "slideId", "menuAction", "updateMenuAction", "createText", "handleContextMenu", "wrappers", "onClick"]);
 
   var widthAttr = {};
 
@@ -7694,7 +7771,7 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     onMouseDownCapture: isPreview ? undefined : function (e) {
       return handleMouseDownCapture(e);
     },
-    onClick: isPreview ? undefined : function (e) {
+    onClick: isPreview ? onClick : function (e) {
       return handleClick(e);
     }
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
@@ -8977,6 +9054,7 @@ __webpack_require__.r(__webpack_exports__);
 var sessionErrorsReducer = function sessionErrorsReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
   var action = arguments.length > 1 ? arguments[1] : undefined;
+  console.log(state, action);
 
   switch (action.type) {
     case _actions_session_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_ERRORS:
@@ -9704,7 +9782,7 @@ var DynamicText = /*#__PURE__*/function () {
   }, {
     key: "toReactComponents",
     value: function toReactComponents() {
-      var maxWidth = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 800;
+      var maxWidth = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 960;
 
       var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
           _ref$tabValue = _ref.tabValue,
@@ -10671,6 +10749,83 @@ function toStyleString(styleObject) {
     return "".concat(k, ": ").concat(v);
   }).join("; ");
 }
+
+/***/ }),
+
+/***/ "./node_modules/fscreen/dist/fscreen.esm.js":
+/*!**************************************************!*\
+  !*** ./node_modules/fscreen/dist/fscreen.esm.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+var key = {
+    fullscreenEnabled: 0,
+    fullscreenElement: 1,
+    requestFullscreen: 2,
+    exitFullscreen: 3,
+    fullscreenchange: 4,
+    fullscreenerror: 5,
+    fullscreen: 6
+};
+var webkit = [
+    'webkitFullscreenEnabled',
+    'webkitFullscreenElement',
+    'webkitRequestFullscreen',
+    'webkitExitFullscreen',
+    'webkitfullscreenchange',
+    'webkitfullscreenerror',
+    '-webkit-full-screen',
+];
+var moz = [
+    'mozFullScreenEnabled',
+    'mozFullScreenElement',
+    'mozRequestFullScreen',
+    'mozCancelFullScreen',
+    'mozfullscreenchange',
+    'mozfullscreenerror',
+    '-moz-full-screen',
+];
+var ms = [
+    'msFullscreenEnabled',
+    'msFullscreenElement',
+    'msRequestFullscreen',
+    'msExitFullscreen',
+    'MSFullscreenChange',
+    'MSFullscreenError',
+    '-ms-fullscreen',
+];
+// so it doesn't throw if no window or document
+var document = typeof window !== 'undefined' && typeof window.document !== 'undefined' ? window.document : {};
+var vendor = (('fullscreenEnabled' in document && Object.keys(key)) ||
+    (webkit[0] in document && webkit) ||
+    (moz[0] in document && moz) ||
+    (ms[0] in document && ms) ||
+    []);
+var fscreen = {
+    requestFullscreen: function (element) { return element[vendor[key.requestFullscreen]](); },
+    requestFullscreenFunction: function (element) { return element[vendor[key.requestFullscreen]]; },
+    get exitFullscreen() { return document[vendor[key.exitFullscreen]].bind(document); },
+    get fullscreenPseudoClass() { return ":" + vendor[key.fullscreen]; },
+    addEventListener: function (type, handler, options) { return document.addEventListener(vendor[key[type]], handler, options); },
+    removeEventListener: function (type, handler, options) { return document.removeEventListener(vendor[key[type]], handler, options); },
+    get fullscreenEnabled() { return Boolean(document[vendor[key.fullscreenEnabled]]); },
+    set fullscreenEnabled(val) { },
+    get fullscreenElement() { return document[vendor[key.fullscreenElement]]; },
+    set fullscreenElement(val) { },
+    get onfullscreenchange() { return document[("on" + vendor[key.fullscreenchange]).toLowerCase()]; },
+    set onfullscreenchange(handler) { return document[("on" + vendor[key.fullscreenchange]).toLowerCase()] = handler; },
+    get onfullscreenerror() { return document[("on" + vendor[key.fullscreenerror]).toLowerCase()]; },
+    set onfullscreenerror(handler) { return document[("on" + vendor[key.fullscreenerror]).toLowerCase()] = handler; },
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (fscreen);
+//# sourceMappingURL=fscreen.esm.js.map
+
 
 /***/ }),
 
@@ -39550,6 +39705,100 @@ function checkDCE() {
 if (false) {} else {
   module.exports = __webpack_require__(/*! ./cjs/react-dom.development.js */ "./node_modules/react-dom/cjs/react-dom.development.js");
 }
+
+
+/***/ }),
+
+/***/ "./node_modules/react-full-screen/dist/index.modern.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/react-full-screen/dist/index.modern.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "FullScreen": () => (/* binding */ FullScreen),
+/* harmony export */   "useFullScreenHandle": () => (/* binding */ useFullScreenHandle)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var fscreen__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! fscreen */ "./node_modules/fscreen/dist/fscreen.esm.js");
+
+
+
+function useFullScreenHandle() {
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+      active = _useState[0],
+      setActive = _useState[1];
+
+  var node = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var handleChange = function handleChange() {
+      setActive(fscreen__WEBPACK_IMPORTED_MODULE_1__.default.fullscreenElement === node.current);
+    };
+
+    fscreen__WEBPACK_IMPORTED_MODULE_1__.default.addEventListener('fullscreenchange', handleChange);
+    return function () {
+      return fscreen__WEBPACK_IMPORTED_MODULE_1__.default.removeEventListener('fullscreenchange', handleChange);
+    };
+  }, []);
+  var enter = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(function () {
+    if (fscreen__WEBPACK_IMPORTED_MODULE_1__.default.fullscreenElement) {
+      return fscreen__WEBPACK_IMPORTED_MODULE_1__.default.exitFullscreen().then(function () {
+        return fscreen__WEBPACK_IMPORTED_MODULE_1__.default.requestFullscreen(node.current);
+      });
+    } else if (node.current) {
+      return fscreen__WEBPACK_IMPORTED_MODULE_1__.default.requestFullscreen(node.current);
+    }
+  }, []);
+  var exit = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(function () {
+    if (fscreen__WEBPACK_IMPORTED_MODULE_1__.default.fullscreenElement === node.current) {
+      return fscreen__WEBPACK_IMPORTED_MODULE_1__.default.exitFullscreen();
+    }
+
+    return Promise.resolve();
+  }, []);
+  return {
+    active: active,
+    enter: enter,
+    exit: exit,
+    node: node
+  };
+}
+var FullScreen = function FullScreen(_ref) {
+  var handle = _ref.handle,
+      onChange = _ref.onChange,
+      children = _ref.children,
+      className = _ref.className;
+  var classNames = [];
+
+  if (className) {
+    classNames.push(className);
+  }
+
+  classNames.push('fullscreen');
+
+  if (handle.active) {
+    classNames.push('fullscreen-enabled');
+  }
+
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    if (onChange) {
+      onChange(handle.active, handle);
+    }
+  }, [handle.active]);
+  return react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: classNames.join(' '),
+    ref: handle.node,
+    style: handle.active ? {
+      height: '100%',
+      width: '100%'
+    } : undefined
+  }, children);
+};
+
+
+//# sourceMappingURL=index.modern.js.map
 
 
 /***/ }),

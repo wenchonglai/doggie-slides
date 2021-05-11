@@ -64,7 +64,7 @@ export const logout = () => (dispatch) =>
       ({responseJSON}) => dispatch(receiveErrors(responseJSON))
     );
 
-export const signup = (formUser) => (dispatch) =>
+export const signup = (formUser) => (dispatch) => 
   SessionUtil.asyncSignup(formUser)
     .then(
       (user) => dispatch(receiveCurrentUser(user)),

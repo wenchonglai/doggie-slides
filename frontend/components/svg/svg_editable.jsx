@@ -148,12 +148,12 @@ const SVGEditable = function({
 
   return ( isPreview ? 
     ( <g>
-        <g clipPath={`url(#${clipId})`}>
+        {/* <g clipPath={`url(#${clipId})`}>
           <clipPath id={clipId}>
             <rect width={transform.cropWidth} height={transform.cropHeight} />
-          </clipPath> 
+          </clipPath>  */}
           {component}
-        </g>
+        {/* </g> */}
       </g>
     ) : (
       <g className={`edit-frame ${active ? 'active' : ''}`}>

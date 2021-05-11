@@ -4,8 +4,8 @@ class CreateDocs < ActiveRecord::Migration[5.2]
       t.integer :owner_id, null: false
       t.integer :share_id
       t.string :filename, null: false, default: "Untitled presentation"
-      t.integer :width, null: false, default: 800
-      t.integer :height, null: false, default: 500
+      t.integer :width, null: false, default: 960
+      t.integer :height, null: false, default: 540
 
       t.timestamps
     end
