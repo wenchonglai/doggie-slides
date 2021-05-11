@@ -128,18 +128,19 @@ const ORDER = { name: "Order", shortCut: undefined, actionName: undefined, child
 ]};
 
 export const MENU_ITEMS = [
+  /*
   { name: "Edit", icon: undefined, children: [
     CUT, COPY, PASTE, PASTE_WITHOUT_FORMATTING, SELECT_ALL
-  ]},
+  ]},*/
   { name: "View", icon: undefined, children: [
-    PRESENT, undefined, GRID_VIEW, ZOOM, undefined, SPEAKER_NOTES, undefined, FULL_SCREEN
+    PRESENT, undefined, GRID_VIEW, ZOOM, /*undefined, SPEAKER_NOTES, undefined, FULL_SCREEN*/
     
   ]},
   { name: "Insert", icon: undefined, children: [
     IMAGE, TEXTBOX, SHAPE
   ]},
   { name: "Slide", icon: undefined, children: [
-    NEW_SLIDE, DUPLICATE_SLIDE, DELETE_SLIDE, SKIP_SLIDE
+    NEW_SLIDE,/* DUPLICATE_SLIDE, */DELETE_SLIDE, SKIP_SLIDE
   ]}
 ];
 

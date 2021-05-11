@@ -6,6 +6,7 @@ const nullState = Object.freeze({wrapperIds: [], nextMenuAction: 'Select'});
 
 function SelectionReducer(state = nullState, action){
   Object.freeze(state);
+  
   switch (action.type){
     case UIActions.RECEIVE_SELECTED_TEXT: 
       return {
@@ -31,6 +32,8 @@ function SelectionReducer(state = nullState, action){
         wrapperIds: [...action.wrapperIds],
         ...action.sharedAttributes
       } : {...nullState, nextMenuAction: state.nextMenuAction}
+    case UIActions.RECEIVE_PRESENTING_SLIDE:
+      return {...state, presentingSlideId: action.slideId}
     case UIActions.RECEIVE_MENU_ACTION:
       return {...nullState, nextMenuAction: action.nextMenuAction};
     case PresentationActions.RECEIVE_SLIDE:;
@@ -45,6 +48,17 @@ function SlideSettingsReducer(state = {}, action){
   Object.freeze(state);
 
   switch (action.type){
+    case PresentationActions.RECEIVE_SLIDES: {
+      let slideId = Math.max(...Object.keys(action.slides));
+
+      for (let key of Object.keys(action.slides))
+        if (state.slideId === key){
+          slideId = key;
+          break;
+        } 
+
+      return {...state, slideId}
+    }
     case UIActions.RECEIVE_CURRENT_SLIDE:
       return {...state, slideId: action.slideId};
     case UIActions.CLEAR_UI:

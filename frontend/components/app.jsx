@@ -9,6 +9,7 @@ import SplashPage from './splash/splash_page'
 import {clearErrors} from '../actions/session_actions'
 import { connect } from 'react-redux';
 import PresentationPageContainer from './presentation/presentation_page_container';
+import FullScreenPresentationContainer from './presentation/full_screen_presentation_container';
 
 function App({errors, history, clearErrorsHandler}){
   const unListenRef = useRef();
@@ -32,7 +33,6 @@ function App({errors, history, clearErrorsHandler}){
       <AuthRoute path='/signin/identifier' exact component={SigninEmailPageContainer}/>
       <AuthRoute path='/signin/challenge' exact component={SigninPasswordPageContainer}/>
       <AuthRoute path='/signup' exact component={SignupContainer}/>
-      <ProtectedRoute path='/presentation/:slideId' component={PresentationPageContainer}/>
       <ProtectedRoute path='/presentation/' component={PresentationPageContainer}/>
       <Route path='/signin' render={() => <Redirect to="/signin/identifier"/>}/>
       <Route path='/' render={() => <Redirect to="/slides/about"/>}/>

@@ -2,6 +2,7 @@ import { getTextboxById, getTextstylesByTextbox } from "../selectors/selectors";
 
 export const RECEIVE_PAGE_SETTINGS = 'RECEIVE_PAGE_SETTINGS';
 export const RECEIVE_CURRENT_SLIDE = 'RECEIVE_CURRENT_SLIDE';
+export const RECEIVE_PRESENTING_SLIDE = 'RECEIVE_PRESENTING_SLIDE';
 export const RECEIVE_SELECTED_WRAPPERS = 'RECEIVE_SELECTED_WRAPPERS';
 export const RECEIVE_SELECTED_TEXT = 'RECEIVE_SELECTED_TEXT';
 export const RECEIVE_MENU_ACTION = 'RECEIVE_MENU_ACTION';
@@ -11,6 +12,11 @@ export const receiveCurrentSlide = (slideId) => ({
   type: RECEIVE_CURRENT_SLIDE,
   slideId
 });
+
+export const receivePresentingSlide = (slideId) => ({
+  type: RECEIVE_PRESENTING_SLIDE,
+  slideId
+})
 
 export const receiveSelectedWrappers = ({wrapperIds, sharedAttributes}) => ({
   type: RECEIVE_SELECTED_WRAPPERS,
@@ -44,8 +50,8 @@ export const updateCurrentSlide = slideId => (dispatch, getState) => {
   if (!slideId){
     const slides = getState().entities.slides;
     const slide = Object.values(slides).sort((a, b) => a.page - b.page)[0];
+
     slideId = slide.id;
-    
     newURL = `/#/presentation/${slide.docId}/slides/${slideId}`;
   } else {
     newURL = `/#/presentation/${ui.pageSettings.docId}/slides/${slideId}`;
@@ -90,10 +96,11 @@ export const updateWrapperSelection = wrapperIds => (dispatch, getState) => {
 export const deleteWrapperSelection = (arg) => (dispatch, getState) => {
   const {entities, ui} = getState();
   const wrapperIds = ui.selections.wrapperIds.filter(id => !arg.includes(id));
-  
-  dispatch(receiveSelectedWrappers(
-    getWrapperSelectionInfo(wrapperIds, entities))
-  );
+
+  if (wrapperIds.length)
+    dispatch(receiveSelectedWrappers(
+      getWrapperSelectionInfo(wrapperIds, entities))
+    );
 }
 
 export const updateUITextSelection = ({cursorOffset, selectOffset, textboxId, uiTextData}) => 
@@ -145,4 +152,8 @@ export const updateUITextSelection = ({cursorOffset, selectOffset, textboxId, ui
 
 export const updateMenuAction = (action) => (dispatch, getState) => {
   dispatch(receiveMenuAction(action));
+}
+
+export const enterPresentMode = slideId => dispatch => {
+  dispatch(receivePresentingSlide(slideId))
 }

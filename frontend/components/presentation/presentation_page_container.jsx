@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 import PresentationPage from "./presentation_page";
 import {fetchPresentation, updateDoc} from "../../actions/presentation_actions";
-import {updateCurrentSlide} from '../../actions/ui_actions';
+import {updateCurrentSlide, enterPresentMode} from '../../actions/ui_actions';
 
 const PresentationPageContainer = connect(
   ({ui, entities}, ownProps) => ({
@@ -13,7 +13,8 @@ const PresentationPageContainer = connect(
   dispatch => ({
     updateCurrentSlideHandler: (slideId) => dispatch(updateCurrentSlide(slideId)),
     fetchPresentationHandler: () => dispatch(fetchPresentation()),
-    saveDocHandler: (doc) => dispatch(updateDoc(doc))
+    saveDocHandler: (doc) => dispatch(updateDoc(doc)),
+    presentHandler: (slideId) => dispatch(enterPresentMode(slideId))
   })
 )(PresentationPage);
 

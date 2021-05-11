@@ -99,6 +99,11 @@ class Api::SlidesController < ApplicationController
     render :show
   end
 
+  def show_content
+    @slide = @slides.find_by(id: params[:id])
+    render :show_content
+  end
+
   def index
     render :index
   end

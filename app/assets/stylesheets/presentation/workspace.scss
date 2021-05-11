@@ -1,15 +1,26 @@
-section.page.presentation {
-  section.workspace {
-    background-color: #f8f9fa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    
-    svg.svg-slide > g:first-child{
-      background: #fff;
-      box-shadow: 0 1px 3px 1px #3c40430f;
-      border: 1px solid #d1d1d1;
+section.page.presentation section.workspace {
+  background-color: #f8f9fa;
+  display: block;
+  padding: 20px;
+  align-items: center;
+  position: relative;
+  overflow: auto;
+
+  > div.svg-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+
+    > svg.svg-slide {
+      transform-origin: 0 0;
+      display: block;
+      // transform: scale(1.5);
+
+      > g:first-child{
+        background: #fff;
+        box-shadow: 0 1px 3px 1px #3c40430f;
+        border: 1px solid #d1d1d1;
+      }
     }
   }
 }

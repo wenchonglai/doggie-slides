@@ -8,7 +8,6 @@ const MenuItemContainer = connect(
   }),
   dispatch => ({
     dispatch,
-    
   })
 )(MenuItem)
 

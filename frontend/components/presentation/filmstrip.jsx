@@ -75,10 +75,6 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
     _setMoveToPage(-1);
   }
 
-  useEffect(() => {
-    // history.replace(`/presentation/${currentSlideId}`);
-  }, [currentSlideId]);
-
   const slidesComponents = Object.values(slides).sort((a, b) => a.page - b.page).map(slide => 
         ( <SlidePreviewListItem 
             className={`${slide.id == currentSlideId ? 'active' : ''} ${slide.skipped ? 'skipped' : ''}`}

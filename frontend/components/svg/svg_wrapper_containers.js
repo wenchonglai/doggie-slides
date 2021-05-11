@@ -17,8 +17,8 @@ export const SVGWrapperContainer = connect(
   mapSTPCreator(false),
   (dispatch) => ({
     updateWrapperHandler: (formData) => dispatch(updateWrapper(formData)),
-    updateWrapperSelection: (wrapperIds) => dispatch(updateWrapperSelection(wrapperIds)),
-    deleteWrapperSelection: (wrapperIds) => dispatch(deleteWrapperSelection(wrapperIds))
+    updateWrapperSelection: (wrapperIds) => {dispatch(updateWrapperSelection(wrapperIds))},
+    deleteWrapperSelection: (wrapperIds) => {dispatch(deleteWrapperSelection(wrapperIds))}
   })
 )(SVGWrapper);
 

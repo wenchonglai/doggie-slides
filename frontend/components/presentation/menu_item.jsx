@@ -2,18 +2,6 @@ import React from 'react';
 import * as ItemThunkActions from '../../actions/item_thunk_actions';
 import MenuIcon from '../utils/menu_icon';
 
-const handleBlur = e => {
-  const currentTarget = e.nativeEvent.path[3];
-  let htmlElement = e.relatedTarget;
-
-  while (htmlElement){
-    if (htmlElement === currentTarget){
-      e.preventDefault(); e.stopPropagation();
-    }
-    htmlElement = htmlElement.parentNode;
-  }
-};
-
 function filterInput(value, {min = 1, max = 100} = {}){
   if (Number.isNaN(Number(value))){
     return undefined;
@@ -53,12 +41,29 @@ function ImageUpload({item, handleChange}){
 
 export default function MenuItem({
   className="", item, dispatch, onClick, onMouseMove,
-  parentData, parentHandleChange
+  parentData, parentHandleChange, parentHandleBlur
 }){
+
+  const handleBlur = e => {
+    const currentTarget = e.nativeEvent.path[3];
+    let htmlElement = e.relatedTarget;
+
+    while (htmlElement){
+      if (htmlElement === currentTarget){
+        e.preventDefault(); e.stopPropagation();
+        return;
+      }
+      htmlElement = htmlElement.parentNode;
+    }
+
+    parentHandleBlur && parentHandleBlur(e);
+  };
 
   function handleChange(e, value = undefined){
     let func;
 
+    value ||= e.target.value;
+    
     switch (typeof item.actionName){
       case 'string': func = ItemThunkActions[item.actionName]; break;
       default: func = item.actionName; break;
@@ -88,18 +93,22 @@ export default function MenuItem({
       case 'input': return (
         <input type="text" 
           onBlur={handleBlur}
+          onKeyDownCapture={(e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter'){
+              let value = filterInput(parentData.replace('px', ''));
+              if (value){
+                dispatch(ItemThunkActions[item.actionName](value + 'px'));
+                handleBlur(e);
+              }
+            }
+          }}
           onChange={(e) => {
+            e.stopPropagation();
             parentHandleChange && 
               parentHandleChange(e,
                 (e.currentTarget.value + 'px') || parentData
               );
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter'){
-              let value = filterInput(parentData.replace('px', ''));
-              if (value)
-                dispatch(ItemThunkActions[item.actionName](value + 'px'));
-            }
           }}
           value={parentData ? parentData.replace('px', '') : ''}
         />

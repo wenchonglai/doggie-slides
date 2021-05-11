@@ -28,6 +28,9 @@ export const RECEIVE_SLIDE = 'RECEIVE_SLIDE';
 export const receiveSlides = (slides) => ({ type: RECEIVE_SLIDES, slides });
 export const receiveSlide = (slide) => ({ type: RECEIVE_SLIDE, slide });
 
+export const RECEIVE_SLIDE_CONTENT = 'RECEIVE_SLIDE_CONTENT';
+export const receiveSlideContent = (data) => ({type: RECEIVE_SLIDE_CONTENT, data});
+
 export const RECEIVE_WRAPPERS = "RECEIVE_WRAPPERS";
 export const RECEIVE_WRAPPER = "RECEIVE_WRAPPER";
 
@@ -74,6 +77,12 @@ export const updateDoc = (formDoc) => (dispatch) =>
 
 // slides
 
+export const fetchSlide = () => (dispatch) => 
+  PresentationUtils.asyncFetchSlideContent()
+    .then((data) => {
+      dispatch(receiveSlideContent(data))
+    })
+
 export const moveSlide = ({start, end=start, offset}) => (dispatch) => {
   return PresentationUtils.asyncMoveSlide({start, end, offset})
     .then((slides) => {
@@ -86,6 +95,7 @@ export const addSlide = (formSlide) => (dispatch) =>
   PresentationUtils.asyncAddSlide(formSlide)
     .then((slide) => {
       dispatch(receiveSlide(slide));
+      console.log(slide);
       return slide;
     });
 

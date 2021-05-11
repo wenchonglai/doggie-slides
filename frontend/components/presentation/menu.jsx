@@ -99,6 +99,7 @@ function DropdownMenu({
         onClick={requireClick ? (e) => {toggleVisibility(e)} : null}
         onMouseOver={requireClick ? null : (e) => handleMouseOver(e) }
         parentHandleChange={handleChange}
+        parentHandleBlur={handleBlur}
         parentData={_data}
       />
 

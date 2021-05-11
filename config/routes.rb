@@ -25,6 +25,7 @@ Rails.application.routes.draw do
     patch '/wrappers/move', to: 'wrappers#move'
     resources :wrappers, only: [:create, :destroy, :update, :show, :index]
 
+    get '/slides/:id/show_content', to: 'slides#show_content'
     patch '/slides/move', to: 'slides#move'
     resources :slides, only: [:create, :destroy, :update, :show, :index]
 

@@ -23,10 +23,10 @@ const TextStyleReducer = (state = {}, action) => {
     }
     case PresentationActions.RECEIVE_TEXT: 
       return {...state, ...action.textData.textstylesAttributes}
-    case PresentationActions.RECEIVE_TEXTSTYLES: 
-      return action.textstyles;
-    case PresentationActions.RECEIVE_TEXTSTYLE: 
-      return {...state, [action.textstyle.id]: action.textstyle};
+    // case PresentationActions.RECEIVE_TEXTSTYLES: 
+    //   return action.textstyles;
+    // case PresentationActions.RECEIVE_TEXTSTYLE: 
+    //   return {...state, [action.textstyle.id]: action.textstyle};
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.textstyles; 
     default:
@@ -46,10 +46,10 @@ const TextboxReducer = (state = {}, action) => {
     }
     case PresentationActions.RECEIVE_ENTITIES:
       return action.entities.textboxes; 
-    case PresentationActions.RECEIVE_TEXTBOXES: 
-      return action.textboxes;
-    case PresentationActions.RECEIVE_TEXTBOX: 
-      return {...state, [action.textbox.id]: action.textbox};
+    // case PresentationActions.RECEIVE_TEXTBOXES: 
+    //   return action.textboxes;
+    // case PresentationActions.RECEIVE_TEXTBOX: 
+    //   return {...state, [action.textbox.id]: action.textbox};
     default:
       return state;
   }
@@ -75,7 +75,7 @@ const WrapperReducer = (state = {}, action) => {
 
 const SlidesReducer = (state = {}, action) => {
   Object.freeze(state);
-
+  
   switch (action.type){
     case PresentationActions.RECEIVE_WRAPPERS: {
       return {...state}
@@ -89,7 +89,6 @@ const SlidesReducer = (state = {}, action) => {
       const wrapperIds = Array.from(
         new Set([...slideData.wrapperIds, wrapperId])
       );
-
       return {...state, [slideId]: {...slideData, wrapperIds}};
     } 
     case PresentationActions.RECEIVE_ENTITIES:

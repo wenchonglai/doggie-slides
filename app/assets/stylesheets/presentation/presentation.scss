@@ -67,6 +67,9 @@ section.page.presentation{
       .titlebar-buttons{
         padding: 0 12px 0 16px;
         align-self: center;
+        display: flex;
+        align-items: center;
+        flex-direction: row; 
       }
     }
   }
@@ -115,8 +118,7 @@ section.page.presentation{
 
         > section.workspace {
           border-left: 1px solid #dadce0;
-          flex: 1 0 auto;
-          overflow: scroll;
+          flex: 1 1 auto;
         }
       }
     }
@@ -128,6 +130,41 @@ section.page.presentation{
       z-index: 1;
       overflow: hidden;
       user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      > a {
+        height: 24px;
+        width: 24px;
+        border-radius: 18px;
+        margin-top: 12px;
+        user-select: none;
+        background-size: cover;
+        overflow: none;
+        border: 6px solid #fff;
+
+        &:hover {
+          border-color: #f1f3f4;
+        }
+
+        &.linkedin {
+          background-image: image-url('external-icons.png');
+          background-position-y: 100%;
+        }
+        &.github {
+          background-image: image-url('external-icons.png');
+        }
+      }
     }
+  }
+
+  >section.full-screen-wrapper{
+    position: fixed;
+    // display: none;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    z-index: 999;
   }
 }

@@ -32,6 +32,11 @@ export const asyncMoveSlide = (data) => $.ajax({
   data: {slide: data}
 });
 
+export const asyncFetchSlideContent = (slideId) => $.ajax({
+  method: 'GET',
+  url: `/api/slides/${slideId}/show_content`,
+});
+
 export const asyncUpdateWrapper = (wrapper) => $.ajax({ // params: { wrapper: { ...wrapper, width, height, x, y, rotate } }
   method: 'PATCH',
   url: `/api/wrappers/${wrapper.id}`,

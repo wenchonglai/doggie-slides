@@ -216,7 +216,6 @@ export default function SVGWrapper({
         svgDOM && svgDOM.addEventListener('mousedown', eventListenerRef.current);
         updateWrapperSelection([wrapper.id]);
       } else {
-        
         svgDOM && svgDOM.removeEventListener('mousedown', eventListenerRef.current);
         deleteWrapperSelection([wrapper.id]);
       }
