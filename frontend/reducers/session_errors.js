@@ -1,7 +1,6 @@
 import * as SessionActions from '../actions/session_actions';
 
 const sessionErrorsReducer = (state = [], action) => {
-  console.log(state, action)
   switch (action.type){
     case SessionActions.RECEIVE_ERRORS: 
       return action.errors;

@@ -1,21 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
+import useSizeAware from "react-resize-aware";
 import {SVGSlidePreviewContainer} from '../svg/svg_slide_containers';
 
-function SlidePreviewListItem({
-  pageWidth, pageHeight, className, slide, clickHandler, dragStartHandler, dragOverHandler, dragEndHandler
+function SlidePreviewItem({
+  pageWidth, pageHeight, className, slide, isGridView,
+  clickHandler, dragStartHandler, dragOverHandler, dragEndHandler
 }){
-  const width = 150;
-  const height = 150 * pageHeight / pageWidth | 0;
+  const width = isGridView ? 300 : 150;
+  const height = width * pageHeight / pageWidth | 0;
 
   return (
-    <li className={`filmstrip-item ${className}`}
+    <div className={`filmstrip-item ${className}`}
       draggable={true}
       onMouseDown={(e) => clickHandler(e, slide.id)}
+      onDoubleClick={(e) => clickHandler(e, slide.id, true)}
       onDragStart={(e) => dragStartHandler(e, slide.id)}
       onDragEnd={(e) => dragEndHandler(e, slide.id)}
       onDragOver={(e) => dragOverHandler(e, slide.page)}
     >
-      <svg width="200px" height={height + 16}>
+      <svg width={isGridView ? width : "200px"} height={height + 16}>
         <defs>
           <clipPath id="clipping-mask">
             <rect x={0} y={8} width={width} height={height} />
@@ -25,7 +28,7 @@ function SlidePreviewListItem({
           {slide.page}
         </text>
         
-        <g transform="translate(40 0)">
+        <g transform={`translate(${isGridView ? 0 : 40} 0)`}>
           <rect x={-2} y={6} className="box" width={width + 4} height={height + 4} rx={4}></rect>
           <g clipPath="url(#clipping-mask)">
             <SVGSlidePreviewContainer containerWidth={width} slideId={slide.id}/>
@@ -33,16 +36,21 @@ function SlidePreviewListItem({
           <rect x={-2} y={6} className="skip-box" width={width + 4} height={height + 4} rx={4}></rect>
         </g>
       </svg>
-    </li>
+    </div>
   )
 }
 
-export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides, history, moveSlideHandler, updateCurrentSlideHandler, handleContextMenu}){
+export default function FilmStrip({
+  pageWidth, pageHeight, currentSlideId, slides, isGridView, 
+  moveSlideHandler, updateCurrentSlideHandler, handleContextMenu
+}){
   const [_moveToPage, _setMoveToPage] = useState(-1);
+  const [_ulWidth, _setULWidth] = useState();
   const animationFrameRef = useRef();
+  const [resizeListener, sizes] = useSizeAware();
 
-  function clickHandler(e, slideId){
-    updateCurrentSlideHandler(slideId);
+  function clickHandler(e, slideId, forceRedirect){
+    updateCurrentSlideHandler(slideId, !isGridView || forceRedirect);
   };
 
   function dragStartHandler(e, slideId){
@@ -56,11 +64,10 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
   function dragOverHandler(e, page){
     e.preventDefault();
 
-    
     cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = requestAnimationFrame(() => {
-      const y = e.nativeEvent.offsetY;
-      const halfHeight = pageHeight / pageWidth * 75 + 8;
+      const y = e.nativeEvent[isGridView ? "offsetX" : "offsetY"];
+      const halfHeight = isGridView ? 150 : pageHeight / pageWidth * 75 + 8;
       
       if (y > halfHeight) page += 1;
       if (page && page !== _moveToPage){ _setMoveToPage(page); }
@@ -76,26 +83,43 @@ export default function FilmStrip({pageWidth, pageHeight, currentSlideId, slides
   }
 
   const slidesComponents = Object.values(slides).sort((a, b) => a.page - b.page).map(slide => 
-        ( <SlidePreviewListItem 
-            className={`${slide.id == currentSlideId ? 'active' : ''} ${slide.skipped ? 'skipped' : ''}`}
-            key={slide.id}
-            {...{slide, pageWidth, pageHeight, clickHandler, dragOverHandler, dragStartHandler, dragEndHandler}}
-          />
-        )
-      );
+    ( <SlidePreviewItem 
+        className={`${slide.id == currentSlideId ? 'active' : ''} ${slide.skipped ? 'skipped' : ''}`}
+        key={slide.id}
+        {...{slide, isGridView, pageWidth, pageHeight, clickHandler, dragOverHandler, dragStartHandler, dragEndHandler}}
+      />
+    )
+  );
 
   const length = slidesComponents.length;
   const children = [];
 
-  for (let i = 0; i <= 2 * length; i += 1){
-    children.push( (i & 1) == 0 ? 
-      (<hr className={((_moveToPage - 1) == i >> 1) ? 'active' : ''} key={(i >> 1) - 0.5}/>) : (slidesComponents[i >> 1])
+  for (let i = 0; i < length; i += 1){
+    children.push(
+      <li key={i}>
+        <div>
+          <hr className={((_moveToPage - 1) == i) ? 'active' : ''}/>
+          {slidesComponents[i]}
+          { i === length - 1 && 
+              <hr className={((_moveToPage - 1) == i + 1) ? 'active' : ''}/>
+          }
+        </div>
+      </li>
     );
   }
   
+  useEffect(() => {
+    isGridView && _setULWidth( ((sizes.width - 14) / 326 | 0) * 326 + 14 );
+  }, [sizes]);
+
   return (
-    <ul className='filmstrip' onContextMenu={(e) => handleContextMenu(e, 'slide')}>
-      {children}
-    </ul>
+    <div>
+      {resizeListener}
+      <ul className='filmstrip' onContextMenu={(e) => handleContextMenu(e, 'slide')}
+        style={isGridView ? {width: _ulWidth} : {}}
+      >
+       {children}
+      </ul>
+    </div>
   )
 };

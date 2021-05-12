@@ -43,7 +43,7 @@ export const clearUI = () => ({
   type: CLEAR_UI
 })
 
-export const updateCurrentSlide = slideId => (dispatch, getState) => {
+export const updateCurrentSlide = (slideId, redirect) => (dispatch, getState) => {
   let {ui} = getState();
   let newURL = '';
 
@@ -58,7 +58,7 @@ export const updateCurrentSlide = slideId => (dispatch, getState) => {
   }
  
   dispatch(receiveCurrentSlide(slideId));
-  window.location.replace(newURL);
+  redirect && window.location.replace(newURL);
 }
 
 function getCommonAttributes(obj1, obj2, ...keys){

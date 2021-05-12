@@ -4,6 +4,7 @@ import AutosaveInputContainer from '../utils/autosave_input_container';
 import LastUpdate from '../utils/last_update';
 import { MENU_ITEMS } from "./menu-items";
 import MenuContainer from './menu_container';
+import MenuIcon from "../utils/menu_icon";
 import UserInfoContainer from '../session/user_info_container';
 
 
@@ -35,10 +36,13 @@ export default function PresentationHeader({doc, _docHook, saveDocHandler, handl
           </div>
         </div>
         <section className="titlebar-buttons">
-          <div onClick={() => {
+          <div className="button present-button" onClick={() => {
             fullScreen.enter();
             handlePresent();
-          }}>Present</div>
+          }}>
+            <MenuIcon icon={[0, 13]}/>
+            Present
+          </div>
           <UserInfoContainer />
         </section>
       </section>

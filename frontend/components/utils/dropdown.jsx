@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-export default function Dropdown({className, children, active=false, requireClick=true, nextMenuAction, name}) {
+export default function Dropdown({className='', children, active=false, requireClick=true, nextMenuAction, name}) {
   const [_active, _setActive] = useState(active);
   const _timeout = useRef();
   const hasChild = !!children[1];

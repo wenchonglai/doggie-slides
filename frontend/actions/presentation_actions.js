@@ -95,7 +95,6 @@ export const addSlide = (formSlide) => (dispatch) =>
   PresentationUtils.asyncAddSlide(formSlide)
     .then((slide) => {
       dispatch(receiveSlide(slide));
-      console.log(slide);
       return slide;
     });
 

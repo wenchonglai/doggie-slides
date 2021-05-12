@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function MenuIcon({className, icon=[-1, -1]}){
+export default function MenuIcon({className='', icon=[-1, -1]}){
   return (
     <div 
       className={`menu-icon ${className}`}

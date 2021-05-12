@@ -3419,7 +3419,6 @@ var addSlide = function addSlide(formSlide) {
   return function (dispatch) {
     return _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__.asyncAddSlide(formSlide).then(function (slide) {
       dispatch(receiveSlide(slide));
-      console.log(slide);
       return slide;
     });
   };
@@ -3715,7 +3714,7 @@ var clearUI = function clearUI() {
     type: CLEAR_UI
   };
 };
-var updateCurrentSlide = function updateCurrentSlide(slideId) {
+var updateCurrentSlide = function updateCurrentSlide(slideId, redirect) {
   return function (dispatch, getState) {
     var _getState = getState(),
         ui = _getState.ui;
@@ -3734,7 +3733,7 @@ var updateCurrentSlide = function updateCurrentSlide(slideId) {
     }
 
     dispatch(receiveCurrentSlide(slideId));
-    window.location.replace(newURL);
+    redirect && window.location.replace(newURL);
   };
 };
 
@@ -3973,7 +3972,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ FilmStrip)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../svg/svg_slide_containers */ "./frontend/components/svg/svg_slide_containers.jsx");
+/* harmony import */ var react_resize_aware__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-resize-aware */ "./node_modules/react-resize-aware/dist/index.js");
+/* harmony import */ var react_resize_aware__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_resize_aware__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../svg/svg_slide_containers */ "./frontend/components/svg/svg_slide_containers.jsx");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -3989,22 +3990,27 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-function SlidePreviewListItem(_ref) {
+
+function SlidePreviewItem(_ref) {
   var pageWidth = _ref.pageWidth,
       pageHeight = _ref.pageHeight,
       className = _ref.className,
       slide = _ref.slide,
+      isGridView = _ref.isGridView,
       clickHandler = _ref.clickHandler,
       dragStartHandler = _ref.dragStartHandler,
       dragOverHandler = _ref.dragOverHandler,
       dragEndHandler = _ref.dragEndHandler;
-  var width = 150;
-  var height = 150 * pageHeight / pageWidth | 0;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", {
+  var width = isGridView ? 300 : 150;
+  var height = width * pageHeight / pageWidth | 0;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "filmstrip-item ".concat(className),
     draggable: true,
     onMouseDown: function onMouseDown(e) {
       return clickHandler(e, slide.id);
+    },
+    onDoubleClick: function onDoubleClick(e) {
+      return clickHandler(e, slide.id, true);
     },
     onDragStart: function onDragStart(e) {
       return dragStartHandler(e, slide.id);
@@ -4016,7 +4022,7 @@ function SlidePreviewListItem(_ref) {
       return dragOverHandler(e, slide.page);
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", {
-    width: "200px",
+    width: isGridView ? width : "200px",
     height: height + 16
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("defs", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("clipPath", {
     id: "clipping-mask"
@@ -4031,7 +4037,7 @@ function SlidePreviewListItem(_ref) {
     fontSize: "12",
     className: "page-number"
   }, slide.page), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-    transform: "translate(40 0)"
+    transform: "translate(".concat(isGridView ? 0 : 40, " 0)")
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     x: -2,
     y: 6,
@@ -4041,7 +4047,7 @@ function SlidePreviewListItem(_ref) {
     rx: 4
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
     clipPath: "url(#clipping-mask)"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_1__.SVGSlidePreviewContainer, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_svg_slide_containers__WEBPACK_IMPORTED_MODULE_2__.SVGSlidePreviewContainer, {
     containerWidth: width,
     slideId: slide.id
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
@@ -4059,7 +4065,7 @@ function FilmStrip(_ref2) {
       pageHeight = _ref2.pageHeight,
       currentSlideId = _ref2.currentSlideId,
       slides = _ref2.slides,
-      history = _ref2.history,
+      isGridView = _ref2.isGridView,
       moveSlideHandler = _ref2.moveSlideHandler,
       updateCurrentSlideHandler = _ref2.updateCurrentSlideHandler,
       handleContextMenu = _ref2.handleContextMenu;
@@ -4069,10 +4075,20 @@ function FilmStrip(_ref2) {
       _moveToPage = _useState2[0],
       _setMoveToPage = _useState2[1];
 
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(),
+      _useState4 = _slicedToArray(_useState3, 2),
+      _ulWidth = _useState4[0],
+      _setULWidth = _useState4[1];
+
   var animationFrameRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
-  function clickHandler(e, slideId) {
-    updateCurrentSlideHandler(slideId);
+  var _useSizeAware = react_resize_aware__WEBPACK_IMPORTED_MODULE_1___default()(),
+      _useSizeAware2 = _slicedToArray(_useSizeAware, 2),
+      resizeListener = _useSizeAware2[0],
+      sizes = _useSizeAware2[1];
+
+  function clickHandler(e, slideId, forceRedirect) {
+    updateCurrentSlideHandler(slideId, !isGridView || forceRedirect);
   }
 
   ;
@@ -4089,8 +4105,8 @@ function FilmStrip(_ref2) {
     e.preventDefault();
     cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = requestAnimationFrame(function () {
-      var y = e.nativeEvent.offsetY;
-      var halfHeight = pageHeight / pageWidth * 75 + 8;
+      var y = e.nativeEvent[isGridView ? "offsetX" : "offsetY"];
+      var halfHeight = isGridView ? 150 : pageHeight / pageWidth * 75 + 8;
       if (y > halfHeight) page += 1;
 
       if (page && page !== _moveToPage) {
@@ -4116,10 +4132,11 @@ function FilmStrip(_ref2) {
   var slidesComponents = Object.values(slides).sort(function (a, b) {
     return a.page - b.page;
   }).map(function (slide) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SlidePreviewListItem, {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SlidePreviewItem, {
       className: "".concat(slide.id == currentSlideId ? 'active' : '', " ").concat(slide.skipped ? 'skipped' : ''),
       key: slide.id,
       slide: slide,
+      isGridView: isGridView,
       pageWidth: pageWidth,
       pageHeight: pageHeight,
       clickHandler: clickHandler,
@@ -4131,19 +4148,28 @@ function FilmStrip(_ref2) {
   var length = slidesComponents.length;
   var children = [];
 
-  for (var i = 0; i <= 2 * length; i += 1) {
-    children.push((i & 1) == 0 ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("hr", {
-      className: _moveToPage - 1 == i >> 1 ? 'active' : '',
-      key: (i >> 1) - 0.5
-    }) : slidesComponents[i >> 1]);
+  for (var i = 0; i < length; i += 1) {
+    children.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("li", {
+      key: i
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("hr", {
+      className: _moveToPage - 1 == i ? 'active' : ''
+    }), slidesComponents[i], i === length - 1 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("hr", {
+      className: _moveToPage - 1 == i + 1 ? 'active' : ''
+    }))));
   }
 
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    isGridView && _setULWidth(((sizes.width - 14) / 326 | 0) * 326 + 14);
+  }, [sizes]);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, resizeListener, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
     className: "filmstrip",
     onContextMenu: function onContextMenu(e) {
       return handleContextMenu(e, 'slide');
-    }
-  }, children);
+    },
+    style: isGridView ? {
+      width: _ulWidth
+    } : {}
+  }, children));
 }
 ;
 
@@ -4184,8 +4210,8 @@ var mapSTP = function mapSTP(_ref) {
 
 var mapDTP = function mapDTP(dispatch) {
   return {
-    updateCurrentSlideHandler: function updateCurrentSlideHandler(slideId) {
-      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateCurrentSlide)(slideId));
+    updateCurrentSlideHandler: function updateCurrentSlideHandler(slideId, redirect) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateCurrentSlide)(slideId, redirect));
     },
     moveSlideHandler: function moveSlideHandler(data) {
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.moveSlide)(data));
@@ -5344,7 +5370,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_last_update__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/last_update */ "./frontend/components/utils/last_update.jsx");
 /* harmony import */ var _menu_items__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./menu-items */ "./frontend/components/presentation/menu-items.js");
 /* harmony import */ var _menu_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./menu_container */ "./frontend/components/presentation/menu_container.js");
-/* harmony import */ var _session_user_info_container__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../session/user_info_container */ "./frontend/components/session/user_info_container.jsx");
+/* harmony import */ var _utils_menu_icon__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils/menu_icon */ "./frontend/components/utils/menu_icon.jsx");
+/* harmony import */ var _session_user_info_container__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../session/user_info_container */ "./frontend/components/session/user_info_container.jsx");
+
 
 
 
@@ -5380,11 +5408,14 @@ function PresentationHeader(_ref) {
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "titlebar-buttons"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "button present-button",
     onClick: function onClick() {
       fullScreen.enter();
       handlePresent();
     }
-  }, "Present"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_session_user_info_container__WEBPACK_IMPORTED_MODULE_6__.default, null))));
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_6__.default, {
+    icon: [0, 13]
+  }), "Present"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_session_user_info_container__WEBPACK_IMPORTED_MODULE_7__.default, null))));
 }
 
 /***/ }),
@@ -5398,16 +5429,20 @@ function PresentationHeader(_ref) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ PresentationPage)
+/* harmony export */   "PresentationPage": () => (/* binding */ PresentationPage),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_full_screen__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-full-screen */ "./node_modules/react-full-screen/dist/index.modern.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var _menu_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./menu_container */ "./frontend/components/presentation/menu_container.js");
 /* harmony import */ var _menu_items__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./menu-items */ "./frontend/components/presentation/menu-items.js");
 /* harmony import */ var _filmstrip_container__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./filmstrip_container */ "./frontend/components/presentation/filmstrip_container.jsx");
 /* harmony import */ var _workspace_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./workspace_container */ "./frontend/components/presentation/workspace_container.js");
 /* harmony import */ var _presentation_header__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./presentation_header */ "./frontend/components/presentation/presentation_header.jsx");
 /* harmony import */ var _full_screen_presentation_container__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./full_screen_presentation_container */ "./frontend/components/presentation/full_screen_presentation_container.js");
+/* harmony import */ var _utils_menu_icon__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../utils/menu_icon */ "./frontend/components/utils/menu_icon.jsx");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -5435,6 +5470,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
+
 var handleContextMenu = function handleContextMenu(e) {
   e.preventDefault();
 };
@@ -5443,6 +5480,7 @@ function PresentationPage(_ref) {
   var currentSlideId = _ref.currentSlideId,
       doc = _ref.doc,
       uiSelections = _ref.uiSelections,
+      history = _ref.history,
       fetchPresentationHandler = _ref.fetchPresentationHandler,
       updateCurrentSlideHandler = _ref.updateCurrentSlideHandler,
       saveDocHandler = _ref.saveDocHandler,
@@ -5454,15 +5492,20 @@ function PresentationPage(_ref) {
       _doc = _docHook2[0],
       _setDoc = _docHook2[1];
 
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true),
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
       _useState2 = _slicedToArray(_useState, 2),
-      _loading = _useState2[0],
-      _setLoading = _useState2[1];
+      _gridView = _useState2[0],
+      _setGridView = _useState2[1];
 
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true),
       _useState4 = _slicedToArray(_useState3, 2),
-      _rightClick = _useState4[0],
-      _setRightClick = _useState4[1];
+      _loading = _useState4[0],
+      _setLoading = _useState4[1];
+
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+      _useState6 = _slicedToArray(_useState5, 2),
+      _rightClick = _useState6[0],
+      _setRightClick = _useState6[1];
 
   var contextMenuRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   var fullScreen = (0,react_full_screen__WEBPACK_IMPORTED_MODULE_1__.useFullScreenHandle)();
@@ -5500,12 +5543,21 @@ function PresentationPage(_ref) {
     _setLoading(true);
   }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var pathname = history.location.pathname;
+    var isGridView = !pathname.match(/\/\d+\/?$/);
+
+    if (isGridView && _gridView === false) {
+      _setGridView(true);
+    } else if (!isGridView && _gridView === true) {
+      _setGridView(false);
+    }
+  }, [history.location.pathname]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     if (_rightClick) {
       contextMenuRef.current.focus();
     }
   }, [_rightClick]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    // updateCurrentSlideHandler(currentSlideId);
     if (doc) {
       if (!currentSlideId) {
         updateCurrentSlideHandler();
@@ -5538,15 +5590,34 @@ function PresentationPage(_ref) {
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "two-panel-layout"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
-    className: "filmstrip"
+    className: "filmstrip".concat(_gridView ? ' grid-view' : '')
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_filmstrip_container__WEBPACK_IMPORTED_MODULE_4__.default, {
-    handleContextMenu: onContextMenu
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_workspace_container__WEBPACK_IMPORTED_MODULE_5__.default, {
+    handleContextMenu: onContextMenu,
+    isGridView: _gridView
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
+    className: "view-options"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.NavLink, {
+    exact: true,
+    to: history.location.pathname.replace(/\/\d+\/?$/, '') + "/".concat(currentSlideId),
+    activeClassName: "selected"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_8__.default, {
+    icon: [1, 13]
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.NavLink, {
+    exact: true,
+    to: history.location.pathname.replace(/\/\d+\/?$/, ''),
+    activeClassName: "selected"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_8__.default, {
+    icon: [2, 13]
+  }))))), _gridView || /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_workspace_container__WEBPACK_IMPORTED_MODULE_5__.default, {
     handleContextMenu: onContextMenu,
     slideId: currentSlideId
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "app-switcher"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
+    className: "portfolio",
+    title: "Wenchong's Portfolio",
+    href: "https://wenchonglai.github.io/portfolio/"
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
     className: "linkedin",
     title: "LinkedIn",
     href: "https://www.linkedin.com/in/wenchong-lai-4296424b/"
@@ -5585,6 +5656,7 @@ function PresentationPage(_ref) {
     fullScreenHandle: fullScreen
   }))));
 }
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_router_dom__WEBPACK_IMPORTED_MODULE_10__.withRouter)(PresentationPage));
 
 /***/ }),
 
@@ -8556,7 +8628,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 function Dropdown(_ref) {
-  var className = _ref.className,
+  var _ref$className = _ref.className,
+      className = _ref$className === void 0 ? '' : _ref$className,
       children = _ref.children,
       _ref$active = _ref.active,
       active = _ref$active === void 0 ? false : _ref$active,
@@ -8692,7 +8765,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 
 function MenuIcon(_ref) {
-  var className = _ref.className,
+  var _ref$className = _ref.className,
+      className = _ref$className === void 0 ? '' : _ref$className,
       _ref$icon = _ref.icon,
       icon = _ref$icon === void 0 ? [-1, -1] : _ref$icon;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
@@ -9054,7 +9128,6 @@ __webpack_require__.r(__webpack_exports__);
 var sessionErrorsReducer = function sessionErrorsReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
   var action = arguments.length > 1 ? arguments[1] : undefined;
-  console.log(state, action);
 
   switch (action.type) {
     case _actions_session_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_ERRORS:
@@ -41668,6 +41741,18 @@ function warning(message) {
   /* eslint-enable no-empty */
 
 }
+
+/***/ }),
+
+/***/ "./node_modules/react-resize-aware/dist/index.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/react-resize-aware/dist/index.js ***!
+  \*******************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var e=__webpack_require__(/*! react */ "./node_modules/react/index.js"),n={display:"block",opacity:0,position:"absolute",top:0,left:0,height:"100%",width:"100%",overflow:"hidden",pointerEvents:"none",zIndex:-1},t=function(t){var r=t.onResize,u=e.useRef();return function(n,t){var r=function(){return n.current&&n.current.contentDocument&&n.current.contentDocument.defaultView};function u(){t();var e=r();e&&e.addEventListener("resize",t)}e.useEffect((function(){return r()?u():n.current&&n.current.addEventListener&&n.current.addEventListener("load",u),function(){var e=r();e&&"function"==typeof e.removeEventListener&&e.removeEventListener("resize",t)}}),[])}(u,(function(){return r(u)})),e.createElement("iframe",{style:n,src:"about:blank",ref:u,"aria-hidden":!0,tabIndex:-1,frameBorder:0})},r=function(e){return{width:null!=e?e.offsetWidth:null,height:null!=e?e.offsetHeight:null}};module.exports=function(n){void 0===n&&(n=r);var u=e.useState(n(null)),o=u[0],i=u[1],c=e.useCallback((function(e){return i(n(e.current))}),[n]);return[e.useMemo((function(){return e.createElement(t,{onResize:c})}),[c]),o]};
+//# sourceMappingURL=index.js.map
+
 
 /***/ }),
 

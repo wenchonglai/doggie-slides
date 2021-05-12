@@ -1,62 +1,92 @@
-ul.filmstrip{
-  position: relative;
-  * {
-    font-family: "Roboto",Helvetica,Arial,sans-serif;
-    user-select: none;
-  }
-
-  > hr, >li {
-    margin: 0 24px 0 0;
+section {
+  ul.filmstrip{
     position: relative;
-  }
 
-  > hr {
-    border: 1px solid transparent; 
-    margin: 0 24px 0 0;
-  }
-
-  > li {
-    display: flex;
-
-    > text.page-number {
-      display: flex;
-      justify-content: flex-end;
-      font-size: 12px;
-      width: 24px;
-      margin-right: 10px;
+    * {
+      font-family: "Roboto",Helvetica,Arial,sans-serif;
+      user-select: none;
     }
 
-    rect.box {
-      box-sizing: border-box;
-      stroke: #dadce0;
-      stroke-width: 1px;
-      border-radius: 4px;
-      background: #fff;
-      fill: none;
-    }
+    > li {
+      > div {
+        > hr, > div {
+          margin: 0 24px 0 0;
+          position: relative;
+        }
+    
+        > hr {
+          border: 1px solid transparent; 
+          margin: 0 24px 0 0;
 
-    rect.skip-box {
-      fill: none;
-      opacity: 0.35;
-    }
-
-    &:hover, &.active {
-      rect.box { stroke-width: 2px; }
-    }
-
-    &.active {
-      background: #fdf7e6;
-      rect.box { stroke: #eda912; }
-    }
-
-    &.skipped {
-      rect.skip-box {
-        fill: #000;
+          &.active { border-color: #eda912; }
+        }
+    
+        > div {
+          display: flex;
+    
+          > text.page-number {
+            display: flex;
+            justify-content: flex-end;
+            font-size: 12px;
+            width: 24px;
+            margin-right: 10px;
+          }
+    
+          rect.box {
+            box-sizing: border-box;
+            stroke: #dadce0;
+            stroke-width: 1px;
+            border-radius: 4px;
+            background: #fff;
+            fill: none;
+          }
+    
+          rect.skip-box {
+            fill: none;
+            opacity: 0.35;
+          }
+    
+          &:hover, &.active {
+            rect.box { stroke-width: 2px; }
+          }
+    
+          &.active {
+            background: #fdf7e6;
+            rect.box { stroke: #eda912; }
+          }
+    
+          &.skipped {
+            rect.skip-box {
+              fill: #000;
+            }
+          }
+        }
       }
     }
   }
 
-  hr.active {
-    border-color: #eda912;
+  &.grid-view {
+    > div {
+      background-color: #f8f9fa;
+      
+      > ul.filmstrip {
+        margin: 0 auto;
+        min-width: 328px;
+
+        > li {
+          display: inline-block;
+          margin-bottom: 40px;
+  
+          > div {
+            display: flex;
+  
+            > hr, > div {
+              margin: 0 6px;
+              position: relative;
+            }
+          }
+        }
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import {NavLink, withRouter} from "react-router-dom";
 
 import MenuContainer from './menu_container'
 import {BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS, SLIDE_CONTEXT_MENU_ITEMS, WRAPPER_CONTEXT_MENU_ITEMS} from './menu-items';
@@ -7,15 +8,18 @@ import FilmStripContainer from './filmstrip_container';
 import WorkspaceContainer from './workspace_container';
 import PresentationHeader from './presentation_header';
 import FullScreenPresentationContainer from './full_screen_presentation_container';
+import MenuIcon from '../utils/menu_icon';
 
 const handleContextMenu = e => {e.preventDefault()};
 
-export default function PresentationPage({
+export function PresentationPage({
   currentSlideId, doc, uiSelections, 
+  history,
   fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler, presentHandler
 }){
   const _docHook = useState();
   const [_doc, _setDoc] = _docHook;
+  const [_gridView, _setGridView] = useState(false);
   const [_loading, _setLoading] = useState(true);
   const [_rightClick, _setRightClick] = useState(false);
   const contextMenuRef = useRef();
@@ -44,13 +48,23 @@ export default function PresentationPage({
   }, []);
 
   useEffect(() => {
+    const pathname = history.location.pathname;
+    const isGridView = !pathname.match(/\/\d+\/?$/);
+
+    if (isGridView && _gridView === false) {
+      _setGridView(true);
+    } else if (!isGridView && _gridView === true) {
+      _setGridView(false);
+    }
+  }, [history.location.pathname])
+
+  useEffect(() => {
     if (_rightClick){
       contextMenuRef.current.focus();
     }
   }, [_rightClick]);
 
   useEffect(() => {
-    // updateCurrentSlideHandler(currentSlideId);
     if (doc){
       if (!currentSlideId){
         updateCurrentSlideHandler();
@@ -74,18 +88,37 @@ export default function PresentationPage({
               items={chooseToolbar()}
               respondToMouseOut={false}
             />
-            
           </section>
           <section className='two-panel-layout'>
-            <section className='filmstrip'>
-              <FilmStripContainer handleContextMenu={onContextMenu}/>
+            <section className={`filmstrip${_gridView ? ' grid-view' : ''}`}>
+              <FilmStripContainer handleContextMenu={onContextMenu} isGridView={_gridView}/>
+              <ul className='view-options'>
+                <NavLink 
+                  exact to={history.location.pathname.replace(/\/\d+\/?$/, '') + `/${currentSlideId}`}
+                  activeClassName="selected"
+                >
+                  <div>
+                    <MenuIcon icon={[1, 13]} />
+                  </div>
+                </NavLink>
+                <NavLink exact to={history.location.pathname.replace(/\/\d+\/?$/, '')}
+                  activeClassName="selected"
+                >
+                  <div>
+                    <MenuIcon icon={[2, 13]} />
+                  </div>
+                </NavLink>
+              </ul>
             </section>
 
-            <WorkspaceContainer handleContextMenu={onContextMenu} slideId={currentSlideId}/>
+            { _gridView ||
+                <WorkspaceContainer handleContextMenu={onContextMenu} slideId={currentSlideId}/>
+            }
 
           </section>
         </section>
         <section className='app-switcher'>
+          <a className="portfolio" title="Wenchong's Portfolio" href="https://wenchonglai.github.io/portfolio/"/>
           <a className="linkedin" title="LinkedIn" href="https://www.linkedin.com/in/wenchong-lai-4296424b/"/>
           <a className="github" title="GitHub" href="https://github.com/wenchonglai/"/>
         </section>
@@ -124,8 +157,8 @@ export default function PresentationPage({
             />
         }</FullScreen>
       </section>
-      
     </section>)
   );
 }
 
+export default withRouter(PresentationPage);
