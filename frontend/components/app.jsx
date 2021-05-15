@@ -33,6 +33,7 @@ function App({errors, history, clearErrorsHandler}){
       <AuthRoute path='/signin/identifier' exact component={SigninEmailPageContainer}/>
       <AuthRoute path='/signin/challenge' exact component={SigninPasswordPageContainer}/>
       <AuthRoute path='/signup' exact component={SignupContainer}/>
+      <ProtectedRoute exact path='/presentation/:presentationId/slide/:slideId' component={PresentationPageContainer}/>
       <ProtectedRoute path='/presentation/' component={PresentationPageContainer}/>
       <Route path='/signin' render={() => <Redirect to="/signin/identifier"/>}/>
       <Route path='/' render={() => <Redirect to="/slides/about"/>}/>

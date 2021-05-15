@@ -3920,6 +3920,10 @@ function App(_ref) {
     exact: true,
     component: _session_signup_page_container__WEBPACK_IMPORTED_MODULE_4__.default
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_route_utils__WEBPACK_IMPORTED_MODULE_1__.ProtectedRoute, {
+    exact: true,
+    path: "/presentation/:presentationId/slide/:slideId",
+    component: _presentation_presentation_page_container__WEBPACK_IMPORTED_MODULE_8__.default
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_route_utils__WEBPACK_IMPORTED_MODULE_1__.ProtectedRoute, {
     path: "/presentation/",
     component: _presentation_presentation_page_container__WEBPACK_IMPORTED_MODULE_8__.default
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_10__.Route, {
@@ -5482,10 +5486,12 @@ function PresentationPage(_ref) {
       doc = _ref.doc,
       uiSelections = _ref.uiSelections,
       history = _ref.history,
+      match = _ref.match,
       fetchPresentationHandler = _ref.fetchPresentationHandler,
       updateCurrentSlideHandler = _ref.updateCurrentSlideHandler,
       saveDocHandler = _ref.saveDocHandler,
       _presentHandler = _ref.presentHandler;
+  console.log(match.params);
 
   var _docHook = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
 
@@ -47487,7 +47493,7 @@ function valueEqual(a, b) {
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-/******/ 		__webpack_require__.h = () => ("24bb363440ccadc578f8")
+/******/ 		__webpack_require__.h = () => ("a08f43ec011afb917e8a")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/global */

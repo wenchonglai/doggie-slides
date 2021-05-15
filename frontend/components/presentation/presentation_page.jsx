@@ -14,9 +14,10 @@ const handleContextMenu = e => {e.preventDefault()};
 
 export function PresentationPage({
   currentSlideId, isFullScreen, doc, uiSelections, 
-  history,
+  history, match,
   fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler, presentHandler
 }){
+  console.log(match.params)
   const _docHook = useState();
   const [_doc, _setDoc] = _docHook;
   const [_gridView, _setGridView] = useState(false);
