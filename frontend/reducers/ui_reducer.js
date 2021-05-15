@@ -2,7 +2,9 @@ import * as UIActions from '../actions/ui_actions';
 import * as PresentationActions from '../actions/presentation_actions';
 import { combineReducers } from 'redux';
 
-const nullState = Object.freeze({wrapperIds: [], nextMenuAction: 'Select'});
+const nullState = Object.freeze({
+  wrapperIds: [], nextMenuAction: 'Select', isFullScreen: false
+});
 
 function SelectionReducer(state = nullState, action){
   Object.freeze(state);
@@ -32,8 +34,6 @@ function SelectionReducer(state = nullState, action){
         wrapperIds: [...action.wrapperIds],
         ...action.sharedAttributes
       } : {...nullState, nextMenuAction: state.nextMenuAction}
-    case UIActions.RECEIVE_PRESENTING_SLIDE:
-      return {...state, presentingSlideId: action.slideId}
     case UIActions.RECEIVE_MENU_ACTION:
       return {...nullState, nextMenuAction: action.nextMenuAction};
     case PresentationActions.RECEIVE_SLIDE:;
@@ -61,6 +61,13 @@ function SlideSettingsReducer(state = {}, action){
     }
     case UIActions.RECEIVE_CURRENT_SLIDE:
       return {...state, slideId: action.slideId};
+    case UIActions.RECEIVE_PRESENTING_SLIDE: {
+      let {slideId} = action;
+      if (slideId !== undefined)
+        return {...state, slideId, isFullScreen: true};
+      else
+        return {...state, isFullScreen: false};
+    };
     case UIActions.CLEAR_UI:
       return {};
     default: return state;
@@ -87,6 +94,10 @@ function PagesettingsReducer(state = {}, action){
   }
 }
 
-const UIReducer = combineReducers({pageSettings: PagesettingsReducer, slideSettings: SlideSettingsReducer, selections: SelectionReducer});
+const UIReducer = combineReducers({
+  pageSettings: PagesettingsReducer,
+  slideSettings: SlideSettingsReducer,
+  selections: SelectionReducer
+});
 
 export default UIReducer;

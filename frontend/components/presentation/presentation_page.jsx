@@ -13,7 +13,7 @@ import MenuIcon from '../utils/menu_icon';
 const handleContextMenu = e => {e.preventDefault()};
 
 export function PresentationPage({
-  currentSlideId, doc, uiSelections, 
+  currentSlideId, isFullScreen, doc, uiSelections, 
   history,
   fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler, presentHandler
 }){
@@ -24,7 +24,7 @@ export function PresentationPage({
   const [_rightClick, _setRightClick] = useState(false);
   const contextMenuRef = useRef();
   const fullScreen = useFullScreenHandle();
-  const {presentingSlideId, slideObjectType} = uiSelections;
+  const {slideObjectType} = uiSelections;
 
   const chooseToolbar = function(){
     switch (slideObjectType){
@@ -118,9 +118,9 @@ export function PresentationPage({
           </section>
         </section>
         <section className='app-switcher'>
-          <a className="portfolio" title="Wenchong's Portfolio" href="https://wenchonglai.github.io/portfolio/"/>
-          <a className="linkedin" title="LinkedIn" href="https://www.linkedin.com/in/wenchong-lai-4296424b/"/>
-          <a className="github" title="GitHub" href="https://github.com/wenchonglai/"/>
+          <a className="portfolio" target="blank" title="Wenchong's Portfolio" href="https://wenchonglai.github.io/portfolio/"/>
+          <a className="linkedin" target="blank" title="LinkedIn" href="https://www.linkedin.com/in/wenchong-lai-4296424b/"/>
+          <a className="github" target="blank" title="GitHub" href="https://github.com/wenchonglai/"/>
         </section>
       </section>
 
@@ -145,13 +145,13 @@ export function PresentationPage({
           parentHandleBlur={handleContextMenuBlur}
         />
       </section>
-      <section className={`full-screen-wrapper${presentingSlideId !== undefined ? ' active' : ''}`}>
+      <section className={`full-screen-wrapper${isFullScreen ? ' active' : ''}`}>
         <FullScreen handle={fullScreen} onChange={(e) => {
           if (!e) presentHandler();
         }}>{
-          presentingSlideId &&
+          isFullScreen &&
             <FullScreenPresentationContainer 
-              slideId={presentingSlideId}
+              slideId={currentSlideId}
               presentHandler={(slideId) => { presentHandler(slideId); }}
               fullScreenHandle={fullScreen}
             />

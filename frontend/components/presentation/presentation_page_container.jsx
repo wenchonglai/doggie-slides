@@ -6,6 +6,7 @@ import {updateCurrentSlide, enterPresentMode} from '../../actions/ui_actions';
 const PresentationPageContainer = connect(
   ({ui, entities}, ownProps) => ({
     currentSlideId: ui.slideSettings.slideId,
+    isFullScreen: ui.slideSettings.isFullScreen,
     uiSelections: {...ui.selections},
     doc: Object.values(entities.docs)[0],
     slides: Object.values(entities.slides).sort((a, b) => a.page - b.page)
