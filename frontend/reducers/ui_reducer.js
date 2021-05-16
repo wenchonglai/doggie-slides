@@ -36,10 +36,14 @@ function SelectionReducer(state = nullState, action){
       } : {...nullState, nextMenuAction: state.nextMenuAction}
     case UIActions.RECEIVE_MENU_ACTION:
       return {...nullState, nextMenuAction: action.nextMenuAction};
+    case PresentationActions.RECEIVE_WRAPPER: {
+      if (!action.wrapper) return nullState;
+      else return state;
+    };
     case PresentationActions.RECEIVE_SLIDE:;
     case UIActions.RECEIVE_CURRENT_SLIDE:;
-    case UIActions.CLEAR_UI:{
-      return nullState;}
+    case UIActions.CLEAR_UI:
+      return nullState;
     default: return state;
   }
 }

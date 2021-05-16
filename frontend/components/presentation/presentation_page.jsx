@@ -3,7 +3,7 @@ import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import {NavLink, withRouter} from "react-router-dom";
 
 import MenuContainer from './menu_container'
-import {BASE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS, SLIDE_CONTEXT_MENU_ITEMS, WRAPPER_CONTEXT_MENU_ITEMS} from './menu-items';
+import {SLIDE_TOOLBAR_ITEMS, TEXTBOX_TOOLBAR_ITEMS, IMAGE_TOOLBAR_ITEMS, SLIDE_CONTEXT_MENU_ITEMS, WRAPPER_CONTEXT_MENU_ITEMS} from './menu-items';
 import FilmStripContainer from './filmstrip_container';
 import WorkspaceContainer from './workspace_container';
 import PresentationHeader from './presentation_header';
@@ -32,7 +32,7 @@ export function PresentationPage({
     switch (slideObjectType){
       case "Textbox": return TEXTBOX_TOOLBAR_ITEMS;
       case "Image": return IMAGE_TOOLBAR_ITEMS;
-      default: return BASE_TOOLBAR_ITEMS;
+      default: return SLIDE_TOOLBAR_ITEMS;
     }
   }
 

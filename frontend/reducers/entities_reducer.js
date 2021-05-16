@@ -67,7 +67,8 @@ const WrapperReducer = (state = {}, action) => {
     case PresentationActions.RECEIVE_WRAPPERS: 
       return action.wrappers;
     case PresentationActions.RECEIVE_WRAPPER: 
-      return {...state, [action.wrapper.id]: action.wrapper};
+      if (action.wrapper)
+        return {...state, [action.wrapper.id]: action.wrapper};
     default:
       return state;
   }

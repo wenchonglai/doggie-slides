@@ -189,7 +189,11 @@ export default function SVGWrapper({
   const animationFrameRef = useRef();
   const eventListenerRef = useRef(
     function handleBlur(e){
-      blurTimeoutRef.current = setTimeout(() => _setActive(false), 0)
+      blurTimeoutRef.current = setTimeout(() => {
+        _setActive(false);
+
+        updateWrapperHandler();
+      }, 0)
     }
   );
   

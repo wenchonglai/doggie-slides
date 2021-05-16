@@ -10,7 +10,7 @@ const mapSTPCreator = isPreview => ({entities, ui}, {wrapperId, svgDOM}) => ({
   pageWidth: ui.pageSettings.pageWidth,
   paggHeight: ui.pageSettings.pageHeight,
   selectedWrapperIds: ui.selections.wrapperIds,
-  wrapper: entities.wrappers[wrapperId]
+  wrapper: entities.wrappers[wrapperId],
 });
 
 export const SVGWrapperContainer = connect(

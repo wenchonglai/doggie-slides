@@ -1,4 +1,18 @@
 section {
+  &.grid-view {
+    ul.filmstrip > li > div > div.filmstrip-item {
+      > div.page-number {
+        top: 100%;
+        text-align: left;
+      }
+
+      &.skipped {
+        > svg.fa-eye-slash {
+          left: 50%;
+        }
+      }
+    }
+  }
   ul.filmstrip{
     position: relative;
 
@@ -23,10 +37,12 @@ section {
     
         > div {
           display: flex;
+          position: relative;
     
-          > text.page-number {
-            display: flex;
-            justify-content: flex-end;
+          > div.page-number {
+            position: absolute;
+            top: 2px;
+            text-align: right;
             font-size: 12px;
             width: 24px;
             margin-right: 10px;
@@ -41,11 +57,6 @@ section {
             fill: none;
           }
     
-          rect.skip-box {
-            fill: none;
-            opacity: 0.35;
-          }
-    
           &:hover, &.active {
             rect.box { stroke-width: 2px; }
           }
@@ -56,8 +67,13 @@ section {
           }
     
           &.skipped {
-            rect.skip-box {
-              fill: #000;
+            > svg.fa-eye-slash {
+              font-size: 20px;
+              position: absolute;
+              left: calc(50% + 15px);
+              top: 50%;
+              transform: translate(-50%, -50%);
+              opacity: 0.75;
             }
           }
         }

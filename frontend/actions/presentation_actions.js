@@ -106,6 +106,8 @@ export const addSlide = (formSlide) => (dispatch) =>
 // wrappers
 
 export const updateWrapper = (formWrapper) => (dispatch) => {
+  if (!formWrapper) return dispatch(receiveWrapper());
+
   return PresentationUtils.asyncUpdateWrapper(formWrapper)
     .then((resData) => {
       dispatch(receiveWrapper(resData));

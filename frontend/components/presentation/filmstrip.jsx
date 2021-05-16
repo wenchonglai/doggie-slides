@@ -1,10 +1,11 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef, useState } from 'react';
 import useSizeAware from "react-resize-aware";
 import { withRouter } from 'react-router';
 import {SVGSlidePreviewContainer} from '../svg/svg_slide_containers';
 
 function SlidePreviewItem({
-  pageWidth, pageHeight, className, slide, isGridView,
+  pageWidth, pageHeight, className, slide, isGridView, skipped,
   clickHandler, dragStartHandler, dragOverHandler, dragEndHandler
 }){
   const width = isGridView ? 300 : 150;
@@ -19,24 +20,23 @@ function SlidePreviewItem({
       onDragEnd={(e) => dragEndHandler(e, slide.id)}
       onDragOver={(e) => dragOverHandler(e, slide.page)}
     >
+      <div className='page-number' fill="black">
+        {slide.page}
+      </div>
       <svg width={isGridView ? width : "200px"} height={height + 16}>
         <defs>
           <clipPath id="clipping-mask">
             <rect x={0} y={8} width={width} height={height} />
           </clipPath>
         </defs>
-        <text x={24} y={16} fontSize="12" className='page-number'>
-          {slide.page}
-        </text>
-        
         <g transform={`translate(${isGridView ? 0 : 40} 0)`}>
           <rect x={-2} y={6} className="box" width={width + 4} height={height + 4} rx={4}></rect>
           <g clipPath="url(#clipping-mask)">
             <SVGSlidePreviewContainer containerWidth={width} slideId={slide.id}/>
           </g>
-          <rect x={-2} y={6} className="skip-box" width={width + 4} height={height + 4} rx={4}></rect>
         </g>
       </svg>
+      { skipped && <FontAwesomeIcon icon="eye-slash" />}
     </div>
   )
 }
@@ -87,6 +87,7 @@ function FilmStrip({
     ( <SlidePreviewItem 
         className={`${slide.id == currentSlideId ? 'active' : ''} ${slide.skipped ? 'skipped' : ''}`}
         key={slide.id}
+        skipped={slide.skipped}
         {...{slide, isGridView, pageWidth, pageHeight, clickHandler, dragOverHandler, dragStartHandler, dragEndHandler}}
       />
     )
