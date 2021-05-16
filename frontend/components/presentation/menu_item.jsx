@@ -73,7 +73,7 @@ export default function MenuItem({
       case 'boolean': value = (parentData !== item.trueValue ? item.trueValue : undefined); break;
       default: value = value === undefined ? item.value : value; break;
     }
-
+    
     if (!item.children){
       dispatch(func(value) );
     }

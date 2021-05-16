@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ProductIcon from "../utils/product_icon";
 import AutosaveInputContainer from '../utils/autosave_input_container';
 import LastUpdate from '../utils/last_update';
@@ -9,6 +9,10 @@ import UserInfoContainer from '../session/user_info_container';
 
 
 export default function PresentationHeader({doc, _docHook, saveDocHandler, handlePresent, fullScreen}){
+  const presentHandler = () => {
+    handlePresent();
+  };
+  
   return (
     <header>
       <div className='icon-wrapper'>
@@ -30,16 +34,14 @@ export default function PresentationHeader({doc, _docHook, saveDocHandler, handl
               className="docs-menu"
               items={MENU_ITEMS}
               respondToMouseOut={false}
+              fullScreen={fullScreen}
             />
             
             <LastUpdate time={doc.updatedAt} />
           </div>
         </div>
         <section className="titlebar-buttons">
-          <div className="button present-button" onClick={() => {
-            fullScreen.enter();
-            handlePresent();
-          }}>
+          <div className="button present-button" onClick={presentHandler}>
             <MenuIcon icon={[0, 13]}/>
             Present
           </div>

@@ -168,3 +168,10 @@ export const zoomOut = () => (dispatch, getState) => {
 
   return dispatch(UIActions.updateZoomLevel(Math.max((zoom || 1) / 2, 0.125)));
 }
+
+export const present = () => (dispatch, getState) => {
+  const {ui} = getState();
+  const {slideId} = ui.slideSettings;
+
+  return dispatch(UIActions.enterPresentMode(slideId))
+}

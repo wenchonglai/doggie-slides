@@ -161,7 +161,7 @@ export const updateMenuAction = (action) => (dispatch, getState) => {
   dispatch(receiveMenuAction(action));
 }
 
-export const enterPresentMode = (slideId, handle) => dispatch => {
+export const enterPresentMode = (slideId) => dispatch => {
   dispatch(receivePresentingSlide(slideId));
 }
 

@@ -124,7 +124,7 @@ const DropdownMenuContainer = connect(
   dispatch => ({dispatch})
 )(DropdownMenu);
 
-export default function Menu({className = "", items, tier = 0, requireClick=true, nextMenuAction, parentHandleBlur}){
+export default function Menu({className = "", items, tier = 0, requireClick=true, nextMenuAction, parentHandleBlur, presentHandler}){
   return (
     <ul className={`menu tier-${tier} ${className}`}>
       { items.map((item, i) => 

@@ -3002,7 +3002,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "sendToBack": () => (/* binding */ sendToBack),
 /* harmony export */   "zoom": () => (/* binding */ zoom),
 /* harmony export */   "zoomIn": () => (/* binding */ zoomIn),
-/* harmony export */   "zoomOut": () => (/* binding */ zoomOut)
+/* harmony export */   "zoomOut": () => (/* binding */ zoomOut),
+/* harmony export */   "present": () => (/* binding */ present)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3243,6 +3244,15 @@ var zoomOut = function zoomOut() {
 
     var zoom = ui.slideSettings.zoom;
     return dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updateZoomLevel(Math.max((zoom || 1) / 2, 0.125)));
+  };
+};
+var present = function present() {
+  return function (dispatch, getState) {
+    var _getState9 = getState(),
+        ui = _getState9.ui;
+
+    var slideId = ui.slideSettings.slideId;
+    return dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.enterPresentMode(slideId));
   };
 };
 
@@ -3883,7 +3893,7 @@ var updateMenuAction = function updateMenuAction(action) {
     dispatch(receiveMenuAction(action));
   };
 };
-var enterPresentMode = function enterPresentMode(slideId, handle) {
+var enterPresentMode = function enterPresentMode(slideId) {
   return function (dispatch) {
     dispatch(receivePresentingSlide(slideId));
   };
@@ -4302,12 +4312,20 @@ function FullScreenPresentation(_ref) {
       handle = _ref.handle;
   var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
-  var jumpToSlide = function jumpToSlide(presentingSlidePage) {
-    if (slides[presentingSlidePage]) presentHandler(presentingSlidePage);
+  var jumpToSlide = function jumpToSlide(presentingSlidePage, incdec) {
+    var slide = slides[presentingSlidePage];
+    var pages = Object.values(slides).filter(function (slide) {
+      return slide.skipped === false;
+    }).sort(function (a, b) {
+      return a.page - b.page;
+    });
+    var index = pages.indexOf(slide);
+    var nextSlide = pages[index + incdec];
+    if (nextSlide) presentHandler(nextSlide.page);
   };
 
   function handleClick(e) {
-    jumpToSlide(presentingSlidePage + 1);
+    jumpToSlide(presentingSlidePage, 1);
   }
 
   function handleKeyDown(e) {
@@ -4320,7 +4338,7 @@ function FullScreenPresentation(_ref) {
 
       case 'ArrowRight':
         {
-          jumpToSlide(presentingSlidePage + 1);
+          jumpToSlide(presentingSlidePage, 1);
         }
         ;
         break;
@@ -4330,7 +4348,7 @@ function FullScreenPresentation(_ref) {
 
       case 'ArrowLeft':
         {
-          jumpToSlide(presentingSlidePage - 1);
+          jumpToSlide(presentingSlidePage, -1);
         }
         ;
         break;
@@ -4473,7 +4491,7 @@ var PRESENT = {
   name: "Present",
   icon: undefined,
   shortCut: undefined,
-  actionName: undefined
+  actionName: 'present'
 };
 var MASTER = {
   name: "Master",
@@ -5146,7 +5164,8 @@ function Menu(_ref3) {
       _ref3$requireClick = _ref3.requireClick,
       requireClick = _ref3$requireClick === void 0 ? true : _ref3$requireClick,
       nextMenuAction = _ref3.nextMenuAction,
-      parentHandleBlur = _ref3.parentHandleBlur;
+      parentHandleBlur = _ref3.parentHandleBlur,
+      presentHandler = _ref3.presentHandler;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ul", {
     className: "menu tier-".concat(tier, " ").concat(className)
   }, items.map(function (item, i) {
@@ -5453,6 +5472,11 @@ function PresentationHeader(_ref) {
       saveDocHandler = _ref.saveDocHandler,
       handlePresent = _ref.handlePresent,
       fullScreen = _ref.fullScreen;
+
+  var presentHandler = function presentHandler() {
+    handlePresent();
+  };
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "icon-wrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_product_icon__WEBPACK_IMPORTED_MODULE_1__.default, {
@@ -5469,17 +5493,15 @@ function PresentationHeader(_ref) {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_menu_container__WEBPACK_IMPORTED_MODULE_5__.default, {
     className: "docs-menu",
     items: _menu_items__WEBPACK_IMPORTED_MODULE_4__.MENU_ITEMS,
-    respondToMouseOut: false
+    respondToMouseOut: false,
+    fullScreen: fullScreen
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_last_update__WEBPACK_IMPORTED_MODULE_3__.default, {
     time: doc.updatedAt
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "titlebar-buttons"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "button present-button",
-    onClick: function onClick() {
-      fullScreen.enter();
-      handlePresent();
-    }
+    onClick: presentHandler
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_utils_menu_icon__WEBPACK_IMPORTED_MODULE_6__.default, {
     icon: [0, 13]
   }), "Present"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_session_user_info_container__WEBPACK_IMPORTED_MODULE_7__.default, null))));
@@ -5615,6 +5637,9 @@ function PresentationPage(_ref) {
 
     _setLoading(true);
   }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    if (isFullScreen) fullScreen.enter();
+  }, [isFullScreen]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     var pathname = history.location.pathname;
     var isGridView = !pathname.match(/\/\d+\/?$/);
@@ -5790,8 +5815,8 @@ var PresentationPageContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.conn
     saveDocHandler: function saveDocHandler(doc) {
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_2__.updateDoc)(doc));
     },
-    presentHandler: function presentHandler(slideId, handle) {
-      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_3__.enterPresentMode)(slideId, handle));
+    presentHandler: function presentHandler(slideId) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_3__.enterPresentMode)(slideId));
     }
   };
 })(_presentation_page__WEBPACK_IMPORTED_MODULE_1__.default);
@@ -6620,10 +6645,10 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 var BODYTEXT = {
-  'docs': 'With Google Docs, you can write, edit, and collaborate wherever you are. For Free.',
-  'sheets': 'With Google Sheets, you can create, edit, and collaborate wherever you are. For free.',
-  'slides': 'With Google Slides, you can create, edit, collaborate, and present wherever you are. For free.',
-  'forms': 'Collect and organize information big and small with Google Forms. For free.'
+  'Docs': 'With Google Docs, you can write, edit, and collaborate wherever you are. For Free.',
+  'Sheets': 'With Google Sheets, you can create, edit, and collaborate wherever you are. For free.',
+  'Slides': 'With Google Slides, you can create, edit, collaborate, and present wherever you are. For free.',
+  'Forms': 'Collect and organize information big and small with Google Forms. For free.'
 };
 
 function NavLink(_ref) {
@@ -6701,7 +6726,7 @@ function Headline(_ref3) {
     className: "one-whole"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h1", null, "Dis ", productName[0].toUpperCase() + productName.substring(1, productName.length - 1).toLowerCase(), ", So Beautiful, wow~"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "headline-items"
-  }, productName === 'slides' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(HeadLineItem, {
+  }, productName === 'Slides' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(HeadLineItem, {
     title: "Clone",
     iconUrl: window.productIconUrl,
     iconIndex: 3
@@ -6711,7 +6736,7 @@ function Headline(_ref3) {
     },
     target: "_blank",
     href: "https://www.linkedin.com/in/wenchong-lai-4296424b/"
-  }, "one human"), "in two weeks, from scratch. He wishes he has more time. Blep."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
+  }, "\xA0one human\xA0"), "in two weeks, from scratch. He wishes he has more time. Blep."), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
     className: "splash button-anchor",
     to: "/presentation/"
   }, "Go to DoggIe Slides")) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(HeadLineItem, {
@@ -6721,12 +6746,15 @@ function Headline(_ref3) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, googleProductBodyText), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("a", {
     className: "splash button-anchor",
     target: "_blank",
-    href: "https://www.google.com/slides/about/"
-  }, "The Real Google Slides"))));
+    href: "https://www.google.com/".concat(productName.toLowerCase(), "/about/")
+  }, "The Real Google ", productName))));
 }
 
 function SplashPage(props) {
-  var productName = props.match.params.productName;
+  var productName = function (s) {
+    return s[0].toUpperCase() + s.substring(1);
+  }(props.match.params.productName);
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "splash"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("header", {

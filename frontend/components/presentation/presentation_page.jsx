@@ -17,11 +17,13 @@ export function PresentationPage({
   fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler, presentHandler,
   history, match, ...args
 }){
+
   const _docHook = useState();
   const [_doc, _setDoc] = _docHook;
   const [_gridView, _setGridView] = useState(false);
   const [_loading, _setLoading] = useState(true);
   const [_rightClick, _setRightClick] = useState(false);
+
   const contextMenuRef = useRef();
   const fullScreen = useFullScreenHandle();
   const {slideObjectType} = uiSelections;
@@ -46,6 +48,11 @@ export function PresentationPage({
     fetchPresentationHandler();
     _setLoading(true);
   }, []);
+
+  useEffect(() => {
+    if (isFullScreen) 
+      fullScreen.enter();
+  }, [isFullScreen]);
 
   useEffect(() => {
     const pathname = history.location.pathname;

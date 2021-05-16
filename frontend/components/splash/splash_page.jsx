@@ -5,10 +5,10 @@ import DoggieLogo from '../utils/doggie_logo';
 import ProductIcon from '../utils/product_icon';
 
 const BODYTEXT = {
-  'docs': 'With Google Docs, you can write, edit, and collaborate wherever you are. For Free.',
-  'sheets': 'With Google Sheets, you can create, edit, and collaborate wherever you are. For free.',
-  'slides': 'With Google Slides, you can create, edit, collaborate, and present wherever you are. For free.',
-  'forms': 'Collect and organize information big and small with Google Forms. For free.'
+  'Docs': 'With Google Docs, you can write, edit, and collaborate wherever you are. For Free.',
+  'Sheets': 'With Google Sheets, you can create, edit, and collaborate wherever you are. For free.',
+  'Slides': 'With Google Slides, you can create, edit, collaborate, and present wherever you are. For free.',
+  'Forms': 'Collect and organize information big and small with Google Forms. For free.'
 }
 
 function NavLink({keyword, iconIndex}){
@@ -70,12 +70,12 @@ function Headline({productName, googleProductBodyText}){
     <div className='one-whole'>
       <h1>Dis {productName[0].toUpperCase() + productName.substring(1,productName.length - 1).toLowerCase()}, So Beautiful, wow~</h1>
       <div className='headline-items'>
-        { productName === 'slides' ?
+        { productName === 'Slides' ?
           ( <HeadLineItem title="Clone" iconUrl={window.productIconUrl} iconIndex={3}>
               <p>
                 Dis DoggIe Slide is made by 
                 <a style={{display: "inline"}} target="_blank" href="https://www.linkedin.com/in/wenchong-lai-4296424b/">
-                  one human
+                  &nbsp;one human&nbsp;
                 </a> 
                 in two weeks, from scratch.
                 He wishes he has more time. Blep.
@@ -86,8 +86,8 @@ function Headline({productName, googleProductBodyText}){
         }
         <HeadLineItem title="Real" iconUrl={window.productIconUrl} iconIndex={5}>
           <p>{googleProductBodyText}</p>
-          <a className='splash button-anchor' target="_blank" href="https://www.google.com/slides/about/">
-            The Real Google Slides
+          <a className='splash button-anchor' target="_blank" href={`https://www.google.com/${productName.toLowerCase()}/about/`}>
+            The Real Google {productName}
           </a>
         </HeadLineItem>
       </div>
@@ -96,7 +96,7 @@ function Headline({productName, googleProductBodyText}){
 }
 
 export default function SplashPage(props){
-  const productName = props.match.params.productName;
+  const productName = (s => s[0].toUpperCase() + s.substring(1))(props.match.params.productName);
   return (
     <section className='splash'>
       <header className='splash header'>

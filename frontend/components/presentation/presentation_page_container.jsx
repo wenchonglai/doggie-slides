@@ -15,7 +15,7 @@ const PresentationPageContainer = connect(
     updateCurrentSlideHandler: (slideId, history, redirect) => dispatch(updateCurrentSlide(slideId, history, redirect)),
     fetchPresentationHandler: () => dispatch(fetchPresentation()),
     saveDocHandler: (doc) => dispatch(updateDoc(doc)),
-    presentHandler: (slideId, handle) => dispatch(enterPresentMode(slideId, handle))
+    presentHandler: (slideId) => dispatch(enterPresentMode(slideId))
   })
 )(PresentationPage);
 
