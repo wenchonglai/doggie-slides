@@ -41,21 +41,14 @@ export const deleteSlide = () => (dispatch, getState) => {
 export const skipSlide = () => (dispatch, getState) => {
   const {ui, entities} = getState();
   const reqSlide = {...entities.slides[ui.slideSettings.slideId]};
-  reqSlide.skipped = !reqSlide.skipped
+  reqSlide.skipped = !reqSlide.skipped;
 
-  return dispatch(PresentationActions.receiveSlide(reqSlide));
+  return dispatch(PresentationActions.updateSlide(reqSlide));
 }
 
 export const textbox = () => (dispatch, getState) => {
-  return new Promise(res => {
-    res();
-  }).then(() => {dispatch(UIActions.updateMenuAction('Text Box'))})
-  
-  
-  // PresentationUtils.asyncUpdateSlide(reqSlide)
-  //   .then(resSlide => {
-  //     dispatch(PresentationActions.receiveSlide(resSlide));
-  //   }, (err) => {console.error(err)});
+  return new Promise(res => res())
+    .then(() => dispatch(UIActions.updateMenuAction('Text Box')))
 }
 
 export const updateWrapperAttribute = (key) => 
@@ -158,3 +151,20 @@ export const bringToFront = moveWrapperCreator(65535);
 export const bringForward = moveWrapperCreator(1);
 export const sendBackward = moveWrapperCreator(-1);
 export const sendToBack = moveWrapperCreator(-65535);
+
+export const zoom = value => dispatch =>
+  dispatch(UIActions.updateZoomLevel(value));
+
+export const zoomIn = () => (dispatch, getState) => {
+  const {ui} = getState();
+  const {zoom} = ui.slideSettings;
+
+  return dispatch(UIActions.updateZoomLevel(Math.min((zoom || 1) * 2, 8)));
+}
+
+export const zoomOut = () => (dispatch, getState) => {
+  const {ui} = getState();
+  const {zoom} = ui.slideSettings;
+
+  return dispatch(UIActions.updateZoomLevel(Math.max((zoom || 1) / 2, 0.125)));
+}

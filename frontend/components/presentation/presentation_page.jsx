@@ -14,10 +14,9 @@ const handleContextMenu = e => {e.preventDefault()};
 
 export function PresentationPage({
   currentSlideId, isFullScreen, doc, uiSelections, 
-  history, match,
-  fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler, presentHandler
+  fetchPresentationHandler, updateCurrentSlideHandler, saveDocHandler, presentHandler,
+  history, match, ...args
 }){
-  console.log(match.params)
   const _docHook = useState();
   const [_doc, _setDoc] = _docHook;
   const [_gridView, _setGridView] = useState(false);
@@ -68,7 +67,15 @@ export function PresentationPage({
   useEffect(() => {
     if (doc){
       if (!currentSlideId){
-        updateCurrentSlideHandler();
+        let {docId, slideId} = match.params;
+        
+        docId = Number(docId);
+        slideId = Number(slideId);
+
+        if (doc && doc.id == docId && doc.slideIds.includes(slideId))
+          currentSlideId ||= slideId;
+          
+        updateCurrentSlideHandler(currentSlideId, history, true);
       }
       _setLoading(false);
     }
@@ -119,9 +126,9 @@ export function PresentationPage({
           </section>
         </section>
         <section className='app-switcher'>
-          <a className="portfolio" target="blank" title="Wenchong's Portfolio" href="https://wenchonglai.github.io/portfolio/"/>
-          <a className="linkedin" target="blank" title="LinkedIn" href="https://www.linkedin.com/in/wenchong-lai-4296424b/"/>
-          <a className="github" target="blank" title="GitHub" href="https://github.com/wenchonglai/"/>
+          <a className="portfolio" target="_blank" title="Wenchong's Portfolio" href="https://wenchonglai.github.io/portfolio/"/>
+          <a className="linkedin" target="_blank" title="LinkedIn" href="https://www.linkedin.com/in/wenchong-lai-4296424b/"/>
+          <a className="github" target="_blank" title="GitHub" href="https://github.com/wenchonglai/"/>
         </section>
       </section>
 

@@ -15,13 +15,13 @@ const PRESENT = { name: "Present", icon: undefined, shortCut: undefined, actionN
 const MASTER = { name: "Master", icon: undefined, shortCut: undefined, actionName: undefined};
 const GRID_VIEW = { name: "Grid View", icon: undefined, shortCut: undefined, actionName: undefined};
 const ZOOM = { name: "Zoom", icon: [5, 8], children: [
-  { name: "Fit", icon: [0, 2], shortCut: undefined, actionName: undefined},
-  { name: "50%", icon: undefined, shortCut: undefined, actionName: undefined},
-  { name: "100%", icon: undefined, shortCut: undefined, actionName: undefined},
-  { name: "200%", icon: undefined, shortCut: undefined, actionName: undefined},
+  { name: "Fit", icon: [0, 2], shortCut: undefined, actionName: "zoom", value: undefined},
+  { name: "50%", icon: undefined, shortCut: undefined, actionName: "zoom", value: 0.5},
+  { name: "100%", icon: undefined, shortCut: undefined, actionName: "zoom", value: 1},
+  { name: "200%", icon: undefined, shortCut: undefined, actionName: "zoom", value: 2},
   undefined,
-  { name: "Zoom in", icon: undefined, shortCut: undefined, actionName: undefined},
-  { name: "Zoom out", icon: undefined, shortCut: undefined, actionName: undefined},
+  { name: "Zoom in", icon: undefined, shortCut: undefined, actionName: 'zoomIn'},
+  { name: "Zoom out", icon: undefined, shortCut: undefined, actionName: 'zoomOut'},
 ]};
 const SPEAKER_NOTES = { name: "speaker notes", icon: undefined, shortCut: undefined, actionName: undefined};
 const FULL_SCREEN = { name: "Full Screen", icon: undefined, shortCut: undefined, actionName: undefined};
@@ -32,7 +32,7 @@ const TEXTBOX = { name: "Text Box", icon: [7, 3], shortCut: undefined, actionNam
 const SHAPE = { name: "Shape", icon: [10, 3], shortCut: undefined, actionName: undefined};
 const DUPLICATE_SLIDE = { name: "Duplicate Slide", icon: undefined, shortCut: undefined, actionName: undefined};
 const DELETE_SLIDE = { name: "Delete Slide", icon: undefined, shortCut: undefined, actionName: "deleteSlide"};
-const SKIP_SLIDE = { name: "Skip Slide", icon: undefined, shortCut: undefined, actionName: "skipSlide"};
+const SKIP_SLIDE = { name: "Skip Slide", type: 'boolean', shortCut: undefined, actionName: "skipSlide"};
 const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, actionName: undefined};
 const FILL_COLOR = { name: "Fill color", icon: [0, 9], type: 'color', key: "fill", shortCut: undefined, children: ColorPalette, actionName: 'fillColor'};
 const BORDER_COLOR = { name: "Border color", icon: [1, 9], type: 'color', key: "stroke", shortCut: undefined, children: ColorPalette, actionName: 'borderColor'};
@@ -118,7 +118,7 @@ const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, actionName: u
 const CROP_IMAGE = { name: "Crop image", icon: [5, 10], shortCut: undefined, actionName: undefined};
 const RESET_IMAGE = { name: "Reset image", icon: [6, 10], shortCut: undefined, actionName: undefined};
 
-const DELETE_WRAPPER = { name: "delete", icon: undefined, shortCut: undefined, actionName: "deleteWrappers"};
+const DELETE_WRAPPER = { name: "Delete", icon: undefined, shortCut: undefined, actionName: "deleteWrappers"};
 
 const ORDER = { name: "Order", shortCut: undefined, actionName: undefined, children: [
   { name: "Bring to front", shortCut: undefined, actionName: "bringToFront"},
@@ -126,6 +126,8 @@ const ORDER = { name: "Order", shortCut: undefined, actionName: undefined, child
   { name: "Send backward", shortCut: undefined, actionName: "sendBackward"},
   { name: "Send to back", shortCut: undefined, actionName: "sendToBack"},
 ]};
+
+const BACKGROUND = {name: "Background", icon: undefined, shortCut: undefined, actionName: "background" }
 
 export const MENU_ITEMS = [
   /*
@@ -145,7 +147,7 @@ export const MENU_ITEMS = [
 ];
 
 export const BASE_TOOLBAR_ITEMS = [
-  NEW_SLIDE, undefined, ZOOM, SELECT, TEXTBOX, IMAGE, SHAPE
+  NEW_SLIDE, undefined, ZOOM, SELECT, TEXTBOX, IMAGE, SHAPE, undefined, BACKGROUND
 ];
 
 export const TEXTBOX_TOOLBAR_ITEMS = [

@@ -12,7 +12,8 @@ const mapSTP = ({entities, ui}) => ({
 });
 
 const mapDTP = (dispatch) => ({
-  updateCurrentSlideHandler: (slideId, redirect) => dispatch(updateCurrentSlide(slideId, redirect)),
+  updateCurrentSlideHandler: (slideId, history, redirect) => 
+    dispatch(updateCurrentSlide(slideId, history, redirect)),
   moveSlideHandler: (data) => dispatch(moveSlide(data))
 });
 

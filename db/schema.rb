@@ -65,6 +65,7 @@ ActiveRecord::Schema.define(version: 2021_04_13_222411) do
     t.integer "doc_id", null: false
     t.integer "page", default: 1, null: false
     t.boolean "skipped", default: false, null: false
+    t.string "background", default: "#ffffff"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["doc_id", "page"], name: "index_slides_on_doc_id_and_page"

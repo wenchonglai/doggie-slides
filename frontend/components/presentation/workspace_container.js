@@ -4,5 +4,6 @@ import Workspace from "./workspace";
 export default connect(({entities, ui}) => ({
   entities,
   ui,
-  slideId: ui.slideSettings.slideId
+  slideId: ui.slideSettings.slideId,
+  zoom: ui.slideSettings.zoom
 }), null)(Workspace);

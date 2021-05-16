@@ -10,10 +10,12 @@ section.page.presentation section.workspace {
     width: 100%;
     height: 100%;
     overflow: scroll;
-
+    text-align: center;
     > svg.svg-slide {
       transform-origin: 0 0;
-      display: block;
+      display: inline-block;
+      vertical-align: middle;
+      margin: auto;
       // transform: scale(1.5);
 
       > g:first-child{

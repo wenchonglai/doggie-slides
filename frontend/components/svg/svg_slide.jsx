@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useLayoutEffect} from 'react';
 import { updateMenuAction } from '../../actions/ui_actions';
 
 import {SVGWrapperContainer, SVGNoWrapperContainer} from './svg_wrapper_containers';
@@ -6,6 +6,7 @@ import {SVGWrapperContainer, SVGNoWrapperContainer} from './svg_wrapper_containe
 const ReactSVG = React.forwardRef(({
   children, isPreview, containerWidth, width, height, slide, slideId,
   menuAction, updateMenuAction, createText, handleContextMenu, wrappers, onClick,
+  zoom, outerHeight,
   ...props
 }, ref) => {
 
@@ -51,14 +52,24 @@ const ReactSVG = React.forwardRef(({
     };
   }
 
+  const [_height, _setHeight] = useState('100%');
+
+  // if (zoom)
+  useEffect(() => {
+    if (!zoom || outerHeight >= zoom * height)
+      _setHeight('100%');
+    else 
+      _setHeight(zoom * height);
+  }, [zoom]);
+
 	return (
 		<svg
       version="1.1" 
       className="react-svg svg-slide"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      width="100%"
-      height="100%"
+      width={zoom ? zoom * width : '100%'}
+      height={_height}
       viewBox={`1000 1000 ${width} ${height}`}
       xmlSpace="preserve"
       ref={ref}

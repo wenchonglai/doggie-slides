@@ -45,10 +45,10 @@ function SplashNavBar(){
       </ul>
       <ul className='splash nav-tertiary'>
         <li>
-          <a className='nav-anchor' href="https://www.google.com/slides/about/">For Real</a>
+          <a className='nav-anchor' target="_blank" href="https://www.google.com/slides/about/">For Real</a>
         </li>
         <li>
-          <a className='nav-anchor' href="https://github.com/wenchonglai/doggie-slides">Help</a>
+          <a className='nav-anchor' target="_blank" href="https://github.com/wenchonglai/doggie-slides">Help</a>
         </li>
       </ul>
     </nav>
@@ -73,7 +73,11 @@ function Headline({productName, googleProductBodyText}){
         { productName === 'slides' ?
           ( <HeadLineItem title="Clone" iconUrl={window.productIconUrl} iconIndex={3}>
               <p>
-                Dis DoggIe Slide is made by <a style={{display: "inline"}} href="https://www.linkedin.com/in/wenchong-lai-4296424b/">one human</a> in two weeks, from scratch.
+                Dis DoggIe Slide is made by 
+                <a style={{display: "inline"}} target="_blank" href="https://www.linkedin.com/in/wenchong-lai-4296424b/">
+                  one human
+                </a> 
+                in two weeks, from scratch.
                 He wishes he has more time. Blep.
               </p>
               <Link className='splash button-anchor' to={`/presentation/`} >Go to DoggIe Slides</Link>
@@ -82,7 +86,9 @@ function Headline({productName, googleProductBodyText}){
         }
         <HeadLineItem title="Real" iconUrl={window.productIconUrl} iconIndex={5}>
           <p>{googleProductBodyText}</p>
-          <a className='splash button-anchor' href="https://www.google.com/slides/about/">The Real Google Slides</a>
+          <a className='splash button-anchor' target="_blank" href="https://www.google.com/slides/about/">
+            The Real Google Slides
+          </a>
         </HeadLineItem>
       </div>
     </div>

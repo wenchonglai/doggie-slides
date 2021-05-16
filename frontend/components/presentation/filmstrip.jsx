@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useSizeAware from "react-resize-aware";
+import { withRouter } from 'react-router';
 import {SVGSlidePreviewContainer} from '../svg/svg_slide_containers';
 
 function SlidePreviewItem({
@@ -40,8 +41,8 @@ function SlidePreviewItem({
   )
 }
 
-export default function FilmStrip({
-  pageWidth, pageHeight, currentSlideId, slides, isGridView, 
+function FilmStrip({
+  pageWidth, pageHeight, currentSlideId, slides, isGridView, history,
   moveSlideHandler, updateCurrentSlideHandler, handleContextMenu
 }){
   const [_moveToPage, _setMoveToPage] = useState(-1);
@@ -50,7 +51,7 @@ export default function FilmStrip({
   const [resizeListener, sizes] = useSizeAware();
 
   function clickHandler(e, slideId, forceRedirect){
-    updateCurrentSlideHandler(slideId, !isGridView || forceRedirect);
+    updateCurrentSlideHandler(slideId, history, !isGridView || forceRedirect);
   };
 
   function dragStartHandler(e, slideId){
@@ -123,3 +124,5 @@ export default function FilmStrip({
     </div>
   )
 };
+
+export default withRouter(FilmStrip);

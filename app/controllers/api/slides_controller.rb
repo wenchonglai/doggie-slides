@@ -166,6 +166,6 @@ class Api::SlidesController < ApplicationController
   end
 
   def slide_move_params
-    params.require(:slide).permit(:start, :end, :offset)
+    params.require(:slide).permit(:start, :end, :offset, :background)
   end
 end

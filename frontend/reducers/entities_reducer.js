@@ -95,8 +95,9 @@ const SlidesReducer = (state = {}, action) => {
       return action.entities.slides; 
     case PresentationActions.RECEIVE_SLIDES: 
       return action.slides;
-    case PresentationActions.RECEIVE_SLIDE: 
+    case PresentationActions.RECEIVE_SLIDE: {
       return {...state, [action.slide.id]: action.slide};
+    }
     default:
       return state;
   }

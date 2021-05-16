@@ -1,6 +1,5 @@
 import { getTextstylesByTextboxId } from '../selectors/selectors';
 import * as PresentationUtils from '../utils/presentation_utils';
-import { receiveCurrentSlide, updatePageSettings, updateUITextSelection } from './ui_actions';
 
 function actionCreatorCreator({verb='receive', noun, nouns = noun + 's'}){
   const verbNoun = verb.toLowerCase() + noun[0].toUpperCase() + noun.substring(1).toLowerCase();
@@ -77,10 +76,16 @@ export const updateDoc = (formDoc) => (dispatch) =>
 
 // slides
 
+export const updateSlide = formData => dispatch => 
+  PresentationUtils.asyncUpdateSlide(formData)
+    .then((data) => {
+      dispatch(receiveSlide(data));
+    });
+
 export const fetchSlide = () => (dispatch) => 
   PresentationUtils.asyncFetchSlideContent()
     .then((data) => {
-      dispatch(receiveSlideContent(data))
+      dispatch(receiveSlide(data))
     })
 
 export const moveSlide = ({start, end=start, offset}) => (dispatch) => {

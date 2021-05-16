@@ -12,7 +12,7 @@ const PresentationPageContainer = connect(
     slides: Object.values(entities.slides).sort((a, b) => a.page - b.page)
   }),
   dispatch => ({
-    updateCurrentSlideHandler: (slideId) => dispatch(updateCurrentSlide(slideId)),
+    updateCurrentSlideHandler: (slideId, history, redirect) => dispatch(updateCurrentSlide(slideId, history, redirect)),
     fetchPresentationHandler: () => dispatch(fetchPresentation()),
     saveDocHandler: (doc) => dispatch(updateDoc(doc)),
     presentHandler: (slideId, handle) => dispatch(enterPresentMode(slideId, handle))

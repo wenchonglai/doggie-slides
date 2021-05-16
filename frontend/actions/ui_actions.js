@@ -7,6 +7,7 @@ export const RECEIVE_SELECTED_WRAPPERS = 'RECEIVE_SELECTED_WRAPPERS';
 export const RECEIVE_SELECTED_TEXT = 'RECEIVE_SELECTED_TEXT';
 export const RECEIVE_MENU_ACTION = 'RECEIVE_MENU_ACTION';
 export const CLEAR_UI = 'CLEAR_UI';
+export const RECEIVE_ZOOM_LEVEL = 'RECEIVE_ZOOM_LEVEL';
 
 export const receiveCurrentSlide = (slideId) => ({
   type: RECEIVE_CURRENT_SLIDE,
@@ -43,7 +44,12 @@ export const clearUI = () => ({
   type: CLEAR_UI
 })
 
-export const updateCurrentSlide = (slideId, redirect) => (dispatch, getState) => {
+export const receiveZoomLevel = (zoom) => ({
+  type: RECEIVE_ZOOM_LEVEL,
+  zoom
+})
+
+export const updateCurrentSlide = (slideId, history, redirect) => (dispatch, getState) => {
   let {ui} = getState();
   let newURL = '';
 
@@ -52,13 +58,14 @@ export const updateCurrentSlide = (slideId, redirect) => (dispatch, getState) =>
     const slide = Object.values(slides).sort((a, b) => a.page - b.page)[0];
 
     slideId = slide.id;
-    newURL = `/#/presentation/${slide.docId}/slides/${slideId}`;
+
+    newURL = `/presentation/${slide.docId}/slides/${slideId}`;
   } else {
-    newURL = `/#/presentation/${ui.pageSettings.docId}/slides/${slideId}`;
+    newURL = `/presentation/${ui.pageSettings.docId}/slides/${slideId}`;
   }
- 
+  
   dispatch(receiveCurrentSlide(slideId));
-  redirect && window.location.replace(newURL);
+  redirect && history.replace(newURL);
 }
 
 function getCommonAttributes(obj1, obj2, ...keys){
@@ -156,4 +163,8 @@ export const updateMenuAction = (action) => (dispatch, getState) => {
 
 export const enterPresentMode = (slideId, handle) => dispatch => {
   dispatch(receivePresentingSlide(slideId));
+}
+
+export const updateZoomLevel = (zoom) => dispatch => {
+  dispatch(receiveZoomLevel(zoom));
 }

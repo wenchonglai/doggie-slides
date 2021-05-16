@@ -8,8 +8,13 @@ function FullScreenPresentation({
 }){
   const eventListenerRef = useRef();
 
+  const jumpToSlide = (presentingSlidePage) => {
+    if (slides[presentingSlidePage])
+      presentHandler(presentingSlidePage)
+  }
+
   function handleClick(e){
-    // console.log(presentingSlidePage, slideId, slides);
+    jumpToSlide(presentingSlidePage + 1);
   }
 
   function handleKeyDown(e){
@@ -17,14 +22,12 @@ function FullScreenPresentation({
       case 'Enter':;
       case 'ArrowDown':;
       case 'ArrowRight': {
-        if (slides[presentingSlidePage + 1])
-          presentHandler(presentingSlidePage + 1)
+        jumpToSlide(presentingSlidePage + 1);
       }; break;
 
       case 'ArrowUp':;
       case 'ArrowLeft': {
-        if (slides[presentingSlidePage - 1])
-          presentHandler(presentingSlidePage - 1)
+        jumpToSlide(presentingSlidePage - 1);
       }; break;
     }
   }

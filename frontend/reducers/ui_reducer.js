@@ -61,6 +61,8 @@ function SlideSettingsReducer(state = {}, action){
     }
     case UIActions.RECEIVE_CURRENT_SLIDE:
       return {...state, slideId: action.slideId};
+    case UIActions.RECEIVE_ZOOM_LEVEL:
+      return {...state, zoom: action.zoom};
     case UIActions.RECEIVE_PRESENTING_SLIDE: {
       let {slideId} = action;
       if (slideId !== undefined)
