@@ -3003,7 +3003,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "zoom": () => (/* binding */ zoom),
 /* harmony export */   "zoomIn": () => (/* binding */ zoomIn),
 /* harmony export */   "zoomOut": () => (/* binding */ zoomOut),
-/* harmony export */   "present": () => (/* binding */ present)
+/* harmony export */   "present": () => (/* binding */ present),
+/* harmony export */   "changeBackground": () => (/* binding */ changeBackground)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3253,6 +3254,19 @@ var present = function present() {
 
     var slideId = ui.slideSettings.slideId;
     return dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.enterPresentMode(slideId));
+  };
+};
+var changeBackground = function changeBackground(value) {
+  return function (dispatch, getState) {
+    var _getState10 = getState(),
+        ui = _getState10.ui,
+        entities = _getState10.entities;
+
+    var slideId = ui.slideSettings.slideId;
+    var slide = entities.slides[slideId];
+    dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateSlide(_objectSpread(_objectSpread({}, slide), {}, {
+      background: value
+    })));
   };
 };
 
@@ -4705,7 +4719,7 @@ function getCommonTextStyleByKey(key) {
 var FONT = {
   name: "Font",
   key: getCommonTextStyleByKey("fontFamily"),
-  type: 'font',
+  type: 'text',
   shortCut: undefined,
   children: [{
     name: "Arial",
@@ -4958,10 +4972,12 @@ var ORDER = {
   }]
 };
 var BACKGROUND = {
-  name: "Background",
-  icon: undefined,
+  name: "Change Background",
+  type: "color",
+  icon: "Background",
   shortCut: undefined,
-  actionName: "background"
+  children: _utils_color_palette__WEBPACK_IMPORTED_MODULE_2__.default,
+  actionName: "changeBackground"
 };
 var MENU_ITEMS = [
 /*
@@ -5349,8 +5365,10 @@ function MenuItem(_ref3) {
 
   function getMenuIcon(type) {
     switch (type) {
-      case 'font':
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, parentData && parentData.length > 12 ? parentData.substring(0, 10) + '...' : parentData);
+      case 'text':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+          className: "text"
+        }, parentData);
 
       case 'input':
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
@@ -7985,7 +8003,7 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     width: width,
     height: height,
-    fill: "#FFFFFF"
+    fill: slide.background || '#ffffff'
   })), wrappers.map(function (_ref2) {
     var id = _ref2.id;
     return isPreview ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_wrapper_containers__WEBPACK_IMPORTED_MODULE_2__.SVGNoWrapperContainer, {
@@ -8901,7 +8919,7 @@ function MenuIcon(_ref) {
       className = _ref$className === void 0 ? '' : _ref$className,
       _ref$icon = _ref.icon,
       icon = _ref$icon === void 0 ? [-1, -1] : _ref$icon;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  return typeof icon === 'string' ? icon : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "menu-icon ".concat(className),
     style: {
       backgroundPositionX: -icon[0] * 18,

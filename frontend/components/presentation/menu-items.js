@@ -65,7 +65,7 @@ function getCommonTextStyleByKey(key){
   }
 }
 
-const FONT = { name: "Font", key: getCommonTextStyleByKey("fontFamily"), type: 'font', shortCut: undefined, children: [
+const FONT = { name: "Font", key: getCommonTextStyleByKey("fontFamily"), type: 'text', shortCut: undefined, children: [
   { name: "Arial", type: 'font-item', value: "Arial", actionName: 'fontFamily'},
   { name: "Comic Sans MS", type: 'font-item', value: "Comic Sans MS", actionName: 'fontFamily'},
   { name: "Courier New", type: 'font-item', value: "Courier New", actionName: 'fontFamily'},
@@ -127,7 +127,7 @@ const ORDER = { name: "Order", shortCut: undefined, actionName: undefined, child
   { name: "Send to back", shortCut: undefined, actionName: "sendToBack"},
 ]};
 
-const BACKGROUND = {name: "Background", icon: undefined, shortCut: undefined, actionName: "background" }
+const BACKGROUND = {name: "Change Background", type: "color", icon: "Background", shortCut: undefined, children: ColorPalette, actionName: "changeBackground" }
 
 export const MENU_ITEMS = [
   /*

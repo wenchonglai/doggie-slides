@@ -17,7 +17,6 @@ class Api::SlidesController < ApplicationController
   end
 
   def update
-
     @slide = @slides.find_by(id: params[:id])
 
     if @slide
@@ -158,7 +157,7 @@ class Api::SlidesController < ApplicationController
 
   def slide_params
     params.require(:slide).permit(
-      :id, :doc_id, :page, :skipped,
+      :id, :doc_id, :page, :skipped, :background,
       wrappers_attributes: [
         :id, :_destroy
       ]
@@ -166,6 +165,6 @@ class Api::SlidesController < ApplicationController
   end
 
   def slide_move_params
-    params.require(:slide).permit(:start, :end, :offset, :background)
+    params.require(:slide).permit(:start, :end, :offset)
   end
 end

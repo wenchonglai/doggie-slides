@@ -103,6 +103,16 @@ ul.menu{
       display: flex;
       align-items: center;
 
+      &.text {
+        > .icon-box {
+          > .text {
+            width: 80px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+          }
+        }
+      }
       &.inc-dec-button, &.input{
         padding: 0px;
         border-radius: 0;
@@ -167,6 +177,7 @@ ul.menu{
           display: flex;
           flex-direction: column;
           align-items: center;
+
           > .color-box {
             width: 100%;
             height: 4px;
@@ -178,7 +189,7 @@ ul.menu{
 
       &.no-action  {
         > div > .menu-item-icon, >.menu-item-name{
-          opacity: 0.5;
+          // opacity: 0.5;
         }
       }
     }
@@ -271,7 +282,8 @@ ul.docs-menu {
       > div.dropdown-button {
         padding: 4px 6px;
         border-radius: 4px;
-
+        
+        > .menu-item-name {position: relative}
         .menu-icon{ display: none; }
         .submenu-indicator {display: none;}
       }

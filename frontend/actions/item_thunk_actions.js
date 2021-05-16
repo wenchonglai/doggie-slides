@@ -175,3 +175,11 @@ export const present = () => (dispatch, getState) => {
 
   return dispatch(UIActions.enterPresentMode(slideId))
 }
+
+export const changeBackground = value => (dispatch, getState) => {
+  const {ui, entities} = getState();
+  const {slideId} = ui.slideSettings;
+  const slide = entities.slides[slideId];
+
+  dispatch(PresentationActions.updateSlide({...slide, background: value}));
+}

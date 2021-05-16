@@ -2,6 +2,7 @@ import React from 'react';
 
 export default function MenuIcon({className='', icon=[-1, -1]}){
   return (
+    typeof icon === 'string' ? icon :
     <div 
       className={`menu-icon ${className}`}
       style={{

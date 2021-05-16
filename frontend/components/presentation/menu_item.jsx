@@ -84,12 +84,8 @@ export default function MenuItem({
 
   function getMenuIcon(type){
     switch (type){
-      case 'font': return (
-        <div>{
-          parentData && parentData.length > 12 ? 
-            (parentData.substring(0, 10) + '...') :
-            parentData
-        }</div>);
+      case 'text': return (
+        <div className="text">{ parentData }</div>);
       case 'input': return (
         <input type="text" 
           onBlur={handleBlur}
@@ -113,7 +109,9 @@ export default function MenuItem({
           value={parentData ? parentData.replace('px', '') : ''}
         />
       )
-      default: return (<MenuIcon className='menu-item-icon' icon={item.icon}/>);
+      default: return (
+        <MenuIcon className='menu-item-icon' icon={item.icon}/>
+      );
     }
   }
 
