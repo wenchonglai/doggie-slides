@@ -2978,7 +2978,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "newSlide": () => (/* binding */ newSlide),
 /* harmony export */   "deleteSlide": () => (/* binding */ deleteSlide),
 /* harmony export */   "skipSlide": () => (/* binding */ skipSlide),
+/* harmony export */   "select": () => (/* binding */ select),
 /* harmony export */   "textbox": () => (/* binding */ textbox),
+/* harmony export */   "circle": () => (/* binding */ circle),
 /* harmony export */   "updateWrapperAttribute": () => (/* binding */ updateWrapperAttribute),
 /* harmony export */   "fillColor": () => (/* binding */ fillColor),
 /* harmony export */   "borderColor": () => (/* binding */ borderColor),
@@ -3089,12 +3091,30 @@ var skipSlide = function skipSlide() {
     return dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateSlide(reqSlide));
   };
 };
+var select = function select() {
+  return function (dispatch, getState) {
+    return new Promise(function (res) {
+      return res();
+    }).then(function () {
+      return dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updateMenuAction('Select'));
+    });
+  };
+};
 var textbox = function textbox() {
   return function (dispatch, getState) {
     return new Promise(function (res) {
       return res();
     }).then(function () {
       return dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updateMenuAction('Text Box'));
+    });
+  };
+};
+var circle = function circle() {
+  return function (dispatch, getState) {
+    return new Promise(function (res) {
+      return res();
+    }).then(function () {
+      return dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updateMenuAction('shape(circle)'));
     });
   };
 };
@@ -4622,7 +4642,10 @@ var SHAPE = {
   name: "Shape",
   icon: [10, 3],
   shortCut: undefined,
-  actionName: undefined
+  children: [{
+    name: "Circle",
+    actionName: "circle"
+  }]
 };
 var DUPLICATE_SLIDE = {
   name: "Duplicate Slide",
@@ -4646,7 +4669,7 @@ var SELECT = {
   name: "Select",
   icon: [7, 8],
   shortCut: undefined,
-  actionName: undefined
+  actionName: "select"
 };
 var FILL_COLOR = {
   name: "Fill color",
@@ -6862,6 +6885,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _utils_presentation_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/presentation_utils */ "./frontend/utils/presentation_utils.js");
 /* harmony import */ var _svg_editable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_editable */ "./frontend/components/svg/svg_editable.jsx");
+/* harmony import */ var _svg_shape__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./svg_shape */ "./frontend/components/svg/svg_shape.jsx");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -6883,6 +6907,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
 
 
 
@@ -6954,7 +6979,9 @@ function SVGWrapper(_ref) {
       _wrapper$strokeWidth = wrapper.strokeWidth,
       strokeWidth = _wrapper$strokeWidth === void 0 ? "0" : _wrapper$strokeWidth,
       _wrapper$strokeDashar = wrapper.strokeDasharray,
-      strokeDasharray = _wrapper$strokeDashar === void 0 ? "" : _wrapper$strokeDashar;
+      strokeDasharray = _wrapper$strokeDashar === void 0 ? "" : _wrapper$strokeDashar,
+      shape = wrapper.shape,
+      shapePath = wrapper.shapePath;
 
   function requestTransformAnimation(args) {
     cancelAnimationFrame(animationFrameRef.current);
@@ -7269,7 +7296,9 @@ function SVGWrapper(_ref) {
     onContextMenu: isPreview ? null : function (e) {
       return handleContextMenu(e, wrapper);
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_shape__WEBPACK_IMPORTED_MODULE_3__.default, {
+    type: shape,
+    path: shapePath,
     width: _transform.cropWidth,
     height: _transform.cropHeight,
     fill: fill,
@@ -7894,6 +7923,57 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./frontend/components/svg/svg_shape.jsx":
+/*!***********************************************!*\
+  !*** ./frontend/components/svg/svg_shape.jsx ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Shape)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+
+function Shape(_ref) {
+  var type = _ref.type,
+      path = _ref.path,
+      width = _ref.width,
+      height = _ref.height,
+      args = _objectWithoutProperties(_ref, ["type", "path", "width", "height"]);
+
+  switch (type.toLowerCase()) {
+    case 'circle':
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("ellipse", _extends({
+        cx: width / 2,
+        cy: height / 2,
+        rx: width / 2,
+        ry: height / 2
+      }, args));
+
+    default:
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", _objectSpread({
+        width: width,
+        height: height
+      }, args));
+  }
+}
+
+/***/ }),
+
 /***/ "./frontend/components/svg/svg_slide.jsx":
 /*!***********************************************!*\
   !*** ./frontend/components/svg/svg_slide.jsx ***!
@@ -7921,6 +8001,12 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
@@ -7964,33 +8050,49 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
     var scale = width / rect.width;
     var x = e.clientX - rect.x;
     var y = e.clientY - rect.y;
+    var wrapperAttributes = {
+      slideId: slideId,
+      groupId: null,
+      width: 400,
+      height: 50,
+      x: x * scale,
+      y: y * scale,
+      crop_x: 0,
+      crop_y: 0,
+      crop_width: 400,
+      crop_height: 50
+    };
+    var textstylesAttributes = [{
+      styleString: "font: 20px Arial; fill: black",
+      offset: 0
+    }];
     var textData = {
-      text: "wow",
-      wrapperAttributes: {
-        slideId: slideId,
-        groupId: null,
-        width: 400,
-        height: 50,
-        x: x * scale,
-        y: y * scale,
-        crop_x: 0,
-        crop_y: 0,
-        crop_width: 400,
-        crop_height: 50
-      },
-      textstylesAttributes: [{
-        styleString: "font: 20px Arial; fill: black",
-        offset: 0
-      }]
+      wrapperAttributes: wrapperAttributes,
+      textstylesAttributes: textstylesAttributes
     };
 
-    switch (menuAction) {
-      case 'Select':
+    switch (menuAction.toLowerCase()) {
+      case 'select':
         return;
 
-      case 'Text Box':
+      case 'text box':
         {
-          createText(textData);
+          createText(_objectSpread(_objectSpread({}, textData), {}, {
+            text: "wow"
+          }));
+        }
+
+      case 'shape(circle)':
+        {
+          createText({
+            textstylesAttributes: textstylesAttributes,
+            text: "",
+            wrapperAttributes: _objectSpread(_objectSpread({}, wrapperAttributes), {}, {
+              shape: "circle",
+              fill: "#dfdfdf",
+              stroke: "#7f7f7f"
+            })
+          });
         }
 
       default:
@@ -9370,23 +9472,30 @@ function SelectionReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : nullState;
   var action = arguments.length > 1 ? arguments[1] : undefined;
   Object.freeze(state);
+  if (action.type === _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_MENU_ACTION) return _objectSpread(_objectSpread({}, nullState), {}, {
+    nextMenuAction: action.nextMenuAction
+  });
+
+  var newState = _objectSpread(_objectSpread({}, state), {}, {
+    nextMenuAction: 'Select'
+  });
 
   switch (action.type) {
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_SELECTED_TEXT:
-      return _objectSpread(_objectSpread({}, state), {}, {
+      return _objectSpread(_objectSpread({}, newState), {}, {
         selectOffset: action.selectOffset,
         cursorOffset: action.cursorOffset
       });
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
       {
-        return _objectSpread({}, state);
+        return _objectSpread({}, newState);
       }
       ;
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_WRAPPERS:
       {
-        return _objectSpread(_objectSpread({}, state), {}, {
+        return _objectSpread(_objectSpread({}, newState), {}, {
           wrapperIds: state.wrapperIds.filter(function (id) {
             return action.wrappers[id];
           })
@@ -9395,26 +9504,21 @@ function SelectionReducer() {
       ;
 
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_SELECTED_WRAPPERS:
-      return action.wrapperIds.length ? _objectSpread(_objectSpread({}, state), {}, {
+      return action.wrapperIds.length ? _objectSpread(_objectSpread({}, newState), {}, {
         wrapperIds: _toConsumableArray(action.wrapperIds)
       }, action.sharedAttributes) : _objectSpread(_objectSpread({}, nullState), {}, {
         nextMenuAction: state.nextMenuAction
       });
 
-    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_MENU_ACTION:
-      return _objectSpread(_objectSpread({}, nullState), {}, {
-        nextMenuAction: action.nextMenuAction
-      });
-
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_WRAPPER:
       {
-        if (!action.wrapper) return nullState;else return state;
+        if (!action.wrapper) return nullState;else return newState;
       }
       ;
 
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_EDIT_MODE:
       {
-        return _objectSpread(_objectSpread({}, state), {}, {
+        return _objectSpread(_objectSpread({}, newState), {}, {
           editMode: action.value
         });
       }
@@ -9430,7 +9534,7 @@ function SelectionReducer() {
       return nullState;
 
     default:
-      return state;
+      return newState;
   }
 }
 

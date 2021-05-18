@@ -23,30 +23,40 @@ const ReactSVG = React.forwardRef(({
     const scale = width / rect.width;
     const x = e.clientX - rect.x;
     const y = e.clientY - rect.y;
-    const textData = {
-      text: "wow", 
-      wrapperAttributes: {
-        slideId,
-        groupId: null,
-        width: 400,
-        height: 50,
-        x: x * scale,
-        y: y * scale,
-        crop_x: 0,
-        crop_y: 0,
-        crop_width: 400,
-        crop_height: 50
-      },
-      textstylesAttributes: [{
-        styleString: "font: 20px Arial; fill: black",
-        offset: 0
-      }]
+    const wrapperAttributes = {
+      slideId,
+      groupId: null,
+      width: 400,
+      height: 50,
+      x: x * scale,
+      y: y * scale,
+      crop_x: 0,
+      crop_y: 0,
+      crop_width: 400,
+      crop_height: 50
     };
+    const textstylesAttributes = [{
+      styleString: "font: 20px Arial; fill: black",
+      offset: 0
+    }];
+    const textData = { wrapperAttributes, textstylesAttributes };
 
-    switch (menuAction){
-      case 'Select': return;
-      case 'Text Box': {
-        createText(textData);
+    switch (menuAction.toLowerCase()){
+      case 'select': return;
+      case 'text box': {
+        createText({...textData, text: "wow"});
+      }
+      case 'shape(circle)': {
+        createText({
+          textstylesAttributes,
+          text: "",
+          wrapperAttributes: {
+            ...wrapperAttributes,
+            shape: "circle",
+            fill: "#dfdfdf",
+            stroke: "#7f7f7f"
+          }
+        });
       }
       default: return updateMenuAction('Select');
     };

@@ -66,6 +66,7 @@ class Api::ImagesController < ApplicationController
         wrapper_attributes: [
           :id, :slide_id, :group_id,
           :slide_object_id, :slide_object_type,
+          :shape, :shape_path,
           :z_index, :width, :height,
           :x, :y, :rotate,
           :fill, :stroke, :stroke_width, :stroke_dasharray,

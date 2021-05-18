@@ -29,11 +29,14 @@ const IMAGE = { name: "Insert Image", icon: [0, 3], shortCut: undefined, childre
   { name: "Upload from computer", icon: [1, 3], type: 'image-upload', actionName: "uploadFromComputer"}
 ]};
 const TEXTBOX = { name: "Text Box", icon: [7, 3], shortCut: undefined, actionName: 'textbox'};
-const SHAPE = { name: "Shape", icon: [10, 3], shortCut: undefined, actionName: undefined};
+const SHAPE = { name: "Shape", icon: [10, 3], shortCut: undefined, children: [
+  { name: "Circle", actionName: "circle"}
+]};
+
 const DUPLICATE_SLIDE = { name: "Duplicate Slide", icon: undefined, shortCut: undefined, actionName: undefined};
 const DELETE_SLIDE = { name: "Delete Slide", icon: undefined, shortCut: undefined, actionName: "deleteSlide"};
 const SKIP_SLIDE = { name: "Skip Slide", type: 'boolean', shortCut: undefined, actionName: "skipSlide"};
-const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, actionName: undefined};
+const SELECT = { name: "Select", icon: [7, 8], shortCut: undefined, actionName: "select"};
 const FILL_COLOR = { name: "Fill color", icon: [0, 9], type: 'color', key: "fill", shortCut: undefined, children: ColorPalette, actionName: 'fillColor'};
 const BORDER_COLOR = { name: "Border color", icon: [1, 9], type: 'color', key: "stroke", shortCut: undefined, children: ColorPalette, actionName: 'borderColor'};
 const BORDER_WEIGHT = { name: "Border weight", icon: [2, 9], shortCut: undefined, children: [

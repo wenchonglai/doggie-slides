@@ -30,6 +30,7 @@ class Wrapper < ApplicationRecord
     :slide_id, :z_index, 
     :x, :y, :width, :height, :rotate,
     :crop_x, :crop_y, :crop_width, :crop_height,
+    :shape,
     {presence: true}
   )
 
@@ -52,6 +53,7 @@ class Wrapper < ApplicationRecord
     self.crop_height = self.height if self.crop_height == 0
     self.rotate ||= 0.0
     self.stroke_width ||= 0.0
+    self.shape_path ||= "";
   end
 
   def ensure_unique_order

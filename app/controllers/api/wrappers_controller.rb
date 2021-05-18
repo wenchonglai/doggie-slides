@@ -171,6 +171,7 @@ class Api::WrappersController < ApplicationController
       :x, :y, :width, :height, :rotate,
       :crop_x, :crop_y, :crop_width, :crop_height,
       :slide_object_id, :slide_object_type,
+      :shape, :shape_path, 
       :fill, :stroke, :stroke_width, :stroke_dasharray
     )
   end

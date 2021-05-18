@@ -9,45 +9,48 @@ const nullState = Object.freeze({
 function SelectionReducer(state = nullState, action){
   Object.freeze(state);
 
+  if (action.type === UIActions.RECEIVE_MENU_ACTION)
+    return {...nullState, nextMenuAction: action.nextMenuAction};
+
+  const newState = {...state, nextMenuAction: 'Select'};
+
   switch (action.type){
     case UIActions.RECEIVE_SELECTED_TEXT: 
       return {
-        ...state,
+        ...newState,
         selectOffset: action.selectOffset,
         cursorOffset: action.cursorOffset
       };
       case PresentationActions.RECEIVE_TEXT: {
         return {
-          ...state,
+          ...newState,
           // wrapperIds: [action.wrapperData.id]
         }
       };
     case PresentationActions.RECEIVE_WRAPPERS: {
       return {
-        ...state,
+        ...newState,
         wrapperIds: state.wrapperIds.filter(id => action.wrappers[id])
       }
     };
     case UIActions.RECEIVE_SELECTED_WRAPPERS: 
       return action.wrapperIds.length ? {
-        ...state,
+        ...newState,
         wrapperIds: [...action.wrapperIds],
         ...action.sharedAttributes
       } : {...nullState, nextMenuAction: state.nextMenuAction}
-    case UIActions.RECEIVE_MENU_ACTION:
-      return {...nullState, nextMenuAction: action.nextMenuAction};
     case PresentationActions.RECEIVE_WRAPPER: {
       if (!action.wrapper) return nullState;
-      else return state;
+      else return newState;
     };
     case UIActions.RECEIVE_EDIT_MODE: {
-      return {...state, editMode: action.value}
+      return {...newState, editMode: action.value}
     };
     case PresentationActions.RECEIVE_SLIDE:;
     case UIActions.RECEIVE_CURRENT_SLIDE:;
     case UIActions.CLEAR_UI:
       return nullState;
-    default: return state;
+    default: return newState;
   }
 }
 

@@ -5,7 +5,6 @@ json.wrappers({})
 json.textboxes({})
 json.textstyles({})
 json.images({})
-json.shapes({})
 
 if @user
   json.users do 
@@ -61,14 +60,6 @@ if @user
     (@user.images).map do |image|
       json.set! image.id do
         json.partial! "api/images/image", image: image
-      end
-    end
-  end
-
-  json.shapes do
-    (@user.shapes).map do |shape|
-      json.set! shape.id do
-        json.partial! "api/shapes/shape", shape: shape
       end
     end
   end

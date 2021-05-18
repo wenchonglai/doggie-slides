@@ -46,9 +46,19 @@ export const skipSlide = () => (dispatch, getState) => {
   return dispatch(PresentationActions.updateSlide(reqSlide));
 }
 
+export const select = () => (dispatch, getState) => {
+  return new Promise(res => res())
+    .then(() => dispatch(UIActions.updateMenuAction('Select')))
+}
+
 export const textbox = () => (dispatch, getState) => {
   return new Promise(res => res())
     .then(() => dispatch(UIActions.updateMenuAction('Text Box')))
+}
+
+export const circle = () => (dispatch, getState) => {
+  return new Promise(res => res())
+    .then(() => dispatch(UIActions.updateMenuAction('shape(circle)')))
 }
 
 export const updateWrapperAttribute = (key) => 

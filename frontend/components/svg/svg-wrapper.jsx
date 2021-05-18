@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { asyncUpdateDoc } from '../../utils/presentation_utils';
-import SVGEditable from './svg_editable'
+import SVGEditable from './svg_editable';
+import Shape from "./svg_shape";
 
 function throttle(e, timeoutRef, func, ...args){
   switch (e.type){
@@ -28,7 +29,8 @@ export default function SVGWrapper({
     slideObjectId, slideObjectType,
     x = 0, y = 0, rotate = 0, width = 300, height = 200,
     cropX = 0, cropY = 0, cropWidth = 300, cropHeight = 200,
-    fill = "none", stroke = "none", strokeWidth = "0", strokeDasharray = ""
+    fill = "none", stroke = "none", strokeWidth = "0", strokeDasharray = "",
+    shape, shapePath
   } = wrapper;
 
   function requestTransformAnimation(args){
@@ -248,14 +250,13 @@ export default function SVGWrapper({
       onMouseDown={!isPreview && svgDOM ? onFocus : null}
       onContextMenu={isPreview ? null : e => handleContextMenu(e, wrapper)}
     > 
-
-      <rect 
+      <Shape 
+        type={shape} path={shapePath}
         width={_transform.cropWidth} height={_transform.cropHeight}
         {...{fill, stroke}}
         strokeWidth={strokeWidth || stroke && 1}
         strokeDasharray={strokeDasharray && strokeDasharray.split(" ").map(x => x * strokeWidth).join(" ")}
       />
-
       { <SVGEditable
           active={_active}
           {...{svgDOM, 

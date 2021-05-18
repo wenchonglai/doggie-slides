@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_17_013702) do
+ActiveRecord::Schema.define(version: 2021_04_13_222411) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,13 +57,6 @@ ActiveRecord::Schema.define(version: 2021_05_17_013702) do
     t.float "scale_x", default: 0.0, null: false
     t.float "scale_y", default: 0.0, null: false
     t.string "style_string", default: ""
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "shapes", force: :cascade do |t|
-    t.string "type", null: false
-    t.string "path", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -125,6 +118,8 @@ ActiveRecord::Schema.define(version: 2021_05_17_013702) do
     t.string "stroke"
     t.float "stroke_width", default: 0.0
     t.string "stroke_dasharray"
+    t.string "shape", default: "rect", null: false
+    t.string "shape_path", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["group_id"], name: "index_wrappers_on_group_id"
