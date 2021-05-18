@@ -45,13 +45,14 @@ function SVGTextAreaSelect({className, text, start, end}){
 }
 
 export default function SVGTextArea({
-  active, slideObjectId,
+  active, editMode, updateEditMode, slideObjectId,
   width, height,
   className='', defaultFont, text, styleStrings, 
   updateTextHandler, updateUITextSelection, 
   svgDOM, isPreview,
   ...props
 }){
+
   function handleUpdate(){
     clearTimeout(_timeout.current);
 
@@ -64,6 +65,7 @@ export default function SVGTextArea({
     cancelAnimationFrame(animationFrameRef.current);
 
     if (!active){ return; }
+    if (!editMode){ updateEditMode(true); }
 
     const altKey = e.altKey;
     const shiftKey = e.shiftKey;
@@ -176,29 +178,11 @@ export default function SVGTextArea({
     });
   }
 
-  // function clickHandler(e){
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   _setActive(editable);
-  // }
-
-  // function blurHandler(e){
-  //   e.preventDefault();
-  //   clearTimeout(_timeout.current);
-
-  //   _timeout.current = setTimeout(() => {
-  //     updateTextHandler(slideObjectId, textRef.current.toReduxState());
-  //   }, 0);
-
-  //   _setActive(false);
-  // }
-
   function forceUpdate(){
     _forceUpdate(!_);
   }
 
   const [_, _forceUpdate] = useState(true);
-  // const [_active, _setActive] = useState(false);
   
   const _timeout = useRef();
   const textRef = useRef();
@@ -214,6 +198,7 @@ export default function SVGTextArea({
   const [_selectOffset, _setSelectOffset] = useState(0); 
 
   textRef.current ||= new DynamicText(text, styleStrings);
+
   componentsRef.current ||= textRef.current.toReactComponents(width);
 
   const [cursorX, cursorY, lineHeight] = (textRef.current.getPositionByOffset(_cursorOffset));
@@ -222,7 +207,8 @@ export default function SVGTextArea({
     textRef.current = new DynamicText(text, styleStrings);
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
-  }, [styleStrings])
+    
+  }, [styleStrings.map(obj => Object.entries(obj).toString()).join("|"), width]);
   
   if (!isPreview){
     useEffect(() => {
@@ -232,7 +218,7 @@ export default function SVGTextArea({
         eventListenerRef.current = keyDownListener;
         document.addEventListener('keydown', eventListenerRef.current);
       }
-    }, [active]);
+    }, [active, editMode]);
   
     useEffect(() => {
       eventListenerRef.current = keyDownListener;
@@ -246,7 +232,7 @@ export default function SVGTextArea({
   
   return (
     <g {...props}
-      className={`svg-textarea ${className} ${active ? 'active' : ''}`}
+      className={`svg-textarea ${className} ${editMode ? 'active' : ''}`}
       fill="none"
     > 
       <rect height={height} width={width} pointerEvents="all"></rect>

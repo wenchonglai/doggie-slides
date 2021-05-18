@@ -42,13 +42,13 @@ class Api::ImagesController < ApplicationController
   private
   def ensure_current_user
     if !current_user
-      render json: ["You are not authorized to visit this slide"], status: 403
+      render json: ["You are not authorized to visit this image"], status: 403
     else
       @user = User.includes(docs: [:slides]).find_by(id: current_user.id);
       @images = @user.images;
 
       unless @images
-        render json: ["You are not authorized to visit this slide"], status: 403
+        render json: ["You are not authorized to visit this image"], status: 403
       end
     end
   end

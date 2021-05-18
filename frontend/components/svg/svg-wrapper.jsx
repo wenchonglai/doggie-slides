@@ -19,6 +19,7 @@ function throttle(e, timeoutRef, func, ...args){
 
 export default function SVGWrapper({
   wrapperId, wrapper, isPreview, svgDOM, pageWidth, pageHeight,
+  editMode, updateEditMode,
   updateWrapperHandler, updateWrapperSelection, deleteWrapperSelection,
   handleContextMenu, selectedWrapperIds,
   ...props
@@ -191,8 +192,6 @@ export default function SVGWrapper({
     function handleBlur(e){
       blurTimeoutRef.current = setTimeout(() => {
         _setActive(false);
-
-        updateWrapperHandler();
       }, 0)
     }
   );
@@ -260,6 +259,7 @@ export default function SVGWrapper({
       { <SVGEditable
           active={_active}
           {...{svgDOM, 
+            editMode, updateEditMode,
             handleMove, handleRotate, handleResize, handleCropMove, handleCropResize,
             slideObjectId, slideObjectType, isPreview
           }}

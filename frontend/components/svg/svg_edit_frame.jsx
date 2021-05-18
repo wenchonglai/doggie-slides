@@ -46,7 +46,8 @@ const SVGMoveControl = function({svgDOM, width, height, onDrag, editMode, ...pro
 }
 
 const SVGEditable = function({
-  width, height, handleMove, handleRotate, handleResize, svgDOM, active,
+  width, height, handleMove, handleRotate, handleResize, svgDOM, active, 
+  editMode, updateEditMode,
   slideObjectId, slideObjectType, isPreview
 }){
   const halfWidth = width / 2;
@@ -67,20 +68,21 @@ const SVGEditable = function({
     <SVGControlPoint svgDOM={svgDOM} key={8} type="nwse-resize" onDrag={e => handleResize(e, 1, 1)} transform={`translate(${width} ${height})`}/>
   ];
 
-  const [_editMode, _setEditMode] = useState(false);
   const svgMoveControl = (
     <SVGMoveControl className='control-background' {...{svgDOM, width, height}}
-      onDoubleClick={e => _setEditMode(true)}
+      onDoubleClick={e => updateEditMode(true)}
       onDrag={e => {
         handleMove(e);
         if (e.type === 'mouseup' && e.dx && e.dy)
-          _setEditMode(false);
+          updateEditMode(false);
       }}
     />
   );
   
   useEffect(() => {
-    if (!active) _setEditMode(false);
+    if (!active) {
+      updateEditMode(false);
+    }
   }, [active]);
 
   const clipId = `${slideObjectType}${slideObjectId}clip`;
@@ -101,7 +103,7 @@ const SVGEditable = function({
           {component}
         </g>
 
-        {_editMode || svgMoveControl}
+        {editMode || svgMoveControl}
 
         { active ? (
             <g className='svg-edit-frame'>

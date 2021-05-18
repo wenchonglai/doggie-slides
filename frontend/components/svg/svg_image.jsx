@@ -7,7 +7,8 @@ export default function SVGImage({id, width, height, cropX, cropY, image, clipPa
 
   useEffect(() => {
     _setScale({ x: width / image.width, y: height / image.height })
-  }, [width, height])
+  }, [width, height]);
+  
   return (
     <image
       href={image.href}

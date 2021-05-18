@@ -183,3 +183,6 @@ export const changeBackground = value => (dispatch, getState) => {
 
   dispatch(PresentationActions.updateSlide({...slide, background: value}));
 }
+
+export const cropImage = () => dispatch => 
+  dispatch(UIActions.updateEditMode(true))

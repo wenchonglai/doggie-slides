@@ -11,8 +11,16 @@ import {getSelectedText, getTextstylesByTextbox} from '../../selectors/selectors
 const CTX = document.createElement('canvas').getContext('2d');
 const COMMON_CHAR_SIZE_MAP = {};
 const DEFAULT_FONT_SIZE = 14;
+const DEFAULT_INDENTATION = 6;
 
 CTX.font = `14px Times`;
+
+const getHeightFromStyle = style => {
+  const lineHeight = parseInt(style.lineHeight);
+
+  if (lineHeight && lineHeight != style.lineHeight) return lineHeight;
+  return (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * (lineHeight || 1.2)
+}
 
 export default class DynamicText{
   static fromCurrentSelection(state){
@@ -287,21 +295,16 @@ export default class DynamicText{
     return this;
   }
 
-  measureSubstringSize(substring, style = {}){
+  measureSubstringSize(substring, style = {}, ignoreSpaces = false){
     let oldFont = CTX.font, size;
-    let height = style.lineHeight;
-
+    
     if (style !== undefined){
       CTX.font = style.font || CTX.font;
-      size = CTX.measureText(substring);
+      size = CTX.measureText(substring.replace(/\n/, ''));
       CTX.font = oldFont;
     } else { size = CTX.measureText(substring); }
     
-    if (!height){
-      height = (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * 1.2
-    }
-
-    return {width: size.width, height: height};
+    return {width: size.width, height: getHeightFromStyle(style)};
   }
 
   toReactComponents(maxWidth = 960, {tabValue = 72} = {}){
@@ -309,25 +312,27 @@ export default class DynamicText{
     // process the substring starting at l and ending at r, create an React element for this substring, and update offsets
 
     let l = 0, r = 0;
-    let offsetX = 0, offsetY = 0;
-    let maxLineHeight = 0;
+    let offsetX = DEFAULT_INDENTATION, offsetY = 0;
+    let maxLineHeight = DEFAULT_FONT_SIZE;
 
     this._segmentMap.clear();
 
     const tempQueue = [];
     const results = [];
 
-    function _changeLine(){
-      offsetX = 0;
+    function _changeLine(newLine = false){
+      offsetX = DEFAULT_INDENTATION;
       offsetY += maxLineHeight;
       maxLineHeight = 0;
+
+      const lineWidth = tempQueue.reduce((acc, el) => acc + el.offsetX, 0) + 
+        (tempQueue.last && tempQueue.last.width || 0)
 
       for (let i = 0, len = tempQueue.length; i < len; i++){
         let el = tempQueue[i];
         let reactComponent = this.toReactComponent({...el, offsetY});
         
         results.push(reactComponent);
-
         this._segmentMap.set(el.l, [el.offsetX, offsetY, el.height]);
       }
 
@@ -346,23 +351,22 @@ export default class DynamicText{
 
       if (![' ', '\n', '\t'].includes(substring)){               // if the last character is not a break character
         if (
-          tempQueue.some(x => x.substring.match(/[\ \n\t]/)) > 0 && 
-          offsetX + width > maxWidth
+          tempQueue.some(x => x.substring.match(/[\s]/)) > 0 && 
+          offsetX + width > maxWidth - DEFAULT_INDENTATION
         ){  // if a line has more than one segment and the last segment exceeds the right boundary
           _changeLine.call(this);
         } else {
-          if (height > maxLineHeight) maxLineHeight = height; 
-          // tempQueue.push({substring, l, r, offsetX})
+          if (height > maxLineHeight) maxLineHeight = height;
         }
       }
 
+      if (height > maxLineHeight) maxLineHeight = height; 
+      
       if (lastChar === '\n'){
-        tempQueue.push({substring, style, l, r, height, offsetX})
+        tempQueue.push({substring, style, l, r, height, offsetX, width});
         _changeLine.call(this);
       } else {
-        if (height > maxLineHeight) maxLineHeight = height; 
-
-        tempQueue.push({substring, style, l, r, height, offsetX})
+        tempQueue.push({substring, style, l, r, height, offsetX, width});
         offsetX += width;
 
         if (lastChar === '\t'){
@@ -389,20 +393,30 @@ export default class DynamicText{
           typeIndex = j;
         }
       }
-
-      r = minPosition + (typeIndex > 0 ? 1 : 0);
+      r = minPosition;
 
       _processSubstring.call(this, l, r);
-
       l = r;
+
+      if (typeIndex > 0) { // if the last character is \s
+        _processSubstring.call(this, l, ++r);
+        l = r
+      }
       positions[typeIndex] += 1;
     }
-    
+
     // process the remaining characters on the right of the last break character or style index
     _processSubstring.call(this, l, this.length);
 
-    this._segmentMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
+    if (this.length <= l + 1 && this._text[l - 1] === '\n'){
+      const style = this._styleMap.getLeftValue(l);
+      const lineHeight = getHeightFromStyle(style);
 
+      this._segmentMap.set(l, [offsetX, offsetY += lineHeight, lineHeight]);
+
+    }
+
+    this._segmentMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
     _changeLine.call(this);
 
     return results;

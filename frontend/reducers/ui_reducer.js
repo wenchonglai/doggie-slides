@@ -3,7 +3,7 @@ import * as PresentationActions from '../actions/presentation_actions';
 import { combineReducers } from 'redux';
 
 const nullState = Object.freeze({
-  wrapperIds: [], nextMenuAction: 'Select', isFullScreen: false
+  wrapperIds: [], nextMenuAction: 'Select', editMode: false
 });
 
 function SelectionReducer(state = nullState, action){
@@ -39,6 +39,9 @@ function SelectionReducer(state = nullState, action){
     case PresentationActions.RECEIVE_WRAPPER: {
       if (!action.wrapper) return nullState;
       else return state;
+    };
+    case UIActions.RECEIVE_EDIT_MODE: {
+      return {...state, editMode: action.value}
     };
     case PresentationActions.RECEIVE_SLIDE:;
     case UIActions.RECEIVE_CURRENT_SLIDE:;

@@ -1,0 +1,1 @@
+json.extract! shape, :id, :type, :path

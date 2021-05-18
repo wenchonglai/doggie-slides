@@ -115,7 +115,7 @@ const ALIGN = { name: "Align", icon: [11, 9], shortCut: undefined, actionName: u
   { name: "Justify", icon: [3, 6], shortCut: undefined, actionName: undefined},
 ]};
 
-const CROP_IMAGE = { name: "Crop image", icon: [5, 10], shortCut: undefined, actionName: undefined};
+const CROP_IMAGE = { name: "Crop image", icon: [5, 10], shortCut: undefined, actionName: 'cropImage'};
 const RESET_IMAGE = { name: "Reset image", icon: [6, 10], shortCut: undefined, actionName: undefined};
 
 const DELETE_WRAPPER = { name: "Delete", icon: undefined, shortCut: undefined, actionName: "deleteWrappers"};

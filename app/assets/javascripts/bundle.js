@@ -3004,7 +3004,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "zoomIn": () => (/* binding */ zoomIn),
 /* harmony export */   "zoomOut": () => (/* binding */ zoomOut),
 /* harmony export */   "present": () => (/* binding */ present),
-/* harmony export */   "changeBackground": () => (/* binding */ changeBackground)
+/* harmony export */   "changeBackground": () => (/* binding */ changeBackground),
+/* harmony export */   "cropImage": () => (/* binding */ cropImage)
 /* harmony export */ });
 /* harmony import */ var _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../actions/presentation_actions */ "./frontend/actions/presentation_actions.js");
 /* harmony import */ var _actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../actions/ui_actions */ "./frontend/actions/ui_actions.js");
@@ -3267,6 +3268,11 @@ var changeBackground = function changeBackground(value) {
     dispatch(_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_0__.updateSlide(_objectSpread(_objectSpread({}, slide), {}, {
       background: value
     })));
+  };
+};
+var cropImage = function cropImage() {
+  return function (dispatch) {
+    return dispatch(_actions_ui_actions__WEBPACK_IMPORTED_MODULE_1__.updateEditMode(true));
   };
 };
 
@@ -3700,6 +3706,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "RECEIVE_MENU_ACTION": () => (/* binding */ RECEIVE_MENU_ACTION),
 /* harmony export */   "CLEAR_UI": () => (/* binding */ CLEAR_UI),
 /* harmony export */   "RECEIVE_ZOOM_LEVEL": () => (/* binding */ RECEIVE_ZOOM_LEVEL),
+/* harmony export */   "RECEIVE_EDIT_MODE": () => (/* binding */ RECEIVE_EDIT_MODE),
 /* harmony export */   "receiveCurrentSlide": () => (/* binding */ receiveCurrentSlide),
 /* harmony export */   "receivePresentingSlide": () => (/* binding */ receivePresentingSlide),
 /* harmony export */   "receiveSelectedWrappers": () => (/* binding */ receiveSelectedWrappers),
@@ -3707,7 +3714,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "receiveMenuAction": () => (/* binding */ receiveMenuAction),
 /* harmony export */   "clearUI": () => (/* binding */ clearUI),
 /* harmony export */   "receiveZoomLevel": () => (/* binding */ receiveZoomLevel),
+/* harmony export */   "receiveEditMode": () => (/* binding */ receiveEditMode),
 /* harmony export */   "updateCurrentSlide": () => (/* binding */ updateCurrentSlide),
+/* harmony export */   "updateEditMode": () => (/* binding */ updateEditMode),
 /* harmony export */   "updateWrapperSelection": () => (/* binding */ updateWrapperSelection),
 /* harmony export */   "deleteWrapperSelection": () => (/* binding */ deleteWrapperSelection),
 /* harmony export */   "updateUITextSelection": () => (/* binding */ updateUITextSelection),
@@ -3731,6 +3740,7 @@ var RECEIVE_SELECTED_TEXT = 'RECEIVE_SELECTED_TEXT';
 var RECEIVE_MENU_ACTION = 'RECEIVE_MENU_ACTION';
 var CLEAR_UI = 'CLEAR_UI';
 var RECEIVE_ZOOM_LEVEL = 'RECEIVE_ZOOM_LEVEL';
+var RECEIVE_EDIT_MODE = 'RECEIVE_EDIT_MODE';
 var receiveCurrentSlide = function receiveCurrentSlide(slideId) {
   return {
     type: RECEIVE_CURRENT_SLIDE,
@@ -3776,6 +3786,12 @@ var receiveZoomLevel = function receiveZoomLevel(zoom) {
   return {
     type: RECEIVE_ZOOM_LEVEL,
     zoom: zoom
+  };
+};
+var receiveEditMode = function receiveEditMode(value) {
+  return {
+    type: RECEIVE_EDIT_MODE,
+    value: value
   };
 };
 var updateCurrentSlide = function updateCurrentSlide(slideId, history, redirect) {
@@ -3827,12 +3843,24 @@ function getWrapperSelectionInfo(wrapperIds, entities) {
   };
 }
 
+var updateEditMode = function updateEditMode(value) {
+  return function (dispatch, getState) {
+    return dispatch(receiveEditMode(value));
+  };
+};
 var updateWrapperSelection = function updateWrapperSelection(wrapperIds) {
   return function (dispatch, getState) {
     var _getState2 = getState(),
-        entities = _getState2.entities;
+        entities = _getState2.entities,
+        ui = _getState2.ui;
 
-    dispatch(receiveSelectedWrappers(getWrapperSelectionInfo(wrapperIds, entities)));
+    var length = wrapperIds.length;
+
+    var _wrapperIds = ui.selections.wrapperIds.filter(function (id) {
+      return wrapperIds.includes(id);
+    });
+
+    if (length !== _wrapperIds.length) dispatch(receiveSelectedWrappers(getWrapperSelectionInfo(wrapperIds, entities)));
   };
 };
 var deleteWrapperSelection = function deleteWrapperSelection(arg) {
@@ -3841,10 +3869,14 @@ var deleteWrapperSelection = function deleteWrapperSelection(arg) {
         entities = _getState3.entities,
         ui = _getState3.ui;
 
-    var wrapperIds = ui.selections.wrapperIds.filter(function (id) {
+    var wrapperIds = ui.selections.wrapperIds;
+    var length = wrapperIds.length;
+
+    var _wrapperIds = ui.selections.wrapperIds.filter(function (id) {
       return !arg.includes(id);
     });
-    if (wrapperIds.length) dispatch(receiveSelectedWrappers(getWrapperSelectionInfo(wrapperIds, entities)));
+
+    if (length !== _wrapperIds.length) dispatch(receiveSelectedWrappers(getWrapperSelectionInfo(_wrapperIds, entities)));
   };
 };
 var updateUITextSelection = function updateUITextSelection(_ref2) {
@@ -4934,7 +4966,7 @@ var CROP_IMAGE = {
   name: "Crop image",
   icon: [5, 10],
   shortCut: undefined,
-  actionName: undefined
+  actionName: 'cropImage'
 };
 var RESET_IMAGE = {
   name: "Reset image",
@@ -6886,12 +6918,14 @@ function SVGWrapper(_ref) {
       svgDOM = _ref.svgDOM,
       pageWidth = _ref.pageWidth,
       pageHeight = _ref.pageHeight,
+      editMode = _ref.editMode,
+      updateEditMode = _ref.updateEditMode,
       updateWrapperHandler = _ref.updateWrapperHandler,
       updateWrapperSelection = _ref.updateWrapperSelection,
       deleteWrapperSelection = _ref.deleteWrapperSelection,
       handleContextMenu = _ref.handleContextMenu,
       selectedWrapperIds = _ref.selectedWrapperIds,
-      props = _objectWithoutProperties(_ref, ["wrapperId", "wrapper", "isPreview", "svgDOM", "pageWidth", "pageHeight", "updateWrapperHandler", "updateWrapperSelection", "deleteWrapperSelection", "handleContextMenu", "selectedWrapperIds"]);
+      props = _objectWithoutProperties(_ref, ["wrapperId", "wrapper", "isPreview", "svgDOM", "pageWidth", "pageHeight", "editMode", "updateEditMode", "updateWrapperHandler", "updateWrapperSelection", "deleteWrapperSelection", "handleContextMenu", "selectedWrapperIds"]);
 
   var slideObjectId = wrapper.slideObjectId,
       slideObjectType = wrapper.slideObjectType,
@@ -7145,8 +7179,6 @@ function SVGWrapper(_ref) {
   var eventListenerRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(function handleBlur(e) {
     blurTimeoutRef.current = setTimeout(function () {
       _setActive(false);
-
-      updateWrapperHandler();
     }, 0);
   });
 
@@ -7249,6 +7281,8 @@ function SVGWrapper(_ref) {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_svg_editable__WEBPACK_IMPORTED_MODULE_2__.default, {
     active: _active,
     svgDOM: svgDOM,
+    editMode: editMode,
+    updateEditMode: updateEditMode,
     handleMove: handleMove,
     handleRotate: handleRotate,
     handleResize: handleResize,
@@ -7400,18 +7434,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _svg_draggable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./svg_draggable */ "./frontend/components/svg/svg_draggable.jsx");
 /* harmony import */ var _svg_textarea_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./svg_textarea_container */ "./frontend/components/svg/svg_textarea_container.js");
 /* harmony import */ var _svg_image_container__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./svg_image_container */ "./frontend/components/svg/svg_image_container.js");
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
@@ -7456,6 +7478,8 @@ function getComponent(_ref2) {
       slideObjectId = _ref2.slideObjectId,
       slideObjectType = _ref2.slideObjectType,
       active = _ref2.active,
+      editMode = _ref2.editMode,
+      updateEditMode = _ref2.updateEditMode,
       svgDOM = _ref2.svgDOM,
       isPreview = _ref2.isPreview;
 
@@ -7467,7 +7491,9 @@ function getComponent(_ref2) {
         slideObjectId: slideObjectId,
         active: active,
         svgDOM: svgDOM,
-        isPreview: isPreview
+        isPreview: isPreview,
+        editMode: editMode,
+        updateEditMode: updateEditMode
       });
 
     case 'Image':
@@ -7479,6 +7505,9 @@ function getComponent(_ref2) {
         cropX: transform.cropX,
         cropY: transform.cropY
       });
+
+    case 'Shape':
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGShapeContainer, null);
   }
 }
 
@@ -7604,8 +7633,7 @@ var SVGCropFrame = function SVGCropFrame(_ref5) {
       width = _ref5.width,
       height = _ref5.height,
       handleCropResize = _ref5.handleCropResize,
-      handleCropMove = _ref5.handleCropMove,
-      handleClick = _ref5.handleClick;
+      handleCropMove = _ref5.handleCropMove;
   var halfWidth = width / 2;
   var halfHeight = height / 2;
   var controlPoints = [/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGControlPoint, {
@@ -7696,29 +7724,27 @@ var SVGEditable = function SVGEditable(_ref6) {
       slideObjectId = _ref6.slideObjectId,
       slideObjectType = _ref6.slideObjectType,
       isPreview = _ref6.isPreview,
+      editMode = _ref6.editMode,
+      updateEditMode = _ref6.updateEditMode,
       handleCropResize = _ref6.handleCropResize,
       handleCropMove = _ref6.handleCropMove;
-
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
-      _useState2 = _slicedToArray(_useState, 2),
-      _editMode = _useState2[0],
-      _setEditMode = _useState2[1];
-
   var svgMoveControl = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGMoveControl, {
     className: "control-background",
     svgDOM: svgDOM,
     width: transform.cropWidth,
     height: transform.cropHeight,
     onDoubleClick: function onDoubleClick(e) {
-      return _setEditMode(true);
+      return updateEditMode(true);
     },
     onDrag: function onDrag(e) {
       handleMove(e);
-      if (e.type === 'mouseup' && e.dx && e.dy) _setEditMode(false);
+      if (e.type === 'mouseup' && e.dx && e.dy) updateEditMode(false);
     }
   });
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    if (!active) _setEditMode(false);
+    if (!active && !isPreview) {
+      updateEditMode(false);
+    }
   }, [active]);
   var clipId = "".concat(slideObjectType, "-").concat(slideObjectId, "-clip").concat(isPreview ? '-preview' : '');
   var component = getComponent({
@@ -7729,6 +7755,8 @@ var SVGEditable = function SVGEditable(_ref6) {
     slideObjectId: slideObjectId,
     slideObjectType: slideObjectType,
     active: active,
+    editMode: editMode,
+    updateEditMode: updateEditMode,
     svgDOM: svgDOM,
     isPreview: isPreview
   });
@@ -7740,8 +7768,8 @@ var SVGEditable = function SVGEditable(_ref6) {
     width: transform.cropWidth,
     height: transform.cropHeight
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", {
-    clipPath: _editMode || slideObjectType === 'Textbox' ? null : "url(#".concat(clipId, ")")
-  }, component), _editMode || svgMoveControl, active ? _editMode && slideObjectType !== 'Textbox' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGCropFrame, {
+    clipPath: editMode || slideObjectType === 'Textbox' ? null : "url(#".concat(clipId, ")")
+  }, component), svgMoveControl, active ? editMode && slideObjectType !== 'Textbox' ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(SVGCropFrame, {
     svgDOM: svgDOM,
     handleCropResize: handleCropResize,
     handleCropMove: handleCropMove,
@@ -8211,6 +8239,8 @@ function SVGTextAreaSelect(_ref) {
 
 function SVGTextArea(_ref2) {
   var active = _ref2.active,
+      editMode = _ref2.editMode,
+      updateEditMode = _ref2.updateEditMode,
       slideObjectId = _ref2.slideObjectId,
       width = _ref2.width,
       height = _ref2.height,
@@ -8223,7 +8253,7 @@ function SVGTextArea(_ref2) {
       updateUITextSelection = _ref2.updateUITextSelection,
       svgDOM = _ref2.svgDOM,
       isPreview = _ref2.isPreview,
-      props = _objectWithoutProperties(_ref2, ["active", "slideObjectId", "width", "height", "className", "defaultFont", "text", "styleStrings", "updateTextHandler", "updateUITextSelection", "svgDOM", "isPreview"]);
+      props = _objectWithoutProperties(_ref2, ["active", "editMode", "updateEditMode", "slideObjectId", "width", "height", "className", "defaultFont", "text", "styleStrings", "updateTextHandler", "updateUITextSelection", "svgDOM", "isPreview"]);
 
   function handleUpdate() {
     clearTimeout(_timeout.current);
@@ -8237,6 +8267,10 @@ function SVGTextArea(_ref2) {
 
     if (!active) {
       return;
+    }
+
+    if (!editMode) {
+      updateEditMode(true);
     }
 
     var altKey = e.altKey;
@@ -8337,20 +8371,7 @@ function SVGTextArea(_ref2) {
 
       _setCursorOffset(cursorOffsetRef.current);
     });
-  } // function clickHandler(e){
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   _setActive(editable);
-  // }
-  // function blurHandler(e){
-  //   e.preventDefault();
-  //   clearTimeout(_timeout.current);
-  //   _timeout.current = setTimeout(() => {
-  //     updateTextHandler(slideObjectId, textRef.current.toReduxState());
-  //   }, 0);
-  //   _setActive(false);
-  // }
-
+  }
 
   function forceUpdate() {
     _forceUpdate(!_);
@@ -8359,8 +8380,7 @@ function SVGTextArea(_ref2) {
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true),
       _useState2 = _slicedToArray(_useState, 2),
       _ = _useState2[0],
-      _forceUpdate = _useState2[1]; // const [_active, _setActive] = useState(false);
-
+      _forceUpdate = _useState2[1];
 
   var _timeout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
@@ -8396,7 +8416,9 @@ function SVGTextArea(_ref2) {
     textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings);
     componentsRef.current = textRef.current.toReactComponents(width);
     forceUpdate();
-  }, [styleStrings]);
+  }, [styleStrings.map(function (obj) {
+    return Object.entries(obj).toString();
+  }).join("|"), width]);
 
   if (!isPreview) {
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
@@ -8406,7 +8428,7 @@ function SVGTextArea(_ref2) {
         eventListenerRef.current = keyDownListener;
         document.addEventListener('keydown', eventListenerRef.current);
       }
-    }, [active]);
+    }, [active, editMode]);
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
       eventListenerRef.current = keyDownListener;
       return function () {
@@ -8417,7 +8439,7 @@ function SVGTextArea(_ref2) {
   }
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("g", _extends({}, props, {
-    className: "svg-textarea ".concat(className, " ").concat(active ? 'active' : ''),
+    className: "svg-textarea ".concat(className, " ").concat(editMode ? 'active' : ''),
     fill: "none"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("rect", {
     height: height,
@@ -8514,9 +8536,10 @@ var mapSTPCreator = function mapSTPCreator(isPreview) {
       isPreview: isPreview,
       svgDOM: isPreview ? undefined : svgDOM,
       pageWidth: ui.pageSettings.pageWidth,
-      paggHeight: ui.pageSettings.pageHeight,
+      pageHeight: ui.pageSettings.pageHeight,
       selectedWrapperIds: ui.selections.wrapperIds,
-      wrapper: entities.wrappers[wrapperId]
+      wrapper: entities.wrappers[wrapperId],
+      editMode: ui.selections.editMode
     };
   };
 };
@@ -8527,10 +8550,13 @@ var SVGWrapperContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(m
       return dispatch((0,_actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.updateWrapper)(formData));
     },
     updateWrapperSelection: function updateWrapperSelection(wrapperIds) {
-      dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateWrapperSelection)(wrapperIds));
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateWrapperSelection)(wrapperIds));
     },
     deleteWrapperSelection: function deleteWrapperSelection(wrapperIds) {
-      dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.deleteWrapperSelection)(wrapperIds));
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.deleteWrapperSelection)(wrapperIds));
+    },
+    updateEditMode: function updateEditMode(value) {
+      return dispatch((0,_actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.updateEditMode)(value));
     }
   };
 })(_svg_wrapper__WEBPACK_IMPORTED_MODULE_3__.default);
@@ -9337,7 +9363,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var nullState = Object.freeze({
   wrapperIds: [],
   nextMenuAction: 'Select',
-  isFullScreen: false
+  editMode: false
 });
 
 function SelectionReducer() {
@@ -9383,6 +9409,14 @@ function SelectionReducer() {
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_WRAPPER:
       {
         if (!action.wrapper) return nullState;else return state;
+      }
+      ;
+
+    case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_0__.RECEIVE_EDIT_MODE:
+      {
+        return _objectSpread(_objectSpread({}, state), {}, {
+          editMode: action.value
+        });
       }
       ;
 
@@ -9571,7 +9605,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var configureStore = function configureStore() {
   var preloadedState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default, (redux_logger__WEBPACK_IMPORTED_MODULE_0___default())));
+  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default));
 };
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (configureStore);
@@ -9710,7 +9744,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var CTX = document.createElement('canvas').getContext('2d');
 var COMMON_CHAR_SIZE_MAP = {};
 var DEFAULT_FONT_SIZE = 14;
+var DEFAULT_INDENTATION = 6;
 CTX.font = "14px Times";
+
+var getHeightFromStyle = function getHeightFromStyle(style) {
+  var lineHeight = parseInt(style.lineHeight);
+  if (lineHeight && lineHeight != style.lineHeight) return lineHeight;
+  return (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * (lineHeight || 1.2);
+};
 
 var DynamicText = /*#__PURE__*/function () {
   function DynamicText() {
@@ -10002,25 +10043,21 @@ var DynamicText = /*#__PURE__*/function () {
     key: "measureSubstringSize",
     value: function measureSubstringSize(substring) {
       var style = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var ignoreSpaces = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       var oldFont = CTX.font,
           size;
-      var height = style.lineHeight;
 
       if (style !== undefined) {
         CTX.font = style.font || CTX.font;
-        size = CTX.measureText(substring);
+        size = CTX.measureText(substring.replace(/\n/, ''));
         CTX.font = oldFont;
       } else {
         size = CTX.measureText(substring);
       }
 
-      if (!height) {
-        height = (parseInt(style.fontSize) || DEFAULT_FONT_SIZE) * 1.2;
-      }
-
       return {
         width: size.width,
-        height: height
+        height: getHeightFromStyle(style)
       };
     }
   }, {
@@ -10036,9 +10073,9 @@ var DynamicText = /*#__PURE__*/function () {
       // process the substring starting at l and ending at r, create an React element for this substring, and update offsets
       var l = 0,
           r = 0;
-      var offsetX = 0,
+      var offsetX = DEFAULT_INDENTATION,
           offsetY = 0;
-      var maxLineHeight = 0;
+      var maxLineHeight = DEFAULT_FONT_SIZE;
 
       this._segmentMap.clear();
 
@@ -10046,9 +10083,13 @@ var DynamicText = /*#__PURE__*/function () {
       var results = [];
 
       function _changeLine() {
-        offsetX = 0;
+        var newLine = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        offsetX = DEFAULT_INDENTATION;
         offsetY += maxLineHeight;
         maxLineHeight = 0;
+        var lineWidth = tempQueue.reduce(function (acc, el) {
+          return acc + el.offsetX;
+        }, 0) + (tempQueue.last && tempQueue.last.width || 0);
 
         for (var i = 0, len = tempQueue.length; i < len; i++) {
           var el = tempQueue[i];
@@ -10078,14 +10119,16 @@ var DynamicText = /*#__PURE__*/function () {
         if (![' ', '\n', '\t'].includes(substring)) {
           // if the last character is not a break character
           if (tempQueue.some(function (x) {
-            return x.substring.match(/[\ \n\t]/);
-          }) > 0 && offsetX + width > maxWidth) {
+            return x.substring.match(/[\s]/);
+          }) > 0 && offsetX + width > maxWidth - DEFAULT_INDENTATION) {
             // if a line has more than one segment and the last segment exceeds the right boundary
             _changeLine.call(this);
           } else {
-            if (height > maxLineHeight) maxLineHeight = height; // tempQueue.push({substring, l, r, offsetX})
+            if (height > maxLineHeight) maxLineHeight = height;
           }
         }
+
+        if (height > maxLineHeight) maxLineHeight = height;
 
         if (lastChar === '\n') {
           tempQueue.push({
@@ -10094,19 +10137,20 @@ var DynamicText = /*#__PURE__*/function () {
             l: l,
             r: r,
             height: height,
-            offsetX: offsetX
+            offsetX: offsetX,
+            width: width
           });
 
           _changeLine.call(this);
         } else {
-          if (height > maxLineHeight) maxLineHeight = height;
           tempQueue.push({
             substring: substring,
             style: style,
             l: l,
             r: r,
             height: height,
-            offsetX: offsetX
+            offsetX: offsetX,
+            width: width
           });
           offsetX += width;
 
@@ -10137,16 +10181,32 @@ var DynamicText = /*#__PURE__*/function () {
           }
         }
 
-        r = minPosition + (typeIndex > 0 ? 1 : 0);
+        r = minPosition;
 
         _processSubstring.call(this, l, r);
 
         l = r;
+
+        if (typeIndex > 0) {
+          // if the last character is \s
+          _processSubstring.call(this, l, ++r);
+
+          l = r;
+        }
+
         positions[typeIndex] += 1;
       } // process the remaining characters on the right of the last break character or style index
 
 
       _processSubstring.call(this, l, this.length);
+
+      if (this.length <= l + 1 && this._text[l - 1] === '\n') {
+        var _style2 = this._styleMap.getLeftValue(l);
+
+        var lineHeight = getHeightFromStyle(_style2);
+
+        this._segmentMap.set(l, [offsetX, offsetY += lineHeight, lineHeight]);
+      }
 
       this._segmentMap.set(this.length, [offsetX, offsetY + maxLineHeight, 0]);
 

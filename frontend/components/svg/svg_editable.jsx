@@ -19,12 +19,15 @@ const SVGControlPoint = function({svgDOM, type, x, y, transform, onDrag}){
   );
 }
 
-function getComponent({width, height, transform, slideObjectId, slideObjectType, active, svgDOM, isPreview}){
+function getComponent({
+  width, height, transform, slideObjectId, slideObjectType, 
+  active, editMode, updateEditMode, svgDOM, isPreview
+}){
   switch (slideObjectType){
     case 'Textbox': 
       return (
         <SVGTextAreaContainer {
-          ...{width, height, slideObjectId, active, svgDOM, isPreview}
+          ...{width, height, slideObjectId, active, svgDOM, isPreview, editMode, updateEditMode}
         } />
       );
     case 'Image':
@@ -35,6 +38,10 @@ function getComponent({width, height, transform, slideObjectId, slideObjectType,
           cropX={transform.cropX}
           cropY={transform.cropY}
         />
+      );
+    case 'Shape':
+      return (
+        <SVGShapeContainer />
       );
   }
 }
@@ -85,7 +92,7 @@ const SVGEditFrame = function({svgDOM, width, height,
 }
 
 const SVGCropFrame = function({svgDOM, width, height,
-   handleCropResize, handleCropMove, handleClick
+   handleCropResize, handleCropMove
 }){
   const halfWidth = width / 2;
   const halfHeight = height / 2;
@@ -114,27 +121,27 @@ const SVGCropFrame = function({svgDOM, width, height,
 
 const SVGEditable = function({
   transform, handleMove, handleRotate, handleResize, svgDOM, active,
-  slideObjectId, slideObjectType, isPreview,
+  slideObjectId, slideObjectType, isPreview, editMode, updateEditMode,
   handleCropResize, handleCropMove
 }){
-
-  const [_editMode, _setEditMode] = useState(false);
   const svgMoveControl = (
     <SVGMoveControl className='control-background' 
       svgDOM={svgDOM}
       width={transform.cropWidth}
       height={transform.cropHeight}
-      onDoubleClick={e => _setEditMode(true)}
+      onDoubleClick={e => updateEditMode(true)}
       onDrag={e => {
         handleMove(e);
         if (e.type === 'mouseup' && e.dx && e.dy)
-          _setEditMode(false);
+          updateEditMode(false);
       }}
     />
   );
   
   useEffect(() => {
-    if (!active) _setEditMode(false);
+    if (!active && !isPreview) {
+      updateEditMode(false);
+    }
   }, [active]);
 
   const clipId = `${slideObjectType}-${slideObjectId}-clip${isPreview ? '-preview' : ''}`;
@@ -142,7 +149,7 @@ const SVGEditable = function({
     clipId, 
     transform: transform,
     width: transform.width, height: transform.height, 
-    slideObjectId, slideObjectType, active, 
+    slideObjectId, slideObjectType, active, editMode, updateEditMode,
     svgDOM, isPreview
   });
 
@@ -160,14 +167,14 @@ const SVGEditable = function({
         <clipPath id={clipId}>
           <rect width={transform.cropWidth} height={transform.cropHeight} />
         </clipPath>
-        <g clipPath={(_editMode || slideObjectType === 'Textbox') ? null : `url(#${clipId})`}>
+        <g clipPath={(editMode || slideObjectType === 'Textbox') ? null : `url(#${clipId})`}>
           {component}
         </g>
 
-        {_editMode || svgMoveControl}
+        {svgMoveControl}
 
         { active ? (
-            _editMode && slideObjectType !== 'Textbox' ? 
+            editMode && slideObjectType !== 'Textbox' ? 
             <SVGCropFrame {...{svgDOM, handleCropResize, handleCropMove}}
               width={transform.cropWidth} height={transform.cropHeight}
             /> :

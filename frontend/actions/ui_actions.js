@@ -8,6 +8,7 @@ export const RECEIVE_SELECTED_TEXT = 'RECEIVE_SELECTED_TEXT';
 export const RECEIVE_MENU_ACTION = 'RECEIVE_MENU_ACTION';
 export const CLEAR_UI = 'CLEAR_UI';
 export const RECEIVE_ZOOM_LEVEL = 'RECEIVE_ZOOM_LEVEL';
+export const RECEIVE_EDIT_MODE = 'RECEIVE_EDIT_MODE';
 
 export const receiveCurrentSlide = (slideId) => ({
   type: RECEIVE_CURRENT_SLIDE,
@@ -47,6 +48,11 @@ export const clearUI = () => ({
 export const receiveZoomLevel = (zoom) => ({
   type: RECEIVE_ZOOM_LEVEL,
   zoom
+})
+
+export const receiveEditMode = value => ({
+  type: RECEIVE_EDIT_MODE,
+  value
 })
 
 export const updateCurrentSlide = (slideId, history, redirect) => (dispatch, getState) => {
@@ -91,22 +97,29 @@ function getWrapperSelectionInfo(wrapperIds, entities){
   return {wrapperIds, sharedAttributes};
 }
 
+export const updateEditMode = value => (dispatch, getState) => 
+  dispatch(receiveEditMode(value));
 
 export const updateWrapperSelection = wrapperIds => (dispatch, getState) => {
-  const {entities} = getState();
+  const {entities, ui} = getState();
+  const length = wrapperIds.length;
+  const _wrapperIds = ui.selections.wrapperIds.filter(id => wrapperIds.includes(id));
 
-  dispatch(receiveSelectedWrappers(
-    getWrapperSelectionInfo(wrapperIds, entities))
-  );
+  if (length !== _wrapperIds.length)
+    dispatch(receiveSelectedWrappers(
+      getWrapperSelectionInfo(wrapperIds, entities))
+    );
 }
 
 export const deleteWrapperSelection = (arg) => (dispatch, getState) => {
   const {entities, ui} = getState();
-  const wrapperIds = ui.selections.wrapperIds.filter(id => !arg.includes(id));
+  const {wrapperIds} = ui.selections;
+  const length = wrapperIds.length;
+  const _wrapperIds = ui.selections.wrapperIds.filter(id => !arg.includes(id));
 
-  if (wrapperIds.length)
+  if (length !== _wrapperIds.length)
     dispatch(receiveSelectedWrappers(
-      getWrapperSelectionInfo(wrapperIds, entities))
+      getWrapperSelectionInfo(_wrapperIds, entities))
     );
 }
 
