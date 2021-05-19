@@ -36,12 +36,20 @@ const TextStyleReducer = (state = {}, action) => {
 
 const TextboxReducer = (state = {}, action) => {
   switch (action.type){
-    case UIActions.RECEIVE_SELECTED_TEXT:
-      return {...state, ...action.textboxData};
+    case UIActions.RECEIVE_SELECTED_TEXT: {
+      const newState = {...state};
+
+      for (let id in action.textboxData){
+        if (newState[id])
+          Object.assign(newState[id], action.textboxData[id])
+        else Object.assign(newState, {[id]: action.textboxData[id]})
+      }
+      return newState;
+    }
     case PresentationActions.RECEIVE_TEXT: {
-      const {id, text, textstyleIds} = action.textData;
+      const {id} = action.textData;
       return {...state,
-        [id]: {id, text, textstyleIds}
+        [id]: action.textData
       }
     }
     case PresentationActions.RECEIVE_ENTITIES:

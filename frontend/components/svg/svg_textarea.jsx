@@ -47,18 +47,17 @@ function SVGTextAreaSelect({className, text, start, end}){
 export default function SVGTextArea({
   active, editMode, updateEditMode, slideObjectId,
   width, height,
-  className='', defaultFont, text, styleStrings, 
+  className='', defaultFont, text, updatedAt, styleStrings, 
   updateTextHandler, updateUITextSelection, 
   svgDOM, isPreview,
   ...props
 }){
-
   function handleUpdate(){
     clearTimeout(_timeout.current);
 
     _timeout.current = setTimeout(() => {
       updateTextHandler(slideObjectId, textRef.current.toReduxState());
-    }, 1000);
+    }, 500);
   }
 
   function keyDownListener(e){
@@ -165,6 +164,7 @@ export default function SVGTextArea({
 
       inputCacheRef.current = '';
       componentsRef.current = textRef.current.toReactComponents(width);
+      timeRef.current = new Date();
 
       updateUITextSelection({
         textboxId: slideObjectId, 
@@ -185,6 +185,7 @@ export default function SVGTextArea({
   const [_, _forceUpdate] = useState(true);
   
   const _timeout = useRef();
+  const timeRef = useRef(new Date());
   const textRef = useRef();
   const inputCacheRef = useRef('');
   const componentsRef = useRef();
@@ -204,11 +205,20 @@ export default function SVGTextArea({
   const [cursorX, cursorY, lineHeight] = (textRef.current.getPositionByOffset(_cursorOffset));
 
   useEffect(() => {
-    textRef.current = new DynamicText(text, styleStrings);
-    componentsRef.current = textRef.current.toReactComponents(width);
-    forceUpdate();
-    
-  }, [styleStrings.map(obj => Object.entries(obj).toString()).join("|"), width]);
+    if (
+      textRef.current._text.replace(/\0/, '') != text && 
+      updatedAt >= timeRef.current.getTime()
+    ) {
+      textRef.current = new DynamicText(text, styleStrings);
+      componentsRef.current = textRef.current.toReactComponents(width);
+      forceUpdate();
+    }
+  }, [
+    styleStrings.map(obj => Object.entries(obj).toString()).join("|"), 
+    width,
+    text,
+    updatedAt
+  ]);
   
   if (!isPreview){
     useEffect(() => {

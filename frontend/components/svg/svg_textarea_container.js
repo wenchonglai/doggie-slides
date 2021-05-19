@@ -9,7 +9,9 @@ export default connect(
     const textbox = entities.textboxes[slideObjectId];
 
     return ({
+      textbox,
       text: textbox.text,
+      updatedAt: new Date(textbox.updatedAt),
       styleStrings: getTextstylesByTextbox({entities}, textbox)
     })
   },

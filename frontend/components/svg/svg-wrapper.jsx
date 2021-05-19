@@ -9,7 +9,7 @@ function throttle(e, timeoutRef, func, ...args){
       clearTimeout(timeoutRef.current)
       timeoutRef.current = setTimeout(
         () => func(...args),
-        500
+        250
       );
     }; break;
     default: {

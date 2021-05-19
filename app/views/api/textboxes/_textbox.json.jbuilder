@@ -1,1 +1,1 @@
-json.extract! textbox, :id, :text, :textstyle_ids
+json.extract! textbox, :id, :text, :textstyle_ids, :updated_at

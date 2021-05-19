@@ -13,7 +13,7 @@ export default function AutosaveInput({className, type="text", keyName: key, sav
 
     _timeout.current = setTimeout(() => {
       saveHandler(newVal);
-    }, 500);
+    }, 250);
   }
 
   return (

@@ -6925,7 +6925,7 @@ function throttle(e, timeoutRef, func) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(function () {
           return func.apply(void 0, args);
-        }, 500);
+        }, 250);
       }
       ;
       break;
@@ -8358,18 +8358,19 @@ function SVGTextArea(_ref2) {
       className = _ref2$className === void 0 ? '' : _ref2$className,
       defaultFont = _ref2.defaultFont,
       text = _ref2.text,
+      updatedAt = _ref2.updatedAt,
       styleStrings = _ref2.styleStrings,
       updateTextHandler = _ref2.updateTextHandler,
       updateUITextSelection = _ref2.updateUITextSelection,
       svgDOM = _ref2.svgDOM,
       isPreview = _ref2.isPreview,
-      props = _objectWithoutProperties(_ref2, ["active", "editMode", "updateEditMode", "slideObjectId", "width", "height", "className", "defaultFont", "text", "styleStrings", "updateTextHandler", "updateUITextSelection", "svgDOM", "isPreview"]);
+      props = _objectWithoutProperties(_ref2, ["active", "editMode", "updateEditMode", "slideObjectId", "width", "height", "className", "defaultFont", "text", "updatedAt", "styleStrings", "updateTextHandler", "updateUITextSelection", "svgDOM", "isPreview"]);
 
   function handleUpdate() {
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
       updateTextHandler(slideObjectId, textRef.current.toReduxState());
-    }, 1000);
+    }, 500);
   }
 
   function keyDownListener(e) {
@@ -8470,6 +8471,7 @@ function SVGTextArea(_ref2) {
 
       inputCacheRef.current = '';
       componentsRef.current = textRef.current.toReactComponents(width);
+      timeRef.current = new Date();
       updateUITextSelection({
         textboxId: slideObjectId,
         uiTextData: textRef.current.toReduxState(),
@@ -8494,6 +8496,7 @@ function SVGTextArea(_ref2) {
 
   var _timeout = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
 
+  var timeRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(new Date());
   var textRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   var inputCacheRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)('');
   var componentsRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
@@ -8523,12 +8526,14 @@ function SVGTextArea(_ref2) {
       lineHeight = _textRef$current$getP2[2];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings);
-    componentsRef.current = textRef.current.toReactComponents(width);
-    forceUpdate();
+    if (textRef.current._text.replace(/\0/, '') != text && updatedAt >= timeRef.current.getTime()) {
+      textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings);
+      componentsRef.current = textRef.current.toReactComponents(width);
+      forceUpdate();
+    }
   }, [styleStrings.map(function (obj) {
     return Object.entries(obj).toString();
-  }).join("|"), width]);
+  }).join("|"), width, text, updatedAt]);
 
   if (!isPreview) {
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
@@ -8597,7 +8602,9 @@ __webpack_require__.r(__webpack_exports__);
   var slideObjectId = _ref2.slideObjectId;
   var textbox = entities.textboxes[slideObjectId];
   return {
+    textbox: textbox,
     text: textbox.text,
+    updatedAt: new Date(textbox.updatedAt),
     styleStrings: (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_3__.getTextstylesByTextbox)({
       entities: entities
     }, textbox)
@@ -8729,7 +8736,7 @@ function AutosaveInput(_ref) {
     clearTimeout(_timeout.current);
     _timeout.current = setTimeout(function () {
       saveHandler(newVal);
-    }, 500);
+    }, 250);
   };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
@@ -9181,19 +9188,20 @@ var TextboxReducer = function TextboxReducer() {
 
   switch (action.type) {
     case _actions_ui_actions__WEBPACK_IMPORTED_MODULE_2__.RECEIVE_SELECTED_TEXT:
-      return _objectSpread(_objectSpread({}, state), action.textboxData);
+      {
+        var newState = _objectSpread({}, state);
+
+        for (var id in action.textboxData) {
+          if (newState[id]) Object.assign(newState[id], action.textboxData[id]);else Object.assign(newState, _defineProperty({}, id, action.textboxData[id]));
+        }
+
+        return newState;
+      }
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_TEXT:
       {
-        var _action$textData = action.textData,
-            id = _action$textData.id,
-            text = _action$textData.text,
-            textstyleIds = _action$textData.textstyleIds;
-        return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, id, {
-          id: id,
-          text: text,
-          textstyleIds: textstyleIds
-        }));
+        var _id = action.textData.id;
+        return _objectSpread(_objectSpread({}, state), {}, _defineProperty({}, _id, action.textData));
       }
 
     case _actions_presentation_actions__WEBPACK_IMPORTED_MODULE_1__.RECEIVE_ENTITIES:
