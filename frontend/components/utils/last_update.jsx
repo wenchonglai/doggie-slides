@@ -5,7 +5,7 @@ export default function LastUpdate({time}){
     const mins = (diff / 60) | 0;
     const hours = (diff / 3600) | 0;
     const days = (diff / 86400) | 0;
-    const weeks = (diff / 86400 * 7) | 0;
+    const weeks = (diff / (86400 * 7)) | 0;
 
     if (weeks === 0){
       if (days === 0){

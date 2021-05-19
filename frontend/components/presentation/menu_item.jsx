@@ -43,7 +43,6 @@ export default function MenuItem({
   className="", item, dispatch, onClick, onMouseMove,
   parentData, parentHandleChange, parentHandleBlur
 }){
-
   const handleBlur = e => {
     const currentTarget = e.nativeEvent.path[3];
     let htmlElement = e.relatedTarget;
@@ -79,7 +78,8 @@ export default function MenuItem({
     }
 
     onClick(e);
-    parentHandleChange && parentHandleChange(e, value === undefined ? item.value : value);
+
+    parentHandleChange && parentHandleChange(e, (value === undefined ? item.value : value) || parentData);
   }
 
   function getMenuIcon(type){

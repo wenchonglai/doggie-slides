@@ -5416,7 +5416,7 @@ function MenuItem(_ref3) {
     }
 
     onClick(e);
-    parentHandleChange && parentHandleChange(e, value === undefined ? item.value : value);
+    parentHandleChange && parentHandleChange(e, (value === undefined ? item.value : value) || parentData);
   }
 
   function getMenuIcon(type) {
@@ -8526,7 +8526,7 @@ function SVGTextArea(_ref2) {
       lineHeight = _textRef$current$getP2[2];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    if (textRef.current._text.replace(/\0/, '') != text && updatedAt >= timeRef.current.getTime()) {
+    if (textRef.current._text.replace(/\0/, '') == text || updatedAt >= timeRef.current.getTime()) {
       textRef.current = new _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_1__.default(text, styleStrings);
       componentsRef.current = textRef.current.toReactComponents(width);
       forceUpdate();
@@ -9017,7 +9017,7 @@ function LastUpdate(_ref) {
     var mins = diff / 60 | 0;
     var hours = diff / 3600 | 0;
     var days = diff / 86400 | 0;
-    var weeks = diff / 86400 * 7 | 0;
+    var weeks = diff / (86400 * 7) | 0;
 
     if (weeks === 0) {
       if (days === 0) {

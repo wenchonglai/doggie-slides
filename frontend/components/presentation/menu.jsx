@@ -10,13 +10,11 @@ function DropdownMenu({
   const [_active, _setActive] = useState(active);
   const [_data, _setData] = useState(data);
   const _timeout = useRef();
-  
   const handleMouseOver = (e) => {
     clearTimeout(_timeout.current);
     
     _timeout.current = setTimeout(() => {
       _setActive(true);
-
     }, 100);
   }
 
@@ -85,6 +83,7 @@ function DropdownMenu({
   useEffect(() => {
     _setData(data);
   }, [data]);
+
 
   return (
     <section

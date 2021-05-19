@@ -206,7 +206,7 @@ export default function SVGTextArea({
 
   useEffect(() => {
     if (
-      textRef.current._text.replace(/\0/, '') != text && 
+      textRef.current._text.replace(/\0/, '') == text || 
       updatedAt >= timeRef.current.getTime()
     ) {
       textRef.current = new DynamicText(text, styleStrings);
