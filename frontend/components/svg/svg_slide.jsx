@@ -45,18 +45,22 @@ const ReactSVG = React.forwardRef(({
       case 'select': return;
       case 'text box': {
         createText({...textData, text: "wow"});
-      }
+      }; break;
       case 'shape(circle)': {
         createText({
           textstylesAttributes,
           text: "",
           wrapperAttributes: {
             ...wrapperAttributes,
+            width: 200,
+            height: 200,
+            crop_width: 200,
+            crop_height: 200,
             shape: "circle",
             fill: "#dfdfdf",
             stroke: "#7f7f7f"
           }
-        });
+        }); break;
       }
       default: return updateMenuAction('Select');
     };

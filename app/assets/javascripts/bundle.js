@@ -5060,7 +5060,8 @@ var SLIDE_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, BACKGROUND])
 var TEXTBOX_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, FILL_COLOR, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, FONT, DECREASE_FONT_SIZE, FONT_SIZE, INCREASE_FONT_SIZE, undefined, BOLD, ITALIC, UNDERLINE, TEXT_COLOR //HIGHLIGHT_COLOR, 
 //undefined, ALIGN
 ]);
-var IMAGE_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, CROP_IMAGE, RESET_IMAGE]);
+var IMAGE_TOOLBAR_ITEMS = [].concat(BASE_TOOLBAR_ITEMS, [undefined, BORDER_COLOR, BORDER_WEIGHT, BORDER_DASH, undefined, CROP_IMAGE //, RESET_IMAGE
+]);
 var SLIDE_CONTEXT_MENU_ITEMS = [NEW_SLIDE, DELETE_SLIDE, SKIP_SLIDE];
 var WRAPPER_CONTEXT_MENU_ITEMS = [DELETE_WRAPPER, undefined, ORDER];
 
@@ -5804,7 +5805,7 @@ function PresentationPage(_ref) {
     className: "github",
     target: "_blank",
     title: "GitHub",
-    href: "https://github.com/wenchonglai/"
+    href: "https://github.com/wenchonglai/doggie-slides/"
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("section", {
     className: "context-menu-wrapper ".concat(_rightClick ? 'active' : ''),
     tabIndex: "0",
@@ -8081,6 +8082,8 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
             text: "wow"
           }));
         }
+        ;
+        break;
 
       case 'shape(circle)':
         {
@@ -8088,11 +8091,16 @@ var ReactSVG = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(functi
             textstylesAttributes: textstylesAttributes,
             text: "",
             wrapperAttributes: _objectSpread(_objectSpread({}, wrapperAttributes), {}, {
+              width: 200,
+              height: 200,
+              crop_width: 200,
+              crop_height: 200,
               shape: "circle",
               fill: "#dfdfdf",
               stroke: "#7f7f7f"
             })
           });
+          break;
         }
 
       default:

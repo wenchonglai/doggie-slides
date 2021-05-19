@@ -135,7 +135,7 @@ export function PresentationPage({
         <section className='app-switcher'>
           <a className="portfolio" target="_blank" title="Wenchong's Portfolio" href="https://wenchonglai.github.io/portfolio/"/>
           <a className="linkedin" target="_blank" title="LinkedIn" href="https://www.linkedin.com/in/wenchong-lai-4296424b/"/>
-          <a className="github" target="_blank" title="GitHub" href="https://github.com/wenchonglai/"/>
+          <a className="github" target="_blank" title="GitHub" href="https://github.com/wenchonglai/doggie-slides/"/>
         </section>
       </section>
 
