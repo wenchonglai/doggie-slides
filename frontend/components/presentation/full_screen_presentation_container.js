@@ -10,7 +10,6 @@ const mapSTP = ({entities, ui}, {slideId}) => ({
 });
 
 const mapDTP = dispatch => ({
-  presentSli
 });
 
 const FullScreenPresentationContainer = connect(mapSTP, null)(FullScreenPresentation);

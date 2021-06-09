@@ -3209,6 +3209,11 @@ var updateFontSizeCreator = function updateFontSizeCreator(value) {
       var _state$ui$selections = state.ui.selections,
           selectOffset = _state$ui$selections.selectOffset,
           cursorOffset = _state$ui$selections.cursorOffset;
+
+      if (selectOffset === undefined && cursorOffset === undefined) {
+        cursorOffset = 0;
+      }
+
       var textbox = (0,_selectors_selectors__WEBPACK_IMPORTED_MODULE_2__.getSelectedTextbox)(state);
 
       var dynamicText = (_DynamicText$fromTexb2 = _utils_data_structure_dynamic_text__WEBPACK_IMPORTED_MODULE_3__.default.fromTexbox(state, textbox)).changeFontSize.apply(_DynamicText$fromTexb2, _toConsumableArray([cursorOffset, selectOffset].sort(function (a, b) {
@@ -4385,7 +4390,7 @@ function FullScreenPresentation(_ref) {
     });
     var index = pages.indexOf(slide);
     var nextSlide = pages[index + incdec];
-    if (nextSlide) presentHandler(nextSlide.page);
+    if (nextSlide) presentHandler(nextSlide.id);
   };
 
   function handleClick(e) {
@@ -4467,9 +4472,7 @@ var mapSTP = function mapSTP(_ref, _ref2) {
 };
 
 var mapDTP = function mapDTP(dispatch) {
-  return {
-    presentSli: presentSli
-  };
+  return {};
 };
 
 var FullScreenPresentationContainer = (0,react_redux__WEBPACK_IMPORTED_MODULE_0__.connect)(mapSTP, null)(_full_screen_presentation__WEBPACK_IMPORTED_MODULE_1__.default);
@@ -9725,7 +9728,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var configureStore = function configureStore() {
   var preloadedState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default));
+  return (0,redux__WEBPACK_IMPORTED_MODULE_3__.createStore)(_reducers_root__WEBPACK_IMPORTED_MODULE_2__.default, preloadedState, (0,redux__WEBPACK_IMPORTED_MODULE_3__.applyMiddleware)(redux_thunk__WEBPACK_IMPORTED_MODULE_1__.default, (redux_logger__WEBPACK_IMPORTED_MODULE_0___default())));
 };
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (configureStore);
@@ -10081,7 +10084,9 @@ var DynamicText = /*#__PURE__*/function () {
     }
   }, {
     key: "changeFontSize",
-    value: function changeFontSize(offset1, offset2, value) {
+    value: function changeFontSize(offset1) {
+      var offset2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.length;
+      var value = arguments.length > 2 ? arguments[2] : undefined;
       this.setStyle(offset1, offset2, {
         '_': true
       });

@@ -218,7 +218,7 @@ export default class DynamicText{
   get lastOffset(){
     return this._segmentMap.lastKey;
   }
-  changeFontSize(offset1, offset2, value){
+  changeFontSize(offset1, offset2 = this.length, value){
     this.setStyle(offset1, offset2, {'_': true});
     
     for (let i = offset1; i < offset2; i++){

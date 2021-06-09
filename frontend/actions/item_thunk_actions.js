@@ -129,7 +129,10 @@ export const fontSize = updateTextstyleAttributeCreator('fontSize');
 export const updateFontSizeCreator = (value) =>
   () => (dispatch, getState) => {
     const state = getState();
-    const {selectOffset, cursorOffset} = state.ui.selections;
+    let {selectOffset, cursorOffset} = state.ui.selections;
+    if (selectOffset === undefined && cursorOffset === undefined){
+      cursorOffset = 0;
+    }
     const textbox = getSelectedTextbox(state);
     const dynamicText = DynamicText
       .fromTexbox(state, textbox)

@@ -15,9 +15,9 @@ function FullScreenPresentation({
       .sort((a, b) => a.page - b.page);
     const index = pages.indexOf(slide);
     const nextSlide = pages[index + incdec];
-    
+
     if (nextSlide)
-      presentHandler(nextSlide.page)
+      presentHandler(nextSlide.id)
   }
 
   function handleClick(e){
