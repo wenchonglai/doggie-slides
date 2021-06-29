@@ -1,4 +1,4 @@
-#DoggIe Slides
+# DoggIe Slides
 
 **[Click Here to Launch the App](https://doggie-slides.herokuapp.com/)**
 
