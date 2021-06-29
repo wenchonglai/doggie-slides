@@ -1,5 +1,5 @@
 # DoggIe Slides
-[](https://doggie-slides.herokuapp.com/assets/metatag-70c75de67a9a8e16496be2d053a22332fbffc03c8ec89e2a70d1f806b273d28f.jpg)
+[a](https://doggie-slides.herokuapp.com/assets/metatag-70c75de67a9a8e16496be2d053a22332fbffc03c8ec89e2a70d1f806b273d28f.jpg)
 
 **[Click Here to Launch the App](https://doggie-slides.herokuapp.com/)**
 
