@@ -1,4 +1,4 @@
-![DoggIe Slides Logo](https://doggie-slides.herokuapp.com/assets/icons-f4a13afbe1257f983830da9fdbc84debda2298a19778a05565eb5fbf85f3ac1b.png) #DoggIe Slides
+#DoggIe Slides
 
 **[Click Here to Launch the App](https://doggie-slides.herokuapp.com/)**
 
